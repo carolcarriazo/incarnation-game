@@ -428,9 +428,18 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
         "fatal cavalry trampling / sword strike on the battlefield"
       ]);
     }
+    if (age >= 40) {
+      return pickRandomItem([
+        "fatal blunt head trauma and internal injuries sustained defending your homestead during a violent settlement raid",
+        "fatal injuries sustained during the sacking, arson, and pillaging of your village by enemy troops",
+        "severe smoke inhalation and fatal thermal burns when raiders torched your dwelling",
+        "starvation and acute exposure during an extended, grueling city or fortress siege",
+        "fatal blunt force trauma sustained during an opportunistic border raid on your rural village"
+      ]);
+    }
     return pickRandomItem([
       "fatal trauma and systemic shock sustained during the violent sacking and predatory pillaging of your settlement by invading troops",
-      "fatal injuries sustained resisting sexual violence and pillaging during an enemy military raid",
+      "fatal injuries sustained resisting predatory violence and pillaging during an enemy military raid",
       "starvation and acute exposure during an extended, grueling city or fortress siege",
       "blunt force trauma sustained during an opportunistic border raid on your rural village"
     ]);
@@ -476,8 +485,13 @@ const generateFallbackNarrative = (lifeData) => {
 
   const p2 = lifeData.age >= 15 ? (
     `As you came of age, you took up the responsibilities expected of your station. ` +
+    (lifeData.isJewish && lifeData.antisemitismExperience ? (lifeData.antisemitismExperience.level === 'Peaceful Coexistence' ? `As a member of the Jewish community, you lived in a period of peaceful coexistence and cultural tradition. ` : `As a Jewish person in this era, your life was impacted by historical events: ${lifeData.antisemitismExperience.details} `) : '') +
+    (lifeData.minorityPersecution && lifeData.minorityPersecution.level !== 'None' ? `Belonging to the ${lifeData.minorityGroupHint} community, your journey was shaped by historical realities: ${lifeData.minorityPersecution.details} ` : '') +
+    (lifeData.wasEnslavedLater ? `Tragically, at age ${lifeData.enslavedAge}, your freedom was violently stripped away: ${lifeData.enslavementDetails}. ` : '') +
+    (lifeData.escapedSlavery ? `In a triumphant turning point at age ${lifeData.escapeAge}, you reclaimed your freedom: ${lifeData.escapeMethod}. ` : '') +
+    (lifeData.modelingCareer ? (lifeData.modelingCareer.accepted ? `Endowed with rare physical beauty, you worked as a successful model: ${lifeData.modelingCareer.details} ` : `Though scouted in your youth for extraordinary beauty, you declined to enter the modeling industry: ${lifeData.modelingCareer.details} `) : '') +
     (lifeData.hasUpwardMobility ? `Through diligence and fortune, you achieved notable social mobility (${lifeData.mobilityDetails || 'rising into a more prosperous tier'}). ` : '') +
-    (lifeData.isMarried ? `You married at age ${lifeData.marriageAge}, establishing a household. ` : `You remained unmarried, dedicating yourself to your trade and kin. `) +
+    (lifeData.isMarried ? (lifeData.isInterfaithMarriage ? `You entered into an interfaith marriage with a ${lifeData.interfaithSpouse} spouse at age ${lifeData.marriageAge}: ${lifeData.interfaithDetails} ` : `You married at age ${lifeData.marriageAge}, establishing a household. `) : `You remained unmarried, dedicating yourself to your trade and kin. `) +
     (lifeData.childrenCount > 0 ? (lifeData.hasUnmarriedPartnerChildren ? `You raised ${lifeData.childrenCount} children with a long-term partner outside formal marriage. ` : `In time, you were blessed with ${lifeData.childrenCount} children. `) : '') +
     (lifeData.orientation === 'Homosexual' ? (lifeData.isOpenlyGay ? `You lived openly in your same-sex relationships within your circle.` : `You harbored deep romantic feelings for the same sex, kept secret due to the dangers of your era.`) : '')
   ) : `Your childhood was marked by innocence, though your journey was destined to be brief.`;
@@ -492,7 +506,12 @@ const generateFallbackNarrative = (lifeData) => {
 
   const timeline = [
     { year: `${year}`, event: `Born a ${lifeData.sex.toLowerCase()} in ${loc} into the ${cls} tier.` },
-    lifeData.isMarried ? { year: `${formatYear(lifeData.birthYear + lifeData.marriageAge)}`, event: `Married at age ${lifeData.marriageAge}.` } : null,
+    lifeData.isJewish && lifeData.antisemitismExperience && lifeData.antisemitismExperience.level !== 'Peaceful Coexistence' ? { year: `${formatYear(lifeData.birthYear + (lifeData.emigrationAge || Math.min(lifeData.age, 22)))}`, event: lifeData.antisemitismExperience.details } : null,
+    lifeData.minorityPersecution && lifeData.minorityPersecution.level !== 'None' ? { year: `${formatYear(lifeData.birthYear + (lifeData.emigrationAge || Math.min(lifeData.age, 22)))}`, event: lifeData.minorityPersecution.details } : null,
+    lifeData.wasEnslavedLater ? { year: `${formatYear(lifeData.birthYear + lifeData.enslavedAge)}`, event: `Enslaved at age ${lifeData.enslavedAge}: ${lifeData.enslavementDetails}.` } : null,
+    lifeData.escapedSlavery ? { year: `${formatYear(lifeData.birthYear + lifeData.escapeAge)}`, event: `Gained freedom from enslavement at age ${lifeData.escapeAge}: ${lifeData.escapeMethod}.` } : null,
+    lifeData.modelingCareer && lifeData.modelingCareer.accepted ? { year: `${formatYear(lifeData.birthYear + 19)}`, event: `Scouted for exceptional beauty; entered modeling: ${lifeData.modelingCareer.details}` } : null,
+    lifeData.isMarried ? { year: `${formatYear(lifeData.birthYear + lifeData.marriageAge)}`, event: lifeData.isInterfaithMarriage ? `Interfaith marriage: ${lifeData.interfaithDetails}` : `Married at age ${lifeData.marriageAge}.` } : null,
     lifeData.hasUpwardMobility ? { year: `${formatYear(lifeData.birthYear + 25)}`, event: `Achieved upward social mobility into the ${lifeData.socialClass} class.` } : null,
     lifeData.isMaimed ? { year: `${formatYear(lifeData.birthYear + lifeData.maimedAge)}`, event: `Survived a severe violent encounter: ${lifeData.maimedDetails}.` } : null,
     lifeData.isAlive ? { year: `2026 CE`, event: `Living today at age ${lifeData.age}.` } : { year: `${formatYear(lifeData.birthYear + lifeData.age)}`, event: `Passed away at age ${lifeData.age} from ${lifeData.causeOfDeath}.` }
@@ -541,6 +560,7 @@ CRITICAL RULES:
 5. MODERN MEDICAL CANCER SURVIVAL: If flagged as a "Cancer Survivor" in a modern era, describe their harrowing but successful battle with modern oncology (surgery/radiation/chemo) and how it shifted their perspective before returning to remission.
 6. CAUSE OF DEATH & CONTEMPORARY LIVES (STILL ALIVE IN 2026):
    - FOR DECEASED CHARACTERS: Weave their assigned Primary Cause of Death seamlessly into their final paragraph. Cancer was extremely rare in premodern eras; rely only on the provided premodern diseases. If they died of old age diseases, describe the physical slowing down of their golden years.
+   - WARTIME RAIDS & OLDER ADULTS (AGE 40+): For mature women (age 40+) who perish or suffer trauma in settlement raids or warfare, depict the tragedy realistically as defending their homestead, family protection, arson, or collateral violence (NEVER frame violence against mature women past 40 as sexual assault/attempted violation).
    - FOR LIVING CHARACTERS (STILL ALIVE IN 2026): NEVER say they are "forgotten by history" or speak of their life in past tense as a closed ancient chapter. Write about their ongoing daily life today in the year 2026, their contemporary routine, reflections on modern times, family/community, and how they navigate life today.
 7. PREMODERN MARRIAGE (CRUCIAL): In premodern eras, marriage was a near-universal economic survival necessity. If a premodern adult remained UNMARRIED, you MUST provide a strict historical reason (e.g. extreme poverty, joined a monastery/convent, enslaved, severe disability, or escaping to a bachelor military/sailor life to hide homosexuality/transgender/asexuality).
 8. FAME & HOBBIES / PASTIMES: Incorporate their assigned Fame level. Even for commoners and poor folk, incorporate their natural casual pastimes (e.g. folk songs, storytelling, dice games, tavern banter, communal dancing, whittling, foraging, fishing, local sports) based on their personality.
@@ -611,6 +631,12 @@ ${lifeData.isRoyaltyOrHistoric ? `- ROYAL / HISTORICAL PERSON INCARNATION (SPECI
   * Tell their REAL, historically authentic life story based on historical facts.
   * If from ancient antiquity or prehistory where records are incomplete, reconstruct their life and reign faithfully using the best available archaeological and historical facts.
   * Align their lifespan, reign, key battles, court intrigues, and legacy with real history.` : ''}
+${lifeData.isJewish ? `- JEWISH IDENTITY & HISTORICAL REALITIES: This soul is Jewish (${lifeData.minorityGroupHint || 'Jewish identity'}). Antisemitism / Historical Experience: ${lifeData.antisemitismExperience ? `${lifeData.antisemitismExperience.level}: ${lifeData.antisemitismExperience.details}` : 'Lived peacefully without overt persecution'}. Weave their Jewish cultural, communal, and historical reality authentically and respectfully into their life story and timeline.` : ''}
+${lifeData.minorityPersecution ? `- MINORITY HISTORICAL EXPERIENCE: As a member of ${lifeData.minorityGroupHint}, historical context: ${lifeData.minorityPersecution.level}: ${lifeData.minorityPersecution.details}. Weave this authentic context respectfully into the narrative.` : ''}
+${lifeData.isInterfaithMarriage ? `- INTERFAITH JEWISH-CHRISTIAN MARRIAGE: This character entered into an interfaith marriage with a ${lifeData.interfaithSpouse} partner: ${lifeData.interfaithDetails}. CRUCIAL: Specifically explore the cultural, religious, and familial dynamics (family reactions, syncretism, holidays, conversion, or social navigation) in the story.` : ''}
+${lifeData.modelingCareer ? `- MODELING INDUSTRY OPPORTUNITY (BEAUTY 90+ IN MODERN ERA): ${lifeData.modelingCareer.offered ? (lifeData.modelingCareer.accepted ? `Offered a modeling career due to extraordinary beauty and ACCEPTED: ${lifeData.modelingCareer.details}` : `Offered a modeling career due to extraordinary beauty but DECLINED based on personality: ${lifeData.modelingCareer.details}`) : ''}. Reflect their personality and choices in the story.` : ''}
+${lifeData.wasEnslavedLater ? `- ENSLAVEMENT / CAPTIVE SERVITUDE: Not born enslaved, but at age ${lifeData.enslavedAge} was captured and enslaved: ${lifeData.enslavementDetails}. Explicitly chronicle this harrowing turning point, the harsh reality of their captive servitude, and its lifelong impact in the narrative and timeline.` : ''}
+${lifeData.escapedSlavery ? `- ESCAPED / EMANCIPATED FROM SLAVERY: At age ${lifeData.escapeAge}, this soul successfully broke the chains of enslavement: ${lifeData.escapeMethod}. Explicitly chronicle this daring escape / emancipation milestone, their journey to freedom, and their life as a free person in the narrative and timeline.` : ''}
 ${lifeData.hasUpwardMobility ? `- UPWARD SOCIAL MOBILITY: Born into ${lifeData.birthSocialClass}, but achieved notable upward mobility in adulthood: ${lifeData.mobilityDetails}. Their attained station is ${lifeData.socialClass}. Explicitly chronicle their rise from humble beginnings to their elevated station in the narrative and timeline.` : ''}
 ${showTraits ? `- Base Intelligence (1-100): ${lifeData.intelligence}` : ''}
 ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${
@@ -1134,6 +1160,185 @@ ${(currentLife.narrative || []).join('\n\n')}
       }
     }
 
+    // 3c. Later Enslavement / Captive Servitude Engine (if not born into slavery)
+    let wasEnslavedLater = false;
+    let enslavedAge = null;
+    let enslavementDetails = null;
+
+    const isAlreadySlave = socialClass.toLowerCase().includes('slave') || socialClass.toLowerCase().includes('enslaved') || socialClass.toLowerCase().includes('serf');
+
+    if (!isAlreadySlave && !isRoyaltyOrHistoric && age >= 5 && !wasExposed) {
+      let enslavementRisk = 0;
+      const eraId = selectedEra.id;
+      const rName = (regionText || '').toLowerCase();
+      const minText = (minorityGroupHint || '').toLowerCase();
+
+      if (eraId === 'BRONZE' || eraId === 'CLASSICAL') {
+        // Captive slavery in antiquity (Roman conquests, Greek piracy, debt bondage)
+        enslavementRisk = 0.05;
+        if (rName.includes('rome') || rName.includes('gaul') || rName.includes('hispania') || rName.includes('britannia') || rName.includes('greece') || rName.includes('levant') || rName.includes('carthage')) {
+          enslavementRisk = 0.08;
+        }
+      } else if (eraId === 'MEDIEVAL') {
+        // Viking thralls, Mongol conquests, Barbary corsairs, Arab slave trade
+        enslavementRisk = 0.04;
+        if (rName.includes('viking') || rName.includes('rus') || rName.includes('england') || rName.includes('poland') || rName.includes('balkans') || rName.includes('mongol') || rName.includes('andalus') || rName.includes('caliphate')) {
+          enslavementRisk = 0.07;
+        }
+      } else if (eraId === 'EARLY_MODERN') {
+        // Transatlantic slave trade, Barbary captures, colonial indenture
+        if (rName.includes('dahomey') || rName.includes('ashanti') || rName.includes('kongo') || rName.includes('west africa') || rName.includes('central africa')) {
+          enslavementRisk = 0.28; // High risk during peak of transatlantic slave trade
+        } else if (rName.includes('caribbean') || rName.includes('brazil') || rName.includes('north america') || rName.includes('viceroyalty')) {
+          if (isMinority && (minText.includes('afro') || minText.includes('black') || minText.includes('indigenous') || minText.includes('tupi') || minText.includes('yoruba'))) {
+            enslavementRisk = 0.35;
+          } else {
+            enslavementRisk = 0.02;
+          }
+        } else if (rName.includes('mediterranean') || rName.includes('spain') || rName.includes('italy') || rName.includes('ottoman') || rName.includes('balkans')) {
+          // Barbary corsair captures / Ottoman devshirme
+          enslavementRisk = 0.04;
+        } else {
+          enslavementRisk = 0.015;
+        }
+      } else if (eraId === 'MODERN') {
+        // 20th century forced labor (Gulag, wartime forced labor) or bonded labor
+        if (rName.includes('russia') || rName.includes('soviet')) {
+          if (birthYear >= 1900 && birthYear <= 1945 && isMinority) enslavementRisk = 0.06;
+        } else if (isMinority && (rName.includes('india') || rName.includes('africa'))) {
+          enslavementRisk = 0.02;
+        }
+      }
+
+      if (socialClass.toLowerCase().includes('patrician') || socialClass.toLowerCase().includes('aristocrat') || socialClass.toLowerCase().includes('upper')) {
+        enslavementRisk *= 0.25;
+      } else if (socialClass.toLowerCase().includes('peasant') || socialClass.toLowerCase().includes('plebeian') || socialClass.toLowerCase().includes('working') || socialClass.toLowerCase().includes('laborer')) {
+        enslavementRisk *= 1.3;
+      }
+
+      if (Math.random() < Math.min(0.65, enslavementRisk)) {
+        wasEnslavedLater = true;
+        enslavedAge = randomInt(5, Math.min(age, 38));
+
+        if (eraId === 'EARLY_MODERN' && (rName.includes('africa') || (isMinority && (minText.includes('afro') || minText.includes('black') || minText.includes('indigenous'))))) {
+          enslavementDetails = pickRandomItem([
+            "Captured by rival slave raiders in the interior, sold to European coastal merchants, and transported across the Middle Passage into chattel plantation slavery",
+            "Seized during a regional coastal slave raid and forced into brutal lifelong labor on a colonial sugarcane and coffee plantation",
+            "Captured during an inter-tribal raid and sold into forced domestic servitude and estate labor"
+          ]);
+        } else if (eraId === 'CLASSICAL' || eraId === 'BRONZE') {
+          enslavementDetails = pickRandomItem([
+            "Captured as a prisoner of war following the siege and fall of your city, then sold on the block into Roman/Hellenistic slavery",
+            "Seized by Mediterranean coastal pirates during a voyage and sold into harsh quarry and agricultural slave labor",
+            "Fell into catastrophic debt insolvency and was sold into legal debt bondage (nexum) to work off ancestral liabilities"
+          ]);
+        } else if (eraId === 'MEDIEVAL') {
+          enslavementDetails = pickRandomItem([
+            "Captured during a violent Viking coastal raid and taken across the sea as an enslaved thrall",
+            "Seized by Barbary corsairs or steppe nomads during a frontier raid and sold into Mediterranean galley or palace servitude",
+            "Enslaved following the sacking of your settlement by invading armies and traded along regional slave routes"
+          ]);
+        } else {
+          enslavementDetails = pickRandomItem([
+            "Captured during a military raid and forced into involuntary servitude and manual labor",
+            "Trapped in deceptive debt bondage and coerced into severe forced labor for an exploitative estate"
+          ]);
+        }
+      }
+    }
+
+    // 3d. Escape & Historical Emancipation Engine for Enslaved Souls
+    let escapedSlavery = false;
+    let escapeAge = null;
+    let escapeMethod = null;
+
+    const isEnslaved = wasEnslavedLater || socialClass.toLowerCase().includes('slave') || socialClass.toLowerCase().includes('enslaved');
+
+    if (isEnslaved && age >= 12 && !wasExposed) {
+      const minEscapeAge = wasEnslavedLater ? Math.min(age, (enslavedAge || 10) + randomInt(1, 4)) : randomInt(14, Math.min(age, 45));
+      const birthY = birthYear;
+      const deathY = birthYear + age;
+      const rName = (regionText || '').toLowerCase();
+      const eraId = selectedEra.id;
+
+      let escapeChance = 0.08; // baseline daring escape / manumission chance
+
+      // 1. Historical Emancipation & Abolition Milestones
+      // Haitian Revolution (1791–1804)
+      if ((rName.includes('haiti') || rName.includes('saint-domingue') || rName.includes('caribbean')) && birthY <= 1804 && deathY >= 1791) {
+        escapeChance = 0.70;
+        escapeAge = Math.max(minEscapeAge, Math.min(age, 1791 - birthY + randomInt(0, 5)));
+        escapeMethod = "Fought in the victorious Haitian Revolution (1791–1804), defeating French colonial forces to secure sovereign freedom";
+      }
+      // British Slavery Abolition Act (1833-1838)
+      else if ((rName.includes('jamaica') || rName.includes('barbados') || rName.includes('guyana') || rName.includes('caribbean') || rName.includes('cape colony')) && birthY <= 1838 && deathY >= 1834) {
+        escapeChance = 0.85;
+        escapeAge = Math.max(minEscapeAge, Math.min(age, 1834 - birthY + randomInt(0, 4)));
+        escapeMethod = "Emancipated upon the enactment of the British Slavery Abolition Act (1833–1838), gaining full legal freedom";
+      }
+      // American Civil War & Emancipation Proclamation (1863-1865)
+      else if ((rName.includes('north america') || rName.includes('united states') || rName.includes('thirteen colonies') || rName.includes('virginia') || rName.includes('carolina') || rName.includes('georgia')) && birthY <= 1865 && deathY >= 1863) {
+        escapeChance = 0.85;
+        escapeAge = Math.max(minEscapeAge, Math.min(age, 1863 - birthY + randomInt(0, 2)));
+        escapeMethod = "Liberated following the Emancipation Proclamation (1863) and Union victory in the American Civil War, establishing a free life";
+      }
+      // Underground Railroad (1830-1860) in North America
+      else if ((rName.includes('north america') || rName.includes('united states') || rName.includes('thirteen colonies')) && birthY >= 1790 && birthY <= 1845 && age >= 18) {
+        escapeChance += 0.22;
+        if (Math.random() < 0.45) {
+          escapeMethod = "Made a daring nocturnal escape via the secret safehouse network of the Underground Railroad, securing freedom in the North / Canada";
+        }
+      }
+      // Brazil Abolition / Lei Áurea (1888)
+      else if (rName.includes('brazil') && birthY <= 1888 && deathY >= 1888) {
+        escapeChance = 0.85;
+        escapeAge = Math.max(minEscapeAge, Math.min(age, 1888 - birthY));
+        escapeMethod = "Achieved universal legal emancipation with the signing of the Lei Áurea (Golden Law) in Brazil in 1888";
+      }
+      // Spanish Abolition in Cuba (1886) / Puerto Rico (1873)
+      else if ((rName.includes('cuba') || rName.includes('puerto rico')) && birthY <= 1886 && deathY >= 1873) {
+        escapeChance = 0.80;
+        escapeAge = Math.max(minEscapeAge, Math.min(age, 1880 - birthY));
+        escapeMethod = "Emancipated with the legal abolition of slavery in the Spanish Antilles in the 1870s–1880s";
+      }
+      // Classical Roman / Greek Manumission or Revolt
+      else if (eraId === 'CLASSICAL' || eraId === 'BRONZE') {
+        if (intelligence >= 70) escapeChance += 0.25;
+        escapeMethod = pickRandomItem([
+          "Purchased legal manumission (libertus) through personal savings (peculium) accumulated as a skilled urban artisan / clerk",
+          "Granted formal manumission in their master's testamentary will in recognition of faithful service",
+          "Escaped estate confinement during the chaos of civil war and assumed a free identity in a distant province"
+        ]);
+      }
+      // Medieval / Barbary / Steppe
+      else if (eraId === 'MEDIEVAL') {
+        escapeMethod = pickRandomItem([
+          "Ransomed from Barbary galley captivity by Mercedarian friars and returned across the Mediterranean",
+          "Staged a daring nocturnal escape while docked at a trading harbor and melted into the free populace of a charter city",
+          "Manumitted by decree after long loyal service to the estate"
+        ]);
+      }
+      // Early Modern Maroons / Fugitives
+      else if (eraId === 'EARLY_MODERN') {
+        if (!escapeMethod) {
+          escapeMethod = pickRandomItem([
+            "Escaped into the dense mountain hinterlands to join a self-governing Maroon / Quilombo community of free self-emancipated people",
+            "Slipped away on an outbound merchant vessel under forged seaman papers, securing a free life in a maritime port",
+            "Accumulated wages from market days to legally purchase their certificate of manumission"
+          ]);
+        }
+      }
+
+      if (Math.random() < Math.min(0.90, escapeChance)) {
+        escapedSlavery = true;
+        if (!escapeAge) escapeAge = randomInt(minEscapeAge, Math.min(age, minEscapeAge + 10));
+        if (!escapeMethod) {
+          escapeMethod = "Daringly escaped bondage and established a hidden free life in a distant community";
+        }
+        socialClass = selectedEra.id === 'MODERN' ? 'Freed Citizen / Laborer' : (eraId === 'CLASSICAL' ? 'Freedman (Libertus) / Artisan' : 'Free Maroon / Tradesperson');
+      }
+    }
+
     // 9. Family & Marriage Math (Rolled early so cause of death can factor in extramarital affairs)
     let isMarried = false;
     let marriageAge = null;
@@ -1168,6 +1373,38 @@ ${(currentLife.narrative || []).join('\n\n')}
         } else {
             if (Math.random() < 0.15) outOfWedlock = true;
         }
+    }
+
+    // 9a2. Interfaith Jewish-Christian Marriage Roll
+    let isInterfaithMarriage = false;
+    let interfaithSpouse = null;
+    let interfaithDetails = null;
+
+    if (isMarried) {
+      const reg = (regionText || '').toLowerCase();
+      const isWesternOrChristianMajority = selectedEra.id === 'MODERN' || reg.includes('europe') || reg.includes('america') || reg.includes('britain') || reg.includes('france') || reg.includes('germany') || reg.includes('spain') || reg.includes('italy') || reg.includes('russia') || reg.includes('poland') || reg.includes('byzantine');
+
+      if (isJewish && isWesternOrChristianMajority) {
+        const interfaithRate = selectedEra.id === 'MODERN' ? (birthYear >= 1960 ? 0.35 : (birthYear >= 1900 ? 0.14 : 0.06)) : 0.03;
+        if (Math.random() < interfaithRate) {
+          isInterfaithMarriage = true;
+          interfaithSpouse = "Christian";
+          if (selectedEra.id === 'MODERN') {
+            interfaithDetails = "Married a Christian spouse. Together you navigated differing religious heritages, celebrating both Jewish and Christian traditions, and raised children in an accepting interfaith home.";
+          } else if (selectedEra.id === 'EARLY_MODERN') {
+            interfaithDetails = "Contracted a controversial interfaith marriage with a Christian partner, prompting community scrutiny, civil legal complexities, and a thoughtful blending of private and public faiths.";
+          } else {
+            interfaithDetails = "Entered into an interfaith union with a Christian spouse, which required formal conversion to Christianity to avoid harsh legal bans, creating painful estrangement from your ancestral community.";
+          }
+        }
+      } else if (!isJewish && isWesternOrChristianMajority && selectedEra.id === 'MODERN') {
+        const interfaithRate = birthYear >= 1950 ? 0.03 : 0.01;
+        if (Math.random() < interfaithRate) {
+          isInterfaithMarriage = true;
+          interfaithSpouse = "Jewish";
+          interfaithDetails = "Married a Jewish spouse. You embraced the rich cultural and holiday traditions of your spouse's family alongside your own background.";
+        }
+      }
     }
 
     let sameSexAffair = false;
@@ -1242,6 +1479,284 @@ ${(currentLife.narrative || []).join('\n\n')}
       }
     }
 
+    // 3e. Jewish Identity & Antisemitism Spectrum Engine
+    let isJewish = (minorityGroupHint || '').toLowerCase().includes('jewish');
+    if (!isJewish && isMinority && selectedEra.id !== 'PALEOLITHIC' && selectedEra.id !== 'NEOLITHIC') {
+      const reg = (regionText || '').toLowerCase();
+      if (reg.includes('judea') || reg.includes('jerusalem') || reg.includes('levant')) {
+        isJewish = true;
+        minorityGroupHint = 'Jewish (Judean)';
+      } else if (reg.includes('andalus') || reg.includes('spain') || reg.includes('iberia') || reg.includes('portugal')) {
+        if (Math.random() < 0.22) { isJewish = true; minorityGroupHint = 'Jewish (Sephardic)'; }
+      } else if (reg.includes('poland') || reg.includes('lithuania') || reg.includes('rus') || reg.includes('rhineland') || reg.includes('germany') || reg.includes('holy roman')) {
+        if (Math.random() < 0.28) { isJewish = true; minorityGroupHint = 'Jewish (Ashkenazi)'; }
+      } else if (reg.includes('caliphate') || reg.includes('egypt') || reg.includes('baghdad') || reg.includes('ottoman') || reg.includes('constantinople')) {
+        if (Math.random() < 0.20) { isJewish = true; minorityGroupHint = 'Jewish (Mizrahi/Sephardic)'; }
+      } else if (reg.includes('rome') || reg.includes('italy') || reg.includes('byzantine') || reg.includes('greece')) {
+        if (Math.random() < 0.16) { isJewish = true; minorityGroupHint = 'Jewish (Romaniote/Italki)'; }
+      }
+    }
+
+    let antisemitismExperience = null;
+
+    if (isJewish && age >= 4 && !wasExposed) {
+      const by = birthYear;
+      const dy = birthYear + age;
+      const rName = (regionText || '').toLowerCase();
+      const isEurope = rName.includes('germany') || rName.includes('poland') || rName.includes('russia') || rName.includes('ukraine') || rName.includes('france') || rName.includes('netherlands') || rName.includes('austria') || rName.includes('czech') || rName.includes('hungary') || rName.includes('italy') || rName.includes('greece') || rName.includes('lithuania') || rName.includes('latvia') || rName.includes('belarus') || rName.includes('romania');
+
+      // 1. THE HOLOCAUST (1933-1945 in Nazi Europe)
+      if (selectedEra.id === 'MODERN' && isEurope && by <= 1944 && dy >= 1933) {
+        if (by <= 1928 && Math.random() < 0.28) {
+          isEmigrant = true;
+          emigrationAge = Math.min(age, Math.max(8, 1938 - by));
+          const refugeDests = [
+            { name: "United States", lat: 40.71, lng: -74.00 },
+            { name: "United Kingdom", lat: 51.50, lng: -0.12 },
+            { name: "Mandatory Palestine", lat: 31.76, lng: 35.21 },
+            { name: "Argentina", lat: -34.60, lng: -58.38 }
+          ];
+          const chosenDest = pickRandomItem(refugeDests);
+          deathRegion = chosenDest.name;
+          deathLat = chosenDest.lat;
+          deathLng = chosenDest.lng;
+          antisemitismExperience = {
+            level: "Holocaust Refugee",
+            details: `Fled escalating Nazi persecution, Nuremberg racial laws, and antisemitic violence in the 1930s, successfully emigrating as a refugee to ${deathRegion}.`
+          };
+        } else if (dy >= 1939) {
+          if (Math.random() < 0.68) {
+            const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 45)));
+            age = Math.max(0, deathY - by);
+            isAlive = false;
+            causeOfDeath = pickRandomItem([
+              "murdered in the extermination camps during the Holocaust in Nazi-occupied Europe (Auschwitz-Birkenau)",
+              "murdered in the gas chambers during the Holocaust (Treblinka / Sobibor)",
+              "murdered in a mass shooting by Nazi Einsatzgruppen mobile killing squads",
+              "starvation, typhus, and brutal exhaustion inside an enclosed Nazi ghetto (Warsaw / Lodz Ghetto)"
+            ]);
+            antisemitismExperience = {
+              level: "The Holocaust (Victim)",
+              details: "Perished in the Holocaust during the Nazi genocide of European Jewry."
+            };
+          } else {
+            antisemitismExperience = {
+              level: "The Holocaust (Survivor)",
+              details: pickRandomItem([
+                "Endured the horrors of the Holocaust, surviving in hiding with underground partisans in the forests and emerging after liberation in 1945.",
+                "Survived the Holocaust through the courage of righteous neighbors who sheltered your family in hidden quarters until liberation.",
+                "Survived imprisonment in Nazi concentration camps, enduring until Allied liberation in 1945 and rebuilding your life in the post-war era."
+              ])
+            };
+            if (Math.random() < 0.65) {
+              isEmigrant = true;
+              emigrationAge = Math.min(age, Math.max(16, 1947 - by));
+              const dest = pickRandomItem([
+                { name: "Israel", lat: 31.76, lng: 35.21 },
+                { name: "United States", lat: 40.71, lng: -74.00 },
+                { name: "Canada", lat: 45.50, lng: -73.56 }
+              ]);
+              deathRegion = dest.name;
+              deathLat = dest.lat;
+              deathLng = dest.lng;
+              antisemitismExperience.details += ` Emigrated after the war to build a new life in ${deathRegion}.`;
+            }
+          }
+        }
+      }
+
+      // 2. PREMODERN & GENERAL ANTISEMITISM SPECTRUM
+      if (!antisemitismExperience) {
+        const roll = Math.random();
+
+        if (roll < 0.25) {
+          antisemitismExperience = {
+            level: "Peaceful Coexistence",
+            details: "Lived in an era and community of cultural coexistence, religious autonomy, and peace with neighboring populations."
+          };
+        } else if (roll < 0.50) {
+          antisemitismExperience = {
+            level: "Social Prejudice",
+            details: "Navigated quiet social prejudice, exclusionary social barriers, and subtle neighborly disdain while maintaining vibrant Jewish communal and family traditions."
+          };
+        } else if (roll < 0.75) {
+          antisemitismExperience = {
+            level: "Institutional Discrimination",
+            details: pickRandomItem([
+              "Subjected to municipal residency restrictions, confined to live within the locked gates of the Jewish quarter / ghetto (such as the Venetian Ghetto or Mellah).",
+              "Subjected to special sumptuary clothing codes (yellow badge / distinctive hat) and special protection taxes (Leibzoll / Jizya) imposed on religious minorities.",
+              "Barred by law from owning agricultural land or entering trade guilds, channeling your livelihood into permitted mercantile and artisan trades."
+            ])
+          };
+        } else {
+          let persecutionScenario = "Faced acute anti-Jewish hostility and localized unrest, relying on community solidarity to endure.";
+          let causesFlight = false;
+
+          if ((rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) && by <= 1492 && dy >= 1492) {
+            persecutionScenario = "Confronted by the 1492 Alhambra Decree expelling all practicing Jews from Spain upon pain of death.";
+            causesFlight = true;
+          } else if ((rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) && by >= 1860 && dy >= 1881) {
+            persecutionScenario = "Survived violent Tsarist pogroms in the Pale of Settlement where armed mobs attacked Jewish homes and shops.";
+            causesFlight = true;
+          } else if (selectedEra.id === 'MEDIEVAL' && by <= 1350 && dy >= 1348) {
+            persecutionScenario = "Narrowly escaped violent mob massacres and scapegoating during the Black Death hysteria in 1348–1349.";
+            causesFlight = true;
+          } else if (by <= 136 && dy >= 66 && (rName.includes('judea') || rName.includes('levant') || rName.includes('rome'))) {
+            persecutionScenario = "Lived through the devastating Roman siege and destruction of Jerusalem during the Jewish-Roman wars.";
+            causesFlight = true;
+          } else {
+            persecutionScenario = pickRandomItem([
+              "Faced escalating localized anti-Jewish riots and violent mob intimidation targeting the Jewish quarter.",
+              "Threatened with arbitrary arrest and confiscation of property during an outbreak of religious hysteria."
+            ]);
+            causesFlight = Math.random() < 0.55;
+          }
+
+          antisemitismExperience = {
+            level: "Pogrom & Persecution",
+            details: persecutionScenario
+          };
+
+          if (causesFlight && age >= 14 && !isEmigrant) {
+            isEmigrant = true;
+            emigrationAge = randomInt(14, Math.min(age, 38));
+            
+            if (rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) {
+              const dest = pickRandomItem([
+                { name: "Ottoman Empire (Salonica / Constantinople)", lat: 40.64, lng: 22.94 },
+                { name: "North Africa (Morocco / Tunisia)", lat: 34.03, lng: -5.00 },
+                { name: "Netherlands (Amsterdam)", lat: 52.37, lng: 4.89 }
+              ]);
+              deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
+            } else if (rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) {
+              const dest = pickRandomItem([
+                { name: "United States (New York Lower East Side)", lat: 40.71, lng: -73.99 },
+                { name: "United Kingdom (London East End)", lat: 51.52, lng: -0.06 },
+                { name: "Argentina (Buenos Aires)", lat: -34.60, lng: -58.38 }
+              ]);
+              deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
+            } else {
+              const destPool = selectedEra.regions.filter(r => r.text !== regionText);
+              const dest = destPool.length > 0 ? pickRandomItem(destPool) : selectedEra.regions[0];
+              deathRegion = dest.text; deathLat = dest.lat; deathLng = dest.lng;
+            }
+            antisemitismExperience.details += ` To escape persecution, emigrated to find safety and rebuild in ${deathRegion}.`;
+          }
+        }
+      }
+    }
+
+    // 3f. Universal Minority Persecution Engine (for all other historically documented minority groups)
+    let minorityPersecution = null;
+
+    if (isMinority && !isJewish && minorityGroupHint && age >= 5 && !wasExposed) {
+      const minHint = minorityGroupHint.toLowerCase();
+      const rName = (regionText || '').toLowerCase();
+      const by = birthYear;
+
+      if (minHint.includes('black') || minHint.includes('afro')) {
+        if (rName.includes('usa') || rName.includes('united states') || rName.includes('north america')) {
+          if (by >= 1865 && by <= 1965) {
+            if (Math.random() < 0.70) {
+              minorityPersecution = {
+                level: "Segregation & Civil Rights Struggle",
+                details: "Navigated the harsh barriers of Jim Crow segregation, racial redlining, and disenfranchisement while building community solidarity through church and family."
+              };
+              if (Math.random() < 0.40 && !isEmigrant && age >= 18) {
+                isEmigrant = true;
+                emigrationAge = randomInt(18, Math.min(age, 35));
+                deathRegion = "Northern Urban Centers (Chicago / New York / Detroit)";
+                deathLat = 41.87; deathLng = -87.62;
+                minorityPersecution.details += " Joined the Great Migration to northern industrial centers seeking economic opportunity and dignity.";
+              }
+            }
+          }
+        }
+      } else if (minHint.includes('indigenous') || minHint.includes('native') || minHint.includes('māori') || minHint.includes('aboriginal') || minHint.includes('quechua') || minHint.includes('mapuche')) {
+        if (selectedEra.id === 'MODERN' || selectedEra.id === 'EARLY_MODERN') {
+          if (Math.random() < 0.60) {
+            minorityPersecution = {
+              level: "Colonial Dispossession & Assimilation",
+              details: "Resisted colonial land encroachment and aggressive state assimilation policies (including forced boarding schools), keeping tribal lore and songs alive."
+            };
+          }
+        }
+      } else if (minHint.includes('romani') || minHint.includes('sinti')) {
+        if (selectedEra.id === 'MODERN' && by <= 1945 && by + age >= 1939 && (rName.includes('germany') || rName.includes('poland') || rName.includes('europe') || rName.includes('france') || rName.includes('hungary') || rName.includes('italy'))) {
+          if (Math.random() < 0.55) {
+            const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 40)));
+            age = Math.max(0, deathY - by);
+            isAlive = false;
+            causeOfDeath = "murdered during the Romani genocide (Porajmos) in Nazi-occupied Europe";
+            minorityPersecution = { level: "Porajmos / Genocide", details: "Perished during the Nazi genocide of Romani and Sinti people (Porajmos)." };
+          } else {
+            minorityPersecution = { level: "Genocide Survivor", details: "Survived the Porajmos (Romani genocide) during WWII, evading deportation and preserving clan traditions." };
+          }
+        } else {
+          minorityPersecution = { level: "Marginalization & Wandering Bans", details: "Faced persistent municipal wandering bans, police harassment, and social exclusion, relying on close family caravans." };
+        }
+      } else if (minHint.includes('chinese') || minHint.includes('asian')) {
+        if (rName.includes('usa') || rName.includes('america') || rName.includes('australia')) {
+          if (by >= 1850 && by <= 1943) {
+            minorityPersecution = { level: "Exclusion Laws & Nativist Bias", details: "Endured the era of the Chinese Exclusion Act and nativist anti-Asian hostility, finding safety in tight-knit chinatowns and mutual-aid merchant associations." };
+          }
+        }
+      } else if (minHint.includes('armenian') && by >= 1880 && by <= 1915) {
+        if (Math.random() < 0.65) {
+          isEmigrant = true;
+          emigrationAge = Math.min(age, Math.max(12, 1915 - by));
+          deathRegion = pickRandomItem(["France (Marseille/Paris)", "United States (California/Boston)", "Lebanon (Beirut)"]);
+          deathLat = 43.29; deathLng = 5.36;
+          minorityPersecution = { level: "Genocide Refugee", details: `Fled the 1915 Armenian Genocide in the Ottoman Empire, emigrating as a displaced refugee to rebuild life in ${deathRegion}.` };
+        }
+      } else if ((minHint.includes('chechen') || minHint.includes('tatar')) && by <= 1944 && by + age >= 1944) {
+        minorityPersecution = { level: "Forced Mass Deportation", details: "Survived the brutal 1944 Stalinist deportation to Central Asia in cattle cars, enduring harsh exile before returning home decades later." };
+      }
+    }
+
+    // 3g. High Beauty Modeling Career Engine (Modern World, Beauty >= 90)
+    let modelingCareer = null;
+
+    if (selectedEra.id === 'MODERN' && birthYear >= 1890 && beauty >= 90 && age >= 16 && !wasExposed) {
+      const isMale = sex === 'Male';
+      const getsOffered = !isMale || (Math.random() < 0.33);
+
+      if (getsOffered) {
+        const pStr = (personality1 + ' ' + personality2).toLowerCase();
+        const isAmbitiousOrSocial = pStr.includes('ambitious') || pStr.includes('creative') || pStr.includes('charismatic') || pStr.includes('bold') || pStr.includes('adventurous') || pStr.includes('proud') || pStr.includes('social') || pStr.includes('garrulous');
+        const isIntrovertedOrModest = pStr.includes('introverted') || pStr.includes('reclusive') || pStr.includes('devout') || pStr.includes('modest') || pStr.includes('anxious') || pStr.includes('stoic');
+
+        if (isAmbitiousOrSocial) {
+          modelingCareer = {
+            offered: true,
+            accepted: true,
+            success: isMale ? "Celebrated Runway & Editorial Male Model" : "High-Fashion Supermodel & Runway Icon",
+            details: isMale 
+              ? "Scouted in your youth for striking facial structure and athletic physique; achieved renown in luxury fashion campaigns, runway shows, and magazine spreads."
+              : "Discovered in your late teens for breathtaking, arresting beauty; became a celebrated fashion model and runway icon, featured in major international fashion houses and magazines."
+          };
+          if (!isRoyaltyOrHistoric && !socialClass.includes('Upper')) {
+            socialClass = "High Fashion Model / Celebrity Elite";
+            hasUpwardMobility = true;
+            mobilityDetails = "Elevated from humble origins into international acclaim, luxury fashion campaigns, and affluent cultural circles through iconic modeling work.";
+          }
+        } else if (isIntrovertedOrModest) {
+          modelingCareer = {
+            offered: true,
+            accepted: false,
+            details: "Scouted by prestigious fashion agencies in your youth due to extraordinary physical beauty, but chose to decline the offers, prioritizing personal privacy, family, and a grounded life away from the commercial lens."
+          };
+        } else {
+          modelingCareer = {
+            offered: true,
+            accepted: true,
+            success: "Commercial & Catalog Print Model",
+            details: "Worked steadily for several years in your twenties as a successful commercial and catalog model, earning good income before transitioning into other business and family pursuits."
+          };
+        }
+      }
+    }
+
     // 9b. Lifetime Emigration / Migration
     let isEmigrant = false;
     let emigrationAge = null;
@@ -1249,7 +1764,7 @@ ${(currentLife.narrative || []).join('\n\n')}
     let deathLat = null;
     let deathLng = null;
 
-    if (age >= 16 && !wasExposed) {
+    if (age >= 16 && !wasExposed && !antisemitismExperience?.details?.includes('emigrated')) {
       const emigrateChance = selectedEra.id === 'MODERN' ? 0.16 : (selectedEra.id === 'EARLY_MODERN' ? 0.09 : 0.04);
       if (Math.random() < emigrateChance) {
         isEmigrant = true;
@@ -1313,6 +1828,11 @@ ${(currentLife.narrative || []).join('\n\n')}
         isEmigrant, emigrationAge, deathRegion, deathLat, deathLng,
         isMaimed, maimedAge, maimedSeverity, maimedDetails, maimedContributedToDeath,
         isRoyaltyOrHistoric, hasUpwardMobility, birthSocialClass, mobilityDetails,
+        wasEnslavedLater, enslavedAge, enslavementDetails,
+        escapedSlavery, escapeAge, escapeMethod,
+        isJewish, antisemitismExperience, minorityPersecution,
+        isInterfaithMarriage, interfaithSpouse, interfaithDetails,
+        modelingCareer,
         disabilityCategory, disabilityExamples, wasExposed,
         orientation, actedOnBi, isOpenlyGay, isInTheCloset,
         isTransgender, transgenderDetails,
@@ -1369,6 +1889,19 @@ ${(currentLife.narrative || []).join('\n\n')}
       maimedSeverity: rawLifeData.maimedSeverity || null,
       maimedDetails: rawLifeData.maimedDetails || null,
       isRoyaltyOrHistoric: rawLifeData.isRoyaltyOrHistoric || false,
+      wasEnslavedLater: rawLifeData.wasEnslavedLater || false,
+      enslavedAge: rawLifeData.enslavedAge || null,
+      enslavementDetails: rawLifeData.enslavementDetails || null,
+      escapedSlavery: rawLifeData.escapedSlavery || false,
+      escapeAge: rawLifeData.escapeAge || null,
+      escapeMethod: rawLifeData.escapeMethod || null,
+      isJewish: rawLifeData.isJewish || false,
+      antisemitismExperience: rawLifeData.antisemitismExperience || null,
+      minorityPersecution: rawLifeData.minorityPersecution || null,
+      isInterfaithMarriage: rawLifeData.isInterfaithMarriage || false,
+      interfaithSpouse: rawLifeData.interfaithSpouse || null,
+      interfaithDetails: rawLifeData.interfaithDetails || null,
+      modelingCareer: rawLifeData.modelingCareer || null,
       hasUpwardMobility: rawLifeData.hasUpwardMobility || false,
       birthSocialClass: rawLifeData.birthSocialClass || socialClass,
       mobilityDetails: rawLifeData.mobilityDetails || null,

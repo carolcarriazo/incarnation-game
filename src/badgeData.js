@@ -2,7 +2,7 @@ import {
   Award, ShieldAlert, Baby, Sparkles, Ghost, 
   Swords, Droplets, HeartHandshake, Brain, 
   DoorClosed, Rainbow, UserX, Crown, Compass,
-  Bone, Flag, Hourglass, PersonStanding, HeartCrack, Sun
+  Bone, Flag, Hourglass, PersonStanding, HeartCrack, Sun, Unlock
 } from 'lucide-react';
 
 export const BADGE_DEFINITIONS = [
@@ -13,6 +13,38 @@ export const BADGE_DEFINITIONS = [
     description: 'Passed away in infancy at 0 years old before reaching your first birthday.',
     colorClass: 'bg-indigo-950/50 border-indigo-500/60 text-indigo-300',
     condition: (life) => life.age === 0
+  },
+  {
+    id: 'in_chains',
+    name: 'In Chains',
+    icon: ShieldAlert,
+    description: 'Enslaved or captured into forced servitude during your lifetime.',
+    colorClass: 'bg-red-950/40 border-red-600/50 text-red-300',
+    condition: (life) => life.wasEnslavedLater === true || life.socialClass?.toLowerCase().includes('slave') || life.socialClass?.toLowerCase().includes('enslaved')
+  },
+  {
+    id: 'unbroken',
+    name: 'Unbroken',
+    icon: Unlock,
+    description: 'Escaped captivity, fled via abolitionist networks, or achieved freedom from enslavement.',
+    colorClass: 'bg-amber-500/25 border-amber-400/60 text-amber-300',
+    condition: (life) => life.escapedSlavery === true
+  },
+  {
+    id: 'the_diaspora',
+    name: 'The Diaspora',
+    icon: Compass,
+    description: 'Navigated the heritage, traditions, or resilience of the Jewish diaspora across world history.',
+    colorClass: 'bg-blue-950/40 border-blue-500/60 text-blue-300',
+    condition: (life) => life.isJewish === true
+  },
+  {
+    id: 'haute_couture',
+    name: 'Haute Couture',
+    icon: Sparkles,
+    description: 'Pursued a career in fashion or commercial modeling in the modern era due to extraordinary physical beauty.',
+    colorClass: 'bg-pink-950/40 border-pink-500/60 text-pink-300',
+    condition: (life) => life.modelingCareer?.accepted === true
   },
   {
     id: 'your_highness',
