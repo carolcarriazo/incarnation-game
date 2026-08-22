@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   RefreshCw, ScrollText, Skull, Heart, Star, Clock, Globe2,
   Sparkles, BookOpen, Loader2, Link as LinkIcon, Calendar, MapPin, Medal,
-  X, Lock, Crown, Landmark, Users, User, Share2, Check
+  X, Lock, Crown, Landmark, Users, User, Share2, Check, AlertTriangle
 } from 'lucide-react';
 import { PERSONALITY_TRAITS, DISABILITY_POOL, MODERN_COUNTRIES, ERAS } from './gameData.js';
 import { BADGE_DEFINITIONS, evaluateBadges } from './badgeData.js';
@@ -262,32 +262,43 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
       if (modernRoll < 0.85) {
         if (isFemale) {
           return pickRandomItem([
-            "metastatic invasive ductal breast carcinoma",
-            "advanced ovarian adenocarcinoma",
-            "metastatic colorectal adenocarcinoma",
-            "acute transmural myocardial infarction (coronary thrombosis)",
-            "massive ischemic cerebral stroke",
-            "severe congestive cardiomyopathy",
-            "bronchogenic lung adenocarcinoma",
-            "advanced pancreatic adenocarcinoma"
+            "breast cancer",
+            "ovarian cancer",
+            "bowel / colon cancer",
+            "acute heart attack (coronary thrombosis)",
+            "massive ischemic stroke",
+            "congestive heart failure",
+            "lung cancer",
+            "pancreatic cancer",
+            "stomach cancer",
+            "cervical cancer",
+            "liver cancer",
+            "motor neuron disease (ALS)",
+            "ruptured brain aneurysm",
+            "advanced multiple sclerosis (MS) with secondary respiratory complications"
           ]);
         }
         return pickRandomItem([
-          "metastatic bronchogenic lung cancer",
-          "pancreatic adenocarcinoma",
-          "metastatic colorectal adenocarcinoma",
-          "metastatic prostate carcinoma",
-          "advanced gastric carcinoma",
-          "acute massive ischemic stroke",
-          "acute transmural myocardial infarction (fatal coronary thrombosis)",
-          "severe congestive cardiomyopathy"
+          "lung cancer",
+          "pancreatic cancer",
+          "bowel / colon cancer",
+          "prostate cancer",
+          "stomach cancer",
+          "acute ischemic stroke",
+          "acute heart attack",
+          "congestive heart failure",
+          "esophageal cancer",
+          "liver cancer",
+          "motor neuron disease (ALS)",
+          "ruptured brain aneurysm",
+          "advanced multiple sclerosis (MS) with secondary complications"
         ]);
       }
       return pickRandomItem([
         "fatal motor vehicle collision",
         "acute respiratory distress syndrome (ARDS)",
-        "postoperative acute pulmonary embolism",
-        "complications of poorly controlled type 2 diabetes mellitus"
+        "postoperative pulmonary embolism",
+        "complications of type 2 diabetes"
       ]);
     } else {
       // Young adults / early middle age (15 - 54)
@@ -312,28 +323,34 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
 
       if (modernRoll < 0.40) {
         return pickRandomItem([
-          "acute massive pulmonary embolism (sudden fatal deep-vein thrombosis clot traveling to the lungs)",
-          "sudden fatal cardiac arrest secondary to undiagnosed hypertrophic cardiomyopathy / cardiac arrhythmia",
-          "ruptured cerebral berry aneurysm (fatal spontaneous subarachnoid hemorrhage)",
-          "acute bacterial endocarditis stemming from unrecognized childhood rheumatic fever"
+          "pulmonary embolism (blood clot traveling to the lungs)",
+          "sudden cardiac arrest secondary to an undiagnosed arrhythmia",
+          "ruptured brain aneurysm (sudden fatal brain hemorrhage)",
+          "motor neuron disease (ALS)",
+          "complications of muscular dystrophy causing progressive respiratory failure",
+          "acute bacterial endocarditis stemming from childhood rheumatic fever"
         ]);
       } else if (modernRoll < 0.70) {
         if (isFemale) {
           return pickRandomItem([
-            "metastatic breast carcinoma",
-            "invasive cervical cancer",
+            "breast cancer",
+            "cervical cancer",
+            "acute leukemia",
+            "brain tumor (glioblastoma)",
+            "ovarian cancer",
             "acute peritonitis secondary to a ruptured appendix",
-            "fulminant cavitary pulmonary tuberculosis with massive hemoptysis",
-            "acute myeloid leukemia",
-            "systemic lupus erythematosus with severe renal failure"
+            "pulmonary tuberculosis",
+            "systemic lupus erythematosus with severe kidney failure"
           ]);
         }
         return pickRandomItem([
           "acute peritonitis secondary to a ruptured appendix",
-          "fulminant cavitary pulmonary tuberculosis with massive hemoptysis",
-          "acute myeloid leukemia",
-          "advanced gastric carcinoma",
-          "severe acute hemorrhagic pancreatitis"
+          "pulmonary tuberculosis",
+          "acute leukemia",
+          "stomach cancer",
+          "brain tumor (glioblastoma)",
+          "lymphoma",
+          "severe acute pancreatitis"
         ]);
       } else if (modernRoll < 0.88) {
         if (isWorkingClass && !isFemale) return "industrial machinery entanglement / crushing workplace trauma";
@@ -380,21 +397,28 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
   }
 
   const historicalRoll = Math.random();
-  // 75% Disease / Epidemic / Internal organ failure (vast majority of premodern adult deaths)
+  // 75% Disease / Epidemic / Internal illness
   if (historicalRoll < 0.75) {
     return pickRandomItem([
-      "consumption (pulmonary tuberculosis) with severe wasting and hemoptysis",
+      "consumption (pulmonary tuberculosis) with severe wasting and coughing of blood",
       "bubonic plague / regional epidemic pestilence",
       "typhus fever transmitted by lice during winter quarters",
       "acute dysentery / severe waterborne enteric illness",
       "dropsy (congestive heart failure / severe fluid retention)",
-      "gangrenous sepsis stemming from a farm tool laceration",
-      "lobar pneumonia following exposure to damp, freezing cold",
+      "gangrenous sepsis stemming from a laceration",
+      "pneumonia following exposure to damp, freezing cold",
       "summer cholera epidemic with rapid dehydration",
-      "malaria (severe ague) causing chronic anemia and splenic rupture",
-      "a mysterious, lingering internal wasting illness",
+      "malaria (severe ague) causing chronic chills, anemia, and weakness",
       "smallpox epidemic with secondary bacterial infection",
-      "acute peritonitis from an undiagnosed internal rupture"
+      "acute peritonitis from an undiagnosed internal rupture",
+      "a creeping, debilitating paralysis with loss of speech and muscle control (Today, we would call this motor neuron disease / ALS)",
+      "a sudden, violent cranial rupture causing instant collapse (Today, we would call this a ruptured brain aneurysm)",
+      "a progressive muscle-wasting condition causing weakness in the limbs from youth (Today, we would call this muscular dystrophy)",
+      "a chronic, progressive nerve illness causing tremors, loss of vision, and numbness (Today, we would call this multiple sclerosis)",
+      "a progressive, painful internal abdominal tumor (Today, we would call this stomach cancer)",
+      "a painful ulcerating breast tumor and severe wasting (Today, we would call this breast cancer)",
+      "a painful, bleeding bowel tumor (Today, we would call this colon / bowel cancer)",
+      "a mysterious, exhausting illness of the blood causing severe pallor and bruising (Today, we would call this leukemia)"
     ]);
   }
   // 12% Accidents / Workplace & Domestic trauma
@@ -420,12 +444,21 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
   // 8% War & Invasion Violence
   if (historicalRoll < 0.95) {
     if (!isFemale) {
+      if (age > 45) {
+        return pickRandomItem([
+          "fatal injuries sustained defending your homestead during a violent settlement raid by invading marauders",
+          "fatal injuries sustained during the sacking, arson, and pillaging of your village by enemy troops",
+          "severe smoke inhalation and fatal thermal burns when raiders torched your dwelling in the night",
+          "starvation and acute exposure during an extended, grueling city or fortress siege",
+          "fatal blunt force trauma sustained during an opportunistic border raid on your rural community"
+        ]);
+      }
       return pickRandomItem([
         "slaughtered in the chaotic crush of a shield wall or infantry clash",
         "fatal spear thrust / thrusting sword wound sustained in pitched battle",
         "fatal arrow wound piercing the lungs or neck in combat",
         "succumbing to gangrenous wound sepsis days after a military engagement",
-        "fatal cavalry trampling / sword strike on the battlefield"
+        "fatal cavalry trampling or sword strike on the battlefield"
       ]);
     }
     if (age >= 40) {
@@ -474,14 +507,6 @@ const DEFAULT_API_KEY = [65, 81, 46, 65, 98, 56, 82, 78, 54, 76, 73, 86, 72, 54,
 const generateNarrativeWithAI = async (lifeData) => {
   const apiKey = (import.meta.env?.VITE_GEMINI_API_KEY || DEFAULT_API_KEY).trim();
 
-  // Active, ultra-fast Gemini 3.x models with fallbacks
-  const candidateModels = [
-    import.meta.env?.VITE_GEMINI_MODEL,
-    "gemini-3.5-flash-lite",
-    "gemini-3.5-flash"
-  ].filter(Boolean);
-  const modelsToTry = Array.from(new Set(candidateModels));
-
   const showTraits = lifeData.age >= 4;
   const showEarlyCrushes = lifeData.age >= 8;
   const showAdult = lifeData.age >= 15;
@@ -493,17 +518,18 @@ CRITICAL RULES:
 1. STRICT SECOND PERSON POV & OPENING SENTENCE: You MUST write exclusively in the second person ("You were born...", "You grew up...", "Your choices..."). NEVER use third person ("He lived...", "She survived...").
    - MANDATORY FIRST SENTENCE: Your very first sentence of the story's first paragraph MUST explicitly begin with either "You were born a male..." or "You were born a female..." based on the assigned birth sex (e.g. "You were born a male to peasant farmers in...", "You were born a female in a drafty timber house in...").
 2. TONE & PROSE: Use clear, grounded, and engaging historical language. AVOID excessively flowery, melodramatic, or poetic adjectives. Write like a straightforward, insightful historical biographer.
-3. NATURAL, ACCESSIBLE LANGUAGE FOR MEDICAL CONDITIONS & ILLNESSES (CRUCIAL):
-   - AVOID dense, clinical, Latinate textbook jargon that hinders readability or player immersion (e.g. NEVER write "severe congenital amblyopia combined with high astigmatism" or "talipes equinovarus").
-   - ALWAYS use plain, natural, vivid English descriptions that any reader immediately grasps (e.g. "crossed eyes and severely impaired vision", "a clubfoot", "a severe hunchback", "a cleft palate", "shaking palsy / tremors", "a heart defect causing blue skin and chronic exhaustion", "childhood reading blindness").
+3. NATURAL, ACCESSIBLE LANGUAGE FOR MEDICAL CONDITIONS, ILLNESSES & CANCERS (CRUCIAL):
+   - AVOID dense, clinical, Latinate textbook jargon (e.g. NEVER write "lung adenocarcinoma", "invasive ductal carcinoma", "gastric adenocarcinoma", or "talipes equinovarus").
+   - ALWAYS use plain, natural, accessible English terms (e.g. "lung cancer", "breast cancer", "stomach cancer", "bowel cancer", "pancreatic cancer", "leukemia", "prostate cancer", "cervical cancer", "ovarian cancer", "liver cancer", "bone cancer", "brain tumor", "motor neuron disease / ALS", "a ruptured brain aneurysm", "muscular dystrophy", "multiple sclerosis", "crossed eyes", "a clubfoot", "a hunchback", "a cleft palate", "a heart defect causing blue skin and chronic fatigue").
+   - PREMODERN MEDICAL FRAMING RULE (CRITICAL): If someone in a premodern era (before 1850) suffers or dies from cancer, motor neuron disease, a brain aneurysm, muscular dystrophy, or multiple sclerosis, describe their progressive symptoms through the lens of historical peers (e.g. creeping paralysis, sudden unheralded stroke, progressive muscle wasting, or a deep lingering internal mass), and follow it with: "Today, we would call this [cancer / motor neuron disease / a ruptured brain aneurysm / muscular dystrophy / multiple sclerosis]."
    - AUTISM & NEURODIVERGENCE (BE EXPLICIT & CLEAR): If the character has an autism spectrum condition, be EXPLICIT about their neurodivergence. In the modern era, explicitly identify it as autism. In premodern eras, vividly depict their distinct autistic traits: their intense hyperfocus on specialized interests, deep sensory sensitivities (to sounds, touch, crowded markets), literal communication style, strong preference for predictable routines, and difficulty navigating unspoken social cues or diplomatic subtext, while explaining how peers perceived their unique mind (e.g. an eccentric solitary savant, singularly gifted craftsperson, or misunderstood thinker).
    - HOBBIES OBSESSIVENESS RULE: Hobbies and pastimes MUST NOT be described as "obsessive" or "all-consuming" UNLESS the character is specifically autistic / neurodivergent. For neurotypical characters, pastimes must be depicted as enjoyable, relaxing, communal, creative, or casual recreational pursuits.
    - SCOLIOSIS & SPINAL CURVATURE ONSET: Idiopathic scoliosis develops during childhood or adolescent growth spurts (ages 10–14) or from adult physical toll, rather than being evident at birth. Describe its gradual development as they grow.
-   - FOR PREMODERN LIVES (Before 1850): First describe how historical peers perceived their condition (e.g. wandering eye, touched by spirits, eccentric, melancholy). If referencing modern medical understanding, keep it conversational and plain (e.g. "In today's terms, you had crossed eyes and poor vision in one eye", "In modern terms, you were born on the autism spectrum").
 4. TRANSGENDER & GENDER DIVERGENCE: If rolled as Transgender, authentically reflect their experience according to their era, culture, and personality. In premodern/early modern eras, people navigating this often lived in disguise, assumed alternate societal roles (e.g. military enlistment, monastic life, sailors like Catalina de Erauso), joined culturally recognized roles (Two-Spirit, Hijra, Galli, Public Universal Friend, Chevalier d'Éon), or repressed it depending on bravery and fear. In the 20th/21st century, reflect the emergence of medical transition (like Lili Elbe) or underground communities.
 5. MODERN MEDICAL CANCER SURVIVAL: If flagged as a "Cancer Survivor" in a modern era, describe their harrowing but successful battle with modern oncology (surgery/radiation/chemo) and how it shifted their perspective before returning to remission.
 6. CAUSE OF DEATH & CONTEMPORARY LIVES (STILL ALIVE IN 2026):
    - FOR DECEASED CHARACTERS: Weave their assigned Primary Cause of Death seamlessly into their final paragraph. Cancer was extremely rare in premodern eras; rely only on the provided premodern diseases. If they died of old age diseases, describe the physical slowing down of their golden years.
+   - BATTLEFIELD & CAVALRY CHARGE AGE LIMIT (AGE <= 45): Active frontline infantry clashes, shield wall melee, and battlefield cavalry charges MUST ONLY happen to combatants aged 15 to 45. Characters over age 45 who die in wartime MUST be depicted as civilian casualties of sieges, village sackings, burning of dwellings, starvation during military blockades, or defense against invading raiders—NEVER as aging elders actively fighting in frontline cavalry charges.
    - WARTIME RAIDS & OLDER ADULTS (AGE 40+): For mature women (age 40+) who perish or suffer trauma in settlement raids or warfare, depict the tragedy realistically as defending their homestead, family protection, arson, or collateral violence (NEVER frame violence against mature women past 40 as sexual assault/attempted violation).
    - FOR LIVING CHARACTERS (STILL ALIVE IN 2026): NEVER say they are "forgotten by history" or speak of their life in past tense as a closed ancient chapter. Write about their ongoing daily life today in the year 2026, their contemporary routine, reflections on modern times, family/community, and how they navigate life today.
 7. PREMODERN MARRIAGE & UNMARRIED WOMEN (STRICT HISTORICAL AGENCY CONSTRAINT):
@@ -566,27 +592,27 @@ ${lifeData.isRoyaltyOrHistoric ? `- REAL HISTORICAL ROYALTY / MONARCH: This soul
 - Exposed / Left to Die at Birth: ${lifeData.wasExposed ? 'YES (Parents/Tribe abandoned infant at birth)' : 'NO'}
 - Family: Mother died in childbirth: ${lifeData.motherDied}. ${lifeData.siblingsSurvived} of ${lifeData.totalSiblings} siblings survived childhood.
 ${showEarlyCrushes ? `- Orientation: ${lifeData.orientation} ${lifeData.orientation === 'Homosexual'
-        ? (lifeData.isOpenlyGay
-          ? '(Lived openly in their same-sex relationships / out and proud in their community)'
-          : '(Kept same-sex attraction strictly secret / in the closet due to social, religious, or familial danger)')
-        : (lifeData.orientation === 'Bisexual'
-          ? `(Attracted to both men and women. ${lifeData.actedOnBi ? (lifeData.isOpenlyGay ? 'Acted openly on same-sex attractions.' : 'Pursued same-sex encounters in strict secrecy.') : 'Suppressed same-sex desires and conformed to heterosexual expectations.'})`
-          : '')
+      ? (lifeData.isOpenlyGay
+        ? '(Lived openly in their same-sex relationships / out and proud in their community)'
+        : '(Kept same-sex attraction strictly secret / in the closet due to social, religious, or familial danger)')
+      : (lifeData.orientation === 'Bisexual'
+        ? `(Attracted to both men and women. ${lifeData.actedOnBi ? (lifeData.isOpenlyGay ? 'Acted openly on same-sex attractions.' : 'Pursued same-sex encounters in strict secrecy.') : 'Suppressed same-sex desires and conformed to heterosexual expectations.'})`
+        : '')
       }` : ''}
 ${showTraits ? `- Personality: ${lifeData.personality.join(' and ')}` : ''}
 ${showAdult ? `- Pastimes & Leisure: ${lifeData.hobbyData} (CRITICAL: Do NOT describe hobbies as obsessive or compulsive unless the person is autistic).` : ''}
-${showAdult ? `- Marriage / Structure: ${lifeData.isMarried 
-    ? `Married/Bonded at age ${lifeData.marriageAge}` 
-    : `Never Married/Bonded (PREMODERN AGENCY RULE: ${lifeData.sex === 'Female' && !lifeData.isModernEra 
-        ? (lifeData.orientation === 'Homosexual' 
-            ? 'Refused/avoided male marriage due to homosexuality' 
-            : (lifeData.socialClass.includes('Nobility') || lifeData.socialClass.includes('Upper') || lifeData.socialClass.includes('Patrician') 
-                ? 'Noble/Upper-class independence and private wealth allowing autonomous refusal of suitors' 
-                : 'Unwed due to poverty, lack of dowry, family labor dependence, severe disability, or monastic life — NOT a casual modern lifestyle choice')) 
+${showAdult ? `- Marriage / Structure: ${lifeData.isMarried
+      ? `Married/Bonded at age ${lifeData.marriageAge}`
+      : `Never Married/Bonded (PREMODERN AGENCY RULE: ${lifeData.sex === 'Female' && !lifeData.isModernEra
+        ? (lifeData.orientation === 'Homosexual'
+          ? 'Refused/avoided male marriage due to homosexuality'
+          : (lifeData.socialClass.includes('Nobility') || lifeData.socialClass.includes('Upper') || lifeData.socialClass.includes('Patrician')
+            ? 'Noble/Upper-class independence and private wealth allowing autonomous refusal of suitors'
+            : 'Unwed due to poverty, lack of dowry, family labor dependence, severe disability, or monastic life — NOT a casual modern lifestyle choice'))
         : 'Dedicated to trade, labor, military, or kin'})`}. ${lifeData.hadAffair ? `Had an extramarital affair / clandestine lover ${lifeData.sameSexAffair ? '(specifically with someone of the same sex)' : '(with an opposite-sex partner)'}.` : ''}` : ''}
 ${showAdult ? `- Children: ${lifeData.effectiveInfertility ? '0 children (Infertile)' : `${lifeData.childrenCount} children`} ${lifeData.hasUnmarriedPartnerChildren
-        ? (lifeData.orientation === 'Homosexual' ? '(Modern adoption or donor parenthood with long-term partner)' : '(Had children with an unmarried long-term cohabiting partner / outside formal marriage)')
-        : (lifeData.outOfWedlock ? '(Includes child/children born out of wedlock / outside primary union)' : '')
+      ? (lifeData.orientation === 'Homosexual' ? '(Modern adoption or donor parenthood with long-term partner)' : '(Had children with an unmarried long-term cohabiting partner / outside formal marriage)')
+      : (lifeData.outOfWedlock ? '(Includes child/children born out of wedlock / outside primary union)' : '')
       }` : ''}
 ${showAdult ? `- Fame/Legacy: ${lifeData.fame}` : ''}
 ${lifeData.survivedCancer ? `- Medical History: Diagnosed with cancer at age ${lifeData.cancerAge}, but successfully underwent modern medical treatments and survived into remission.` : ''}
@@ -604,14 +630,14 @@ ${lifeData.escapedSlavery && lifeData.age >= 12 ? `- ESCAPED / EMANCIPATED FROM 
 ${showAdult && lifeData.hasUpwardMobility ? `- UPWARD SOCIAL MOBILITY: Born into ${lifeData.birthSocialClass}, but achieved notable upward mobility in adulthood: ${lifeData.mobilityDetails}. Their attained station is ${lifeData.socialClass}. Explicitly chronicle their rise from humble beginnings to their elevated station in the narrative and timeline.` : ''}
 ${showTraits ? `- Base Intelligence (1-100): ${lifeData.intelligence}` : ''}
 ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${lifeData.beauty >= 80
-        ? (lifeData.sex === 'Female'
-          ? `Exceptionally beautiful (Score ${lifeData.beauty}/100). Use the word 'beautiful', describe specific features, and depict how others perceived her appearance and the attention/suitors she drew.`
-          : `Exceptionally handsome / striking (Score ${lifeData.beauty}/100). Use words like 'handsome', 'striking', describe his distinct physical features/physique, and the notice and attention he received.`)
-        : (lifeData.beauty >= 60
-          ? `Pleasant and good-looking (Score ${lifeData.beauty}/100).`
-          : (lifeData.beauty <= 20
-            ? `Notably plain, rough-hewn, or unadorned in appearance (Score ${lifeData.beauty}/100).`
-            : `Average, typical appearance for their era and class (Score ${lifeData.beauty}/100).`))
+      ? (lifeData.sex === 'Female'
+        ? `Exceptionally beautiful (Score ${lifeData.beauty}/100). Use the word 'beautiful', describe specific features, and depict how others perceived her appearance and the attention/suitors she drew.`
+        : `Exceptionally handsome / striking (Score ${lifeData.beauty}/100). Use words like 'handsome', 'striking', describe his distinct physical features/physique, and the notice and attention he received.`)
+      : (lifeData.beauty >= 60
+        ? `Pleasant and good-looking (Score ${lifeData.beauty}/100).`
+        : (lifeData.beauty <= 20
+          ? `Notably plain, rough-hewn, or unadorned in appearance (Score ${lifeData.beauty}/100).`
+          : `Average, typical appearance for their era and class (Score ${lifeData.beauty}/100).`))
       }` : ''}
 - Mental/Physical Health: ${[lifeData.schizophrenia && showAdult ? 'Schizophrenia' : '', lifeData.depression && showAdult ? 'Clinical Depression' : '', lifeData.suicide ? 'Suicide' : ''].filter(Boolean).join(', ') || 'No major anomalies'}
 - Age at Death: ${lifeData.age} ${lifeData.isAlive ? '(Currently still alive in the year 2026!)' : ''}
@@ -675,81 +701,90 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
     }
   };
 
-  const model = import.meta.env?.VITE_GEMINI_MODEL || "gemini-3.5-flash-lite";
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const candidateModels = [
+    import.meta.env?.VITE_GEMINI_MODEL,
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite"
+  ].filter(Boolean);
+  const modelsToTry = Array.from(new Set(candidateModels));
 
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 14000); // 14.0s timeout for deep narrative generation
+  let lastError = null;
 
-  try {
-    const response = await fetch(url, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-      signal: controller.signal
-    });
-    clearTimeout(timeoutId);
+  for (const model of modelsToTry) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 20000); // Generous 20.0s timeout
 
-    if (!response.ok) {
-      const errBody = await response.text().catch(() => '');
-      throw new Error(`Gemini API Error (HTTP ${response.status} ${response.statusText}): ${errBody || 'No response body'}`);
-    }
-
-    const data = await response.json();
-    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-    if (!responseText) {
-      const finishReason = data?.candidates?.[0]?.finishReason || 'NO_CANDIDATES';
-      throw new Error(`Gemini API returned no content (Finish Reason: ${finishReason})`);
-    }
-
-    const parsed = JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
-    if (!parsed || (!Array.isArray(parsed.narrative) && typeof parsed.narrative !== 'string')) {
-      throw new Error("Failed to parse valid narrative array from Gemini response JSON");
-    }
-
-    if (typeof parsed.narrative === 'string') {
-      parsed.narrative = parsed.narrative.split('\n\n').filter(Boolean);
-    }
-    if (!parsed.specificLocation) parsed.specificLocation = lifeData.region;
-    if (!Array.isArray(parsed.timeline)) parsed.timeline = [];
-    if (!Array.isArray(parsed.historicalEncounters)) parsed.historicalEncounters = [];
-    if (!Array.isArray(parsed.historicalEventsLivedThrough)) parsed.historicalEventsLivedThrough = [];
-    if (!Array.isArray(parsed.wikiLinks)) parsed.wikiLinks = [];
-    parsed.wikiLinks = parsed.wikiLinks.map(link => {
-      if (!link || (!link.title && !link.url)) return null;
-      let title = (link.title || 'Historical Reference').trim();
-      let url = (link.url || '').trim();
-      if (!url.startsWith('http')) {
-        url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/\s+/g, '_'))}`;
-      }
-      return {
-        title,
-        url,
-        description: (link.description || 'Encyclopedia reference.').trim()
-      };
-    }).filter(Boolean);
-
-    // If royal but AI returned no wiki links, provide default dynasty link
-    if (lifeData.isRoyaltyOrHistoric && parsed.wikiLinks.length === 0) {
-      parsed.wikiLinks.push({
-        title: `Monarchy of ${lifeData.region}`,
-        url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(lifeData.region + ' royal dynasty')}`,
-        description: `Historical royal house and dynasty of ${lifeData.region}.`
+    try {
+      const response = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+        signal: controller.signal
       });
-    }
+      clearTimeout(timeoutId);
 
-    if (parsed.narrative.length === 0) {
-      throw new Error("Gemini returned an empty narrative array");
-    }
+      if (!response.ok) {
+        const errBody = await response.text().catch(() => '');
+        throw new Error(`Model ${model} returned HTTP ${response.status}: ${errBody}`);
+      }
 
-    return parsed;
-  } catch (err) {
-    clearTimeout(timeoutId);
-    if (err.name === 'AbortError') {
-      throw new Error("Gemini API request timed out after 14 seconds.");
+      const data = await response.json();
+      const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+      if (!responseText) {
+        const finishReason = data?.candidates?.[0]?.finishReason || 'NO_CANDIDATES';
+        throw new Error(`Gemini API returned no content (Finish Reason: ${finishReason})`);
+      }
+
+      const parsed = JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
+      if (!parsed || (!Array.isArray(parsed.narrative) && typeof parsed.narrative !== 'string')) {
+        throw new Error("Failed to parse valid narrative array from Gemini response JSON");
+      }
+
+      if (typeof parsed.narrative === 'string') {
+        parsed.narrative = parsed.narrative.split('\n\n').filter(Boolean);
+      }
+      if (!parsed.specificLocation) parsed.specificLocation = lifeData.region;
+      if (!Array.isArray(parsed.timeline)) parsed.timeline = [];
+      if (!Array.isArray(parsed.historicalEncounters)) parsed.historicalEncounters = [];
+      if (!Array.isArray(parsed.historicalEventsLivedThrough)) parsed.historicalEventsLivedThrough = [];
+      if (!Array.isArray(parsed.wikiLinks)) parsed.wikiLinks = [];
+      parsed.wikiLinks = parsed.wikiLinks.map(link => {
+        if (!link || (!link.title && !link.url)) return null;
+        let title = (link.title || 'Historical Reference').trim();
+        let url = (link.url || '').trim();
+        if (!url.startsWith('http')) {
+          url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/\s+/g, '_'))}`;
+        }
+        return {
+          title,
+          url,
+          description: (link.description || 'Encyclopedia reference.').trim()
+        };
+      }).filter(Boolean);
+
+      // If royal but AI returned no wiki links, provide default dynasty link
+      if (lifeData.isRoyaltyOrHistoric && parsed.wikiLinks.length === 0) {
+        parsed.wikiLinks.push({
+          title: `Monarchy of ${lifeData.region}`,
+          url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(lifeData.region + ' royal dynasty')}`,
+          description: `Historical royal house and dynasty of ${lifeData.region}.`
+        });
+      }
+
+      if (parsed.narrative.length === 0) {
+        throw new Error("Gemini returned an empty narrative array");
+      }
+
+      return parsed;
+    } catch (err) {
+      clearTimeout(timeoutId);
+      lastError = err;
+      console.warn(`Model ${model} failed, trying next candidate:`, err.message);
     }
-    throw err;
   }
+
+  throw lastError || new Error("All Gemini candidate models failed to respond.");
 };
 
 export default function App() {
@@ -1093,6 +1128,9 @@ ${(currentLife.narrative || []).join('\n\n')}
     try { playUiSound('incarnate'); } catch (e) { }
     setIsGenerating(true);
 
+    // Yield to the browser render loop so the button immediately transitions to "Weaving Timeline..."
+    await new Promise(resolve => setTimeout(resolve, 50));
+
     try {
       // 1. Era selection (weighted)
       let selectedEra = ERAS[0];
@@ -1178,7 +1216,7 @@ ${(currentLife.narrative || []).join('\n\n')}
 
       // 2b. Base Genetics
       const intelligence = randomGaussian(50, 15);
-      const beauty = import.meta.env.DEV ? 100 : randomGaussian(50, 15);
+      const beauty = randomGaussian(50, 15);
 
       // 3. Mortality Setup
       let baseInfantMortality = selectedEra.infantMortality;
@@ -1312,52 +1350,52 @@ ${(currentLife.narrative || []).join('\n\n')}
         }
       }
 
-    // 7. Hobby & Pastimes Engine (Rich casual pastimes for ordinary & working classes)
-    const isAutistic = disabilityCategory === "Neurodivergent condition" && (disabilityExamples || '').toLowerCase().includes('autism');
-    const isNeurodivergent = disabilityCategory === "Neurodivergent condition";
-    const isUpperClass = socialClass.includes("Upper") || socialClass.includes("Nobility") || socialClass.includes("Aristocrat") || socialClass.includes("Patrician");
-    const isSocialOrCurious = [personality1, personality2].some(p => 
-      p.includes("social") || p.includes("curious") || p.includes("empathetic") || p.includes("creative") || p.includes("garrulous") || p.includes("contemplative")
-    );
+      // 7. Hobby & Pastimes Engine (Rich casual pastimes for ordinary & working classes)
+      const isAutistic = disabilityCategory === "Neurodivergent condition" && (disabilityExamples || '').toLowerCase().includes('autism');
+      const isNeurodivergent = disabilityCategory === "Neurodivergent condition";
+      const isUpperClass = socialClass.includes("Upper") || socialClass.includes("Nobility") || socialClass.includes("Aristocrat") || socialClass.includes("Patrician");
+      const isSocialOrCurious = [personality1, personality2].some(p =>
+        p.includes("social") || p.includes("curious") || p.includes("empathetic") || p.includes("creative") || p.includes("garrulous") || p.includes("contemplative")
+      );
 
-    let hobbyData = "No formal hobbies (daily life centered on labor and sustenance).";
-    
-    // Casual pastimes pool for commoners/poor
-    const commonPastimes = [
-      "folk singing and learning traditional ballads",
-      "communal folk dancing at village feasts and seasonal festivals",
-      "storytelling and recounting local folklore by the hearth or town fountain",
-      "dice, knucklebone, or coin-tossing games in taverns and public squares",
-      "fishing along local rivers and coastal waters",
-      "whittling decorative wood figurines, utensils, or whistles",
-      "playing a handmade pipe, reed flute, or drum",
-      "foraging for wild herbs, berries, and medicinal plants",
-      "casual wrestling, footraces, or traditional stone-lifting games",
-      "stargazing and tracking the constellations",
-      "gardening a small patch of flowers, herbs, or vegetables"
-    ];
+      let hobbyData = "No formal hobbies (daily life centered on labor and sustenance).";
 
-    if (isAutistic) {
-      hobbyData = Math.random() < 0.8
-        ? "an intense, all-consuming autistic special interest and hyperfocus (historically grounded in their era)"
-        : "a deep, quiet, repetitive autistic craft or specialized fascination";
-    } else if (isNeurodivergent) {
-      hobbyData = "a dedicated, absorbing focus on a specific manual craft or technical pursuit";
-    } else if (isUpperClass) {
-      hobbyData = pickRandomItem([
-        "formal equestrian riding, hunting, or falconry",
-        "patronage of fine arts, collecting ancient coins or curiosities",
-        "scholarly reading, poetry composition, and philosophical correspondence",
-        "fencing, music composition, or playing the lute/harpsichord/guqin",
-        "botanical cultivation and ornate estate gardening"
-      ]);
-    } else {
-      // 80% of commoners/poor have enjoyable casual pastimes, especially if personality is compatible
-      const commonPastimeChance = isSocialOrCurious ? 0.88 : 0.70;
-      if (Math.random() < commonPastimeChance) {
-        hobbyData = `a casual, relaxing pastime: ${pickRandomItem(commonPastimes)}`;
+      // Casual pastimes pool for commoners/poor
+      const commonPastimes = [
+        "folk singing and learning traditional ballads",
+        "communal folk dancing at village feasts and seasonal festivals",
+        "storytelling and recounting local folklore by the hearth or town fountain",
+        "dice, knucklebone, or coin-tossing games in taverns and public squares",
+        "fishing along local rivers and coastal waters",
+        "whittling decorative wood figurines, utensils, or whistles",
+        "playing a handmade pipe, reed flute, or drum",
+        "foraging for wild herbs, berries, and medicinal plants",
+        "casual wrestling, footraces, or traditional stone-lifting games",
+        "stargazing and tracking the constellations",
+        "gardening a small patch of flowers, herbs, or vegetables"
+      ];
+
+      if (isAutistic) {
+        hobbyData = Math.random() < 0.8
+          ? "an intense, all-consuming autistic special interest and hyperfocus (historically grounded in their era)"
+          : "a deep, quiet, repetitive autistic craft or specialized fascination";
+      } else if (isNeurodivergent) {
+        hobbyData = "a dedicated, absorbing focus on a specific manual craft or technical pursuit";
+      } else if (isUpperClass) {
+        hobbyData = pickRandomItem([
+          "formal equestrian riding, hunting, or falconry",
+          "patronage of fine arts, collecting ancient coins or curiosities",
+          "scholarly reading, poetry composition, and philosophical correspondence",
+          "fencing, music composition, or playing the lute/harpsichord/guqin",
+          "botanical cultivation and ornate estate gardening"
+        ]);
+      } else {
+        // 80% of commoners/poor have enjoyable casual pastimes, especially if personality is compatible
+        const commonPastimeChance = isSocialOrCurious ? 0.88 : 0.70;
+        if (Math.random() < commonPastimeChance) {
+          hobbyData = `a casual, relaxing pastime: ${pickRandomItem(commonPastimes)}`;
+        }
       }
-    }
 
       if (intelligence > 75 && Math.random() < 0.22) {
         hobbyData += " Through sharp intellect and skill, they eventually turned this pastime into an auxiliary trade or respected community renown.";
@@ -1408,6 +1446,244 @@ ${(currentLife.narrative || []).join('\n\n')}
 
           if (Math.random() < currentRisk) { isAlive = false; break; }
           age++;
+        }
+      }
+
+      // 3e. Jewish Identity & Antisemitism Spectrum Engine
+      let isJewish = false;
+      let antisemitismExperience = null;
+
+      if (isMinority && selectedEra.id !== 'PALEOLITHIC' && selectedEra.id !== 'NEOLITHIC') {
+        isJewish = (minorityGroupHint || '').toLowerCase().includes('jewish');
+        if (!isJewish) {
+          const reg = (regionText || '').toLowerCase();
+          if (reg.includes('judea') || reg.includes('jerusalem') || reg.includes('levant')) {
+            isJewish = true;
+            minorityGroupHint = 'Jewish (Judean)';
+          } else if (reg.includes('andalus') || reg.includes('spain') || reg.includes('iberia') || reg.includes('portugal')) {
+            if (Math.random() < 0.22) { isJewish = true; minorityGroupHint = 'Jewish (Sephardic)'; }
+          } else if (reg.includes('poland') || reg.includes('lithuania') || reg.includes('rus') || reg.includes('rhineland') || reg.includes('germany') || reg.includes('holy roman')) {
+            if (Math.random() < 0.28) { isJewish = true; minorityGroupHint = 'Jewish (Ashkenazi)'; }
+          } else if (reg.includes('caliphate') || reg.includes('egypt') || reg.includes('baghdad') || reg.includes('ottoman') || reg.includes('constantinople')) {
+            if (Math.random() < 0.20) { isJewish = true; minorityGroupHint = 'Jewish (Mizrahi/Sephardic)'; }
+          } else if (reg.includes('rome') || reg.includes('italy') || reg.includes('byzantine') || reg.includes('greece')) {
+            if (Math.random() < 0.16) { isJewish = true; minorityGroupHint = 'Jewish (Romaniote/Italki)'; }
+          }
+        }
+
+        if (isJewish && age >= 4 && !wasExposed) {
+          const by = birthYear;
+          const dy = birthYear + age;
+          const rName = (regionText || '').toLowerCase();
+          const isEurope = rName.includes('germany') || rName.includes('poland') || rName.includes('russia') || rName.includes('ukraine') || rName.includes('france') || rName.includes('netherlands') || rName.includes('austria') || rName.includes('czech') || rName.includes('hungary') || rName.includes('italy') || rName.includes('greece') || rName.includes('lithuania') || rName.includes('latvia') || rName.includes('belarus') || rName.includes('romania');
+
+          // 1. THE HOLOCAUST (1933-1945 in Nazi Europe)
+          if (selectedEra.id === 'MODERN' && isEurope && by <= 1944 && dy >= 1933) {
+            if (by <= 1928 && Math.random() < 0.28) {
+              isEmigrant = true;
+              emigrationAge = Math.min(age, Math.max(8, 1938 - by));
+              const refugeDests = [
+                { name: "United States", lat: 40.71, lng: -74.00 },
+                { name: "United Kingdom", lat: 51.50, lng: -0.12 },
+                { name: "Mandatory Palestine", lat: 31.76, lng: 35.21 },
+                { name: "Argentina", lat: -34.60, lng: -58.38 }
+              ];
+              const chosenDest = pickRandomItem(refugeDests);
+              deathRegion = chosenDest.name;
+              deathLat = chosenDest.lat;
+              deathLng = chosenDest.lng;
+              antisemitismExperience = {
+                level: "Holocaust Refugee",
+                details: `Fled escalating Nazi persecution, Nuremberg racial laws, and antisemitic violence in the 1930s, successfully emigrating as a refugee to ${deathRegion}.`
+              };
+            } else if (dy >= 1939) {
+              if (Math.random() < 0.68) {
+                const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 45)));
+                age = Math.max(0, deathY - by);
+                isAlive = false;
+                causeOfDeath = pickRandomItem([
+                  "murdered in the extermination camps during the Holocaust in Nazi-occupied Europe (Auschwitz-Birkenau)",
+                  "murdered in the gas chambers during the Holocaust (Treblinka / Sobibor)",
+                  "murdered in a mass shooting by Nazi Einsatzgruppen mobile killing squads",
+                  "starvation, typhus, and brutal exhaustion inside an enclosed Nazi ghetto (Warsaw / Lodz Ghetto)"
+                ]);
+                antisemitismExperience = {
+                  level: "The Holocaust (Victim)",
+                  details: "Perished in the Holocaust during the Nazi genocide of European Jewry."
+                };
+              } else {
+                antisemitismExperience = {
+                  level: "The Holocaust (Survivor)",
+                  details: pickRandomItem([
+                    "Endured the horrors of the Holocaust, surviving in hiding with underground partisans in the forests and emerging after liberation in 1945.",
+                    "Survived the Holocaust through the courage of righteous neighbors who sheltered your family in hidden quarters until liberation.",
+                    "Survived imprisonment in Nazi concentration camps, enduring until Allied liberation in 1945 and rebuilding your life in the post-war era."
+                  ])
+                };
+                if (Math.random() < 0.65) {
+                  isEmigrant = true;
+                  emigrationAge = Math.min(age, Math.max(16, 1947 - by));
+                  const dest = pickRandomItem([
+                    { name: "Israel", lat: 31.76, lng: 35.21 },
+                    { name: "United States", lat: 40.71, lng: -74.00 },
+                    { name: "Canada", lat: 45.50, lng: -73.56 }
+                  ]);
+                  deathRegion = dest.name;
+                  deathLat = dest.lat;
+                  deathLng = dest.lng;
+                  antisemitismExperience.details += ` Emigrated after the war to build a new life in ${deathRegion}.`;
+                }
+              }
+            }
+          }
+
+          // 2. PREMODERN & GENERAL ANTISEMITISM SPECTRUM
+          if (!antisemitismExperience) {
+            const roll = Math.random();
+
+            if (roll < 0.25) {
+              antisemitismExperience = {
+                level: "Peaceful Coexistence",
+                details: "Lived in an era and community of cultural coexistence, religious autonomy, and peace with neighboring populations."
+              };
+            } else if (roll < 0.50) {
+              antisemitismExperience = {
+                level: "Social Prejudice",
+                details: "Navigated quiet social prejudice, exclusionary social barriers, and subtle neighborly disdain while maintaining vibrant Jewish communal and family traditions."
+              };
+            } else if (roll < 0.75) {
+              antisemitismExperience = {
+                level: "Institutional Discrimination",
+                details: pickRandomItem([
+                  "Subjected to municipal residency restrictions, confined to live within the locked gates of the Jewish quarter / ghetto (such as the Venetian Ghetto or Mellah).",
+                  "Subjected to special sumptuary clothing codes (yellow badge / distinctive hat) and special protection taxes (Leibzoll / Jizya) imposed on religious minorities.",
+                  "Barred by law from owning agricultural land or entering trade guilds, channeling your livelihood into permitted mercantile and artisan trades."
+                ])
+              };
+            } else {
+              let persecutionScenario = "Faced acute anti-Jewish hostility and localized unrest, relying on community solidarity to endure.";
+              let causesFlight = false;
+
+              if ((rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) && by <= 1492 && dy >= 1492) {
+                persecutionScenario = "Confronted by the 1492 Alhambra Decree expelling all practicing Jews from Spain upon pain of death.";
+                causesFlight = true;
+              } else if ((rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) && by >= 1860 && dy >= 1881) {
+                persecutionScenario = "Survived violent Tsarist pogroms in the Pale of Settlement where armed mobs attacked Jewish homes and shops.";
+                causesFlight = true;
+              } else if (selectedEra.id === 'MEDIEVAL' && by <= 1350 && dy >= 1348) {
+                persecutionScenario = "Narrowly escaped violent mob massacres and scapegoating during the Black Death hysteria in 1348–1349.";
+                causesFlight = true;
+              } else if (by <= 136 && dy >= 66 && (rName.includes('judea') || rName.includes('levant') || rName.includes('rome'))) {
+                persecutionScenario = "Lived through the devastating Roman siege and destruction of Jerusalem during the Jewish-Roman wars.";
+                causesFlight = true;
+              } else {
+                persecutionScenario = pickRandomItem([
+                  "Faced escalating localized anti-Jewish riots and violent mob intimidation targeting the Jewish quarter.",
+                  "Threatened with arbitrary arrest and confiscation of property during an outbreak of religious hysteria."
+                ]);
+                causesFlight = Math.random() < 0.55;
+              }
+
+              antisemitismExperience = {
+                level: "Pogrom & Persecution",
+                details: persecutionScenario
+              };
+
+              if (causesFlight && age >= 14 && !isEmigrant) {
+                isEmigrant = true;
+                emigrationAge = randomInt(14, Math.min(age, 38));
+
+                if (rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) {
+                  const dest = pickRandomItem([
+                    { name: "Ottoman Empire (Salonica / Constantinople)", lat: 40.64, lng: 22.94 },
+                    { name: "North Africa (Morocco / Tunisia)", lat: 34.03, lng: -5.00 },
+                    { name: "Netherlands (Amsterdam)", lat: 52.37, lng: 4.89 }
+                  ]);
+                  deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
+                } else if (rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) {
+                  const dest = pickRandomItem([
+                    { name: "United States (New York Lower East Side)", lat: 40.71, lng: -73.99 },
+                    { name: "United Kingdom (London East End)", lat: 51.52, lng: -0.06 },
+                    { name: "Argentina (Buenos Aires)", lat: -34.60, lng: -58.38 }
+                  ]);
+                  deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
+                } else {
+                  const destPool = selectedEra.regions.filter(r => r.text !== regionText);
+                  const dest = destPool.length > 0 ? pickRandomItem(destPool) : selectedEra.regions[0];
+                  deathRegion = dest.text; deathLat = dest.lat; deathLng = dest.lng;
+                }
+                antisemitismExperience.details += ` To escape persecution, emigrated to find safety and rebuild in ${deathRegion}.`;
+              }
+            }
+          }
+        }
+      }
+
+      // 3f. Universal Minority Persecution Engine
+      let minorityPersecution = null;
+
+      if (isMinority && !isJewish && minorityGroupHint && age >= 5 && !wasExposed) {
+        const minHint = minorityGroupHint.toLowerCase();
+        const rName = (regionText || '').toLowerCase();
+        const by = birthYear;
+
+        if (minHint.includes('black') || minHint.includes('afro')) {
+          if (rName.includes('usa') || rName.includes('united states') || rName.includes('north america')) {
+            if (by >= 1865 && by <= 1965) {
+              if (Math.random() < 0.70) {
+                minorityPersecution = {
+                  level: "Segregation & Civil Rights Struggle",
+                  details: "Navigated the harsh barriers of Jim Crow segregation, racial redlining, and disenfranchisement while building community solidarity through church and family."
+                };
+                if (Math.random() < 0.40 && !isEmigrant && age >= 18) {
+                  isEmigrant = true;
+                  emigrationAge = randomInt(18, Math.min(age, 35));
+                  deathRegion = "Northern Urban Centers (Chicago / New York / Detroit)";
+                  deathLat = 41.87; deathLng = -87.62;
+                  minorityPersecution.details += " Joined the Great Migration to northern industrial centers seeking economic opportunity and dignity.";
+                }
+              }
+            }
+          }
+        } else if (minHint.includes('indigenous') || minHint.includes('native') || minHint.includes('māori') || minHint.includes('aboriginal') || minHint.includes('quechua') || minHint.includes('mapuche')) {
+          if (selectedEra.id === 'MODERN' || selectedEra.id === 'EARLY_MODERN') {
+            if (Math.random() < 0.60) {
+              minorityPersecution = {
+                level: "Colonial Dispossession & Assimilation",
+                details: "Resisted colonial land encroachment and aggressive state assimilation policies (including forced boarding schools), keeping tribal lore and songs alive."
+              };
+            }
+          }
+        } else if (minHint.includes('romani') || minHint.includes('sinti')) {
+          if (selectedEra.id === 'MODERN' && by <= 1945 && by + age >= 1939 && (rName.includes('germany') || rName.includes('poland') || rName.includes('europe') || rName.includes('france') || rName.includes('hungary') || rName.includes('italy'))) {
+            if (Math.random() < 0.55) {
+              const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 40)));
+              age = Math.max(0, deathY - by);
+              isAlive = false;
+              causeOfDeath = "murdered during the Romani genocide (Porajmos) in Nazi-occupied Europe";
+              minorityPersecution = { level: "Porajmos / Genocide", details: "Perished during the Nazi genocide of Romani and Sinti people (Porajmos)." };
+            } else {
+              minorityPersecution = { level: "Genocide Survivor", details: "Survived the Porajmos (Romani genocide) during WWII, evading deportation and preserving clan traditions." };
+            }
+          } else {
+            minorityPersecution = { level: "Marginalization & Wandering Bans", details: "Faced persistent municipal wandering bans, police harassment, and social exclusion, relying on close family caravans." };
+          }
+        } else if (minHint.includes('chinese') || minHint.includes('asian')) {
+          if (rName.includes('usa') || rName.includes('america') || rName.includes('australia')) {
+            if (by >= 1850 && by <= 1943) {
+              minorityPersecution = { level: "Exclusion Laws & Nativist Bias", details: "Endured the era of the Chinese Exclusion Act and nativist anti-Asian hostility, finding safety in tight-knit chinatowns and mutual-aid merchant associations." };
+            }
+          }
+        } else if (minHint.includes('armenian') && by >= 1880 && by <= 1915) {
+          if (Math.random() < 0.65) {
+            isEmigrant = true;
+            emigrationAge = Math.min(age, Math.max(12, 1915 - by));
+            deathRegion = pickRandomItem(["France (Marseille/Paris)", "United States (California/Boston)", "Lebanon (Beirut)"]);
+            deathLat = 43.29; deathLng = 5.36;
+            minorityPersecution = { level: "Genocide Refugee", details: `Fled the 1915 Armenian Genocide in the Ottoman Empire, emigrating as a displaced refugee to rebuild life in ${deathRegion}.` };
+          }
+        } else if ((minHint.includes('chechen') || minHint.includes('tatar')) && by <= 1944 && by + age >= 1944) {
+          minorityPersecution = { level: "Forced Mass Deportation", details: "Survived the brutal 1944 Stalinist deportation to Central Asia in cattle cars, enduring harsh exile before returning home decades later." };
         }
       }
 
@@ -1828,244 +2104,6 @@ ${(currentLife.narrative || []).join('\n\n')}
         }
       }
 
-      // 3e. Jewish Identity & Antisemitism Spectrum Engine (Early Exit if not minority or not applicable)
-      let isJewish = false;
-      let antisemitismExperience = null;
-
-      if (isMinority && selectedEra.id !== 'PALEOLITHIC' && selectedEra.id !== 'NEOLITHIC') {
-        isJewish = (minorityGroupHint || '').toLowerCase().includes('jewish');
-        if (!isJewish) {
-          const reg = (regionText || '').toLowerCase();
-          if (reg.includes('judea') || reg.includes('jerusalem') || reg.includes('levant')) {
-            isJewish = true;
-            minorityGroupHint = 'Jewish (Judean)';
-          } else if (reg.includes('andalus') || reg.includes('spain') || reg.includes('iberia') || reg.includes('portugal')) {
-            if (Math.random() < 0.22) { isJewish = true; minorityGroupHint = 'Jewish (Sephardic)'; }
-          } else if (reg.includes('poland') || reg.includes('lithuania') || reg.includes('rus') || reg.includes('rhineland') || reg.includes('germany') || reg.includes('holy roman')) {
-            if (Math.random() < 0.28) { isJewish = true; minorityGroupHint = 'Jewish (Ashkenazi)'; }
-          } else if (reg.includes('caliphate') || reg.includes('egypt') || reg.includes('baghdad') || reg.includes('ottoman') || reg.includes('constantinople')) {
-            if (Math.random() < 0.20) { isJewish = true; minorityGroupHint = 'Jewish (Mizrahi/Sephardic)'; }
-          } else if (reg.includes('rome') || reg.includes('italy') || reg.includes('byzantine') || reg.includes('greece')) {
-            if (Math.random() < 0.16) { isJewish = true; minorityGroupHint = 'Jewish (Romaniote/Italki)'; }
-          }
-        }
-
-        if (isJewish && age >= 4 && !wasExposed) {
-          const by = birthYear;
-          const dy = birthYear + age;
-          const rName = (regionText || '').toLowerCase();
-          const isEurope = rName.includes('germany') || rName.includes('poland') || rName.includes('russia') || rName.includes('ukraine') || rName.includes('france') || rName.includes('netherlands') || rName.includes('austria') || rName.includes('czech') || rName.includes('hungary') || rName.includes('italy') || rName.includes('greece') || rName.includes('lithuania') || rName.includes('latvia') || rName.includes('belarus') || rName.includes('romania');
-
-          // 1. THE HOLOCAUST (1933-1945 in Nazi Europe)
-          if (selectedEra.id === 'MODERN' && isEurope && by <= 1944 && dy >= 1933) {
-            if (by <= 1928 && Math.random() < 0.28) {
-              isEmigrant = true;
-              emigrationAge = Math.min(age, Math.max(8, 1938 - by));
-              const refugeDests = [
-                { name: "United States", lat: 40.71, lng: -74.00 },
-                { name: "United Kingdom", lat: 51.50, lng: -0.12 },
-                { name: "Mandatory Palestine", lat: 31.76, lng: 35.21 },
-                { name: "Argentina", lat: -34.60, lng: -58.38 }
-              ];
-              const chosenDest = pickRandomItem(refugeDests);
-              deathRegion = chosenDest.name;
-              deathLat = chosenDest.lat;
-              deathLng = chosenDest.lng;
-              antisemitismExperience = {
-                level: "Holocaust Refugee",
-                details: `Fled escalating Nazi persecution, Nuremberg racial laws, and antisemitic violence in the 1930s, successfully emigrating as a refugee to ${deathRegion}.`
-              };
-            } else if (dy >= 1939) {
-              if (Math.random() < 0.68) {
-                const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 45)));
-                age = Math.max(0, deathY - by);
-                isAlive = false;
-                causeOfDeath = pickRandomItem([
-                  "murdered in the extermination camps during the Holocaust in Nazi-occupied Europe (Auschwitz-Birkenau)",
-                  "murdered in the gas chambers during the Holocaust (Treblinka / Sobibor)",
-                  "murdered in a mass shooting by Nazi Einsatzgruppen mobile killing squads",
-                  "starvation, typhus, and brutal exhaustion inside an enclosed Nazi ghetto (Warsaw / Lodz Ghetto)"
-                ]);
-                antisemitismExperience = {
-                  level: "The Holocaust (Victim)",
-                  details: "Perished in the Holocaust during the Nazi genocide of European Jewry."
-                };
-              } else {
-                antisemitismExperience = {
-                  level: "The Holocaust (Survivor)",
-                  details: pickRandomItem([
-                    "Endured the horrors of the Holocaust, surviving in hiding with underground partisans in the forests and emerging after liberation in 1945.",
-                    "Survived the Holocaust through the courage of righteous neighbors who sheltered your family in hidden quarters until liberation.",
-                    "Survived imprisonment in Nazi concentration camps, enduring until Allied liberation in 1945 and rebuilding your life in the post-war era."
-                  ])
-                };
-                if (Math.random() < 0.65) {
-                  isEmigrant = true;
-                  emigrationAge = Math.min(age, Math.max(16, 1947 - by));
-                  const dest = pickRandomItem([
-                    { name: "Israel", lat: 31.76, lng: 35.21 },
-                    { name: "United States", lat: 40.71, lng: -74.00 },
-                    { name: "Canada", lat: 45.50, lng: -73.56 }
-                  ]);
-                  deathRegion = dest.name;
-                  deathLat = dest.lat;
-                  deathLng = dest.lng;
-                  antisemitismExperience.details += ` Emigrated after the war to build a new life in ${deathRegion}.`;
-                }
-              }
-            }
-          }
-
-          // 2. PREMODERN & GENERAL ANTISEMITISM SPECTRUM
-          if (!antisemitismExperience) {
-            const roll = Math.random();
-
-            if (roll < 0.25) {
-              antisemitismExperience = {
-                level: "Peaceful Coexistence",
-                details: "Lived in an era and community of cultural coexistence, religious autonomy, and peace with neighboring populations."
-              };
-            } else if (roll < 0.50) {
-              antisemitismExperience = {
-                level: "Social Prejudice",
-                details: "Navigated quiet social prejudice, exclusionary social barriers, and subtle neighborly disdain while maintaining vibrant Jewish communal and family traditions."
-              };
-            } else if (roll < 0.75) {
-              antisemitismExperience = {
-                level: "Institutional Discrimination",
-                details: pickRandomItem([
-                  "Subjected to municipal residency restrictions, confined to live within the locked gates of the Jewish quarter / ghetto (such as the Venetian Ghetto or Mellah).",
-                  "Subjected to special sumptuary clothing codes (yellow badge / distinctive hat) and special protection taxes (Leibzoll / Jizya) imposed on religious minorities.",
-                  "Barred by law from owning agricultural land or entering trade guilds, channeling your livelihood into permitted mercantile and artisan trades."
-                ])
-              };
-            } else {
-              let persecutionScenario = "Faced acute anti-Jewish hostility and localized unrest, relying on community solidarity to endure.";
-              let causesFlight = false;
-
-              if ((rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) && by <= 1492 && dy >= 1492) {
-                persecutionScenario = "Confronted by the 1492 Alhambra Decree expelling all practicing Jews from Spain upon pain of death.";
-                causesFlight = true;
-              } else if ((rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) && by >= 1860 && dy >= 1881) {
-                persecutionScenario = "Survived violent Tsarist pogroms in the Pale of Settlement where armed mobs attacked Jewish homes and shops.";
-                causesFlight = true;
-              } else if (selectedEra.id === 'MEDIEVAL' && by <= 1350 && dy >= 1348) {
-                persecutionScenario = "Narrowly escaped violent mob massacres and scapegoating during the Black Death hysteria in 1348–1349.";
-                causesFlight = true;
-              } else if (by <= 136 && dy >= 66 && (rName.includes('judea') || rName.includes('levant') || rName.includes('rome'))) {
-                persecutionScenario = "Lived through the devastating Roman siege and destruction of Jerusalem during the Jewish-Roman wars.";
-                causesFlight = true;
-              } else {
-                persecutionScenario = pickRandomItem([
-                  "Faced escalating localized anti-Jewish riots and violent mob intimidation targeting the Jewish quarter.",
-                  "Threatened with arbitrary arrest and confiscation of property during an outbreak of religious hysteria."
-                ]);
-                causesFlight = Math.random() < 0.55;
-              }
-
-              antisemitismExperience = {
-                level: "Pogrom & Persecution",
-                details: persecutionScenario
-              };
-
-              if (causesFlight && age >= 14 && !isEmigrant) {
-                isEmigrant = true;
-                emigrationAge = randomInt(14, Math.min(age, 38));
-
-                if (rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) {
-                  const dest = pickRandomItem([
-                    { name: "Ottoman Empire (Salonica / Constantinople)", lat: 40.64, lng: 22.94 },
-                    { name: "North Africa (Morocco / Tunisia)", lat: 34.03, lng: -5.00 },
-                    { name: "Netherlands (Amsterdam)", lat: 52.37, lng: 4.89 }
-                  ]);
-                  deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
-                } else if (rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) {
-                  const dest = pickRandomItem([
-                    { name: "United States (New York Lower East Side)", lat: 40.71, lng: -73.99 },
-                    { name: "United Kingdom (London East End)", lat: 51.52, lng: -0.06 },
-                    { name: "Argentina (Buenos Aires)", lat: -34.60, lng: -58.38 }
-                  ]);
-                  deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
-                } else {
-                  const destPool = selectedEra.regions.filter(r => r.text !== regionText);
-                  const dest = destPool.length > 0 ? pickRandomItem(destPool) : selectedEra.regions[0];
-                  deathRegion = dest.text; deathLat = dest.lat; deathLng = dest.lng;
-                }
-                antisemitismExperience.details += ` To escape persecution, emigrated to find safety and rebuild in ${deathRegion}.`;
-              }
-            }
-          }
-        }
-      }
-
-      // 3f. Universal Minority Persecution Engine (for all other historically documented minority groups)
-      let minorityPersecution = null;
-
-      if (isMinority && !isJewish && minorityGroupHint && age >= 5 && !wasExposed) {
-        const minHint = minorityGroupHint.toLowerCase();
-        const rName = (regionText || '').toLowerCase();
-        const by = birthYear;
-
-        if (minHint.includes('black') || minHint.includes('afro')) {
-          if (rName.includes('usa') || rName.includes('united states') || rName.includes('north america')) {
-            if (by >= 1865 && by <= 1965) {
-              if (Math.random() < 0.70) {
-                minorityPersecution = {
-                  level: "Segregation & Civil Rights Struggle",
-                  details: "Navigated the harsh barriers of Jim Crow segregation, racial redlining, and disenfranchisement while building community solidarity through church and family."
-                };
-                if (Math.random() < 0.40 && !isEmigrant && age >= 18) {
-                  isEmigrant = true;
-                  emigrationAge = randomInt(18, Math.min(age, 35));
-                  deathRegion = "Northern Urban Centers (Chicago / New York / Detroit)";
-                  deathLat = 41.87; deathLng = -87.62;
-                  minorityPersecution.details += " Joined the Great Migration to northern industrial centers seeking economic opportunity and dignity.";
-                }
-              }
-            }
-          }
-        } else if (minHint.includes('indigenous') || minHint.includes('native') || minHint.includes('māori') || minHint.includes('aboriginal') || minHint.includes('quechua') || minHint.includes('mapuche')) {
-          if (selectedEra.id === 'MODERN' || selectedEra.id === 'EARLY_MODERN') {
-            if (Math.random() < 0.60) {
-              minorityPersecution = {
-                level: "Colonial Dispossession & Assimilation",
-                details: "Resisted colonial land encroachment and aggressive state assimilation policies (including forced boarding schools), keeping tribal lore and songs alive."
-              };
-            }
-          }
-        } else if (minHint.includes('romani') || minHint.includes('sinti')) {
-          if (selectedEra.id === 'MODERN' && by <= 1945 && by + age >= 1939 && (rName.includes('germany') || rName.includes('poland') || rName.includes('europe') || rName.includes('france') || rName.includes('hungary') || rName.includes('italy'))) {
-            if (Math.random() < 0.55) {
-              const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 40)));
-              age = Math.max(0, deathY - by);
-              isAlive = false;
-              causeOfDeath = "murdered during the Romani genocide (Porajmos) in Nazi-occupied Europe";
-              minorityPersecution = { level: "Porajmos / Genocide", details: "Perished during the Nazi genocide of Romani and Sinti people (Porajmos)." };
-            } else {
-              minorityPersecution = { level: "Genocide Survivor", details: "Survived the Porajmos (Romani genocide) during WWII, evading deportation and preserving clan traditions." };
-            }
-          } else {
-            minorityPersecution = { level: "Marginalization & Wandering Bans", details: "Faced persistent municipal wandering bans, police harassment, and social exclusion, relying on close family caravans." };
-          }
-        } else if (minHint.includes('chinese') || minHint.includes('asian')) {
-          if (rName.includes('usa') || rName.includes('america') || rName.includes('australia')) {
-            if (by >= 1850 && by <= 1943) {
-              minorityPersecution = { level: "Exclusion Laws & Nativist Bias", details: "Endured the era of the Chinese Exclusion Act and nativist anti-Asian hostility, finding safety in tight-knit chinatowns and mutual-aid merchant associations." };
-            }
-          }
-        } else if (minHint.includes('armenian') && by >= 1880 && by <= 1915) {
-          if (Math.random() < 0.65) {
-            isEmigrant = true;
-            emigrationAge = Math.min(age, Math.max(12, 1915 - by));
-            deathRegion = pickRandomItem(["France (Marseille/Paris)", "United States (California/Boston)", "Lebanon (Beirut)"]);
-            deathLat = 43.29; deathLng = 5.36;
-            minorityPersecution = { level: "Genocide Refugee", details: `Fled the 1915 Armenian Genocide in the Ottoman Empire, emigrating as a displaced refugee to rebuild life in ${deathRegion}.` };
-          }
-        } else if ((minHint.includes('chechen') || minHint.includes('tatar')) && by <= 1944 && by + age >= 1944) {
-          minorityPersecution = { level: "Forced Mass Deportation", details: "Survived the brutal 1944 Stalinist deportation to Central Asia in cattle cars, enduring harsh exile before returning home decades later." };
-        }
-      }
-
       // 3g. High Beauty Modeling Career Engine (Modern World, Beauty >= 90)
       let modelingCareer = null;
 
@@ -2262,9 +2300,11 @@ ${(currentLife.narrative || []).join('\n\n')}
         badges: earnedBadges,
         historicalEncounters: generatedData?.historicalEncounters || [],
         historicalEventsLivedThrough: generatedData?.historicalEventsLivedThrough || [],
-        narrative: generatedData.narrative,
-        timeline: generatedData.timeline || [],
-        wikiLinks: generatedData.wikiLinks || [],
+        narrative: Array.isArray(generatedData?.narrative)
+          ? generatedData.narrative
+          : (typeof generatedData?.narrative === 'string' ? generatedData.narrative.split('\n\n').filter(Boolean) : ["An ancient life recorded in the threads of time."]),
+        timeline: Array.isArray(generatedData?.timeline) ? generatedData.timeline : [],
+        wikiLinks: Array.isArray(generatedData?.wikiLinks) ? generatedData.wikiLinks : [],
         eraName: selectedEra.name
       };
 
@@ -2273,6 +2313,7 @@ ${(currentLife.narrative || []).join('\n\n')}
       setStats(prev => ({ totalLived: prev.totalLived + 1, highestAge: Math.max(prev.highestAge, age) }));
     } catch (criticalErr) {
       console.error("Critical simulation error:", criticalErr);
+      setGenerationError(import.meta.env.DEV ? `[DEV ERROR] Simulation error:\n${criticalErr.stack || criticalErr.message}` : "An unexpected error occurred. Please tap 'Incarnate' again.");
     } finally {
       setIsGenerating(false);
     }
@@ -2360,8 +2401,8 @@ ${(currentLife.narrative || []).join('\n\n')}
             onClick={simulateLife}
             disabled={isGenerating}
             className={`group relative inline-flex items-center justify-center px-9 py-4 font-sans font-semibold text-white transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 focus:ring-offset-slate-950 shadow-[0_0_25px_rgba(99,102,241,0.4)] ${isGenerating
-                ? 'bg-indigo-700/80 cursor-wait'
-                : 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 hover:shadow-[0_0_35px_rgba(99,102,241,0.6)] active:scale-[0.98] cursor-pointer'
+              ? 'bg-indigo-700/80 cursor-wait'
+              : 'bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 hover:shadow-[0_0_35px_rgba(99,102,241,0.6)] active:scale-[0.98] cursor-pointer'
               }`}
           >
             {isGenerating ? (
@@ -2537,9 +2578,9 @@ ${(currentLife.narrative || []).join('\n\n')}
 
               {/* Narrative Story */}
               <section className="space-y-6 text-[1.15rem] md:text-[1.2rem] leading-relaxed text-slate-200" aria-label="Life Narrative">
-                {currentLife.narrative.map((p, idx) => (
+                {(Array.isArray(currentLife?.narrative) ? currentLife.narrative : [currentLife?.narrative || '']).filter(Boolean).map((p, idx) => (
                   <p key={idx} className={idx === 0 ? "first-letter:text-5xl md:first-letter:text-6xl first-letter:font-bold first-letter:text-indigo-400 first-letter:mr-3 first-letter:float-left first-letter:leading-none" : ""}>
-                    {p}
+                    {typeof p === 'string' ? p : JSON.stringify(p)}
                   </p>
                 ))}
               </section>
@@ -2597,8 +2638,8 @@ ${(currentLife.narrative || []).join('\n\n')}
                     onMouseLeave={() => setHoveredBadge(null)}
                     onClick={() => { playUiSound('click'); setHoveredBadge(badge); }}
                     className={`relative aspect-square rounded-xl border flex items-center justify-center transition-all cursor-pointer group ${isUnlocked
-                        ? `${badge.colorClass} shadow-sm hover:scale-105 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)]`
-                        : 'bg-slate-900/50 border-slate-800/80 text-slate-600 opacity-40 hover:opacity-80 hover:border-slate-700'
+                      ? `${badge.colorClass} shadow-sm hover:scale-105 hover:shadow-[0_0_15px_rgba(245,158,11,0.3)]`
+                      : 'bg-slate-900/50 border-slate-800/80 text-slate-600 opacity-40 hover:opacity-80 hover:border-slate-700'
                       } ${isSelected ? 'ring-2 ring-indigo-400 scale-105 opacity-100' : ''}`}
                   >
                     <Icon className={`w-6 h-6 transition-transform group-hover:scale-110 ${isUnlocked ? '' : 'text-slate-600'}`} />
@@ -2620,8 +2661,8 @@ ${(currentLife.narrative || []).join('\n\n')}
                       {hoveredBadge.name}
                     </span>
                     <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md ${unlockedBadges.includes(hoveredBadge.id)
-                        ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30'
-                        : 'bg-slate-800 text-slate-400 border border-slate-700'
+                      ? 'bg-emerald-950/60 text-emerald-300 border border-emerald-500/30'
+                      : 'bg-slate-800 text-slate-400 border border-slate-700'
                       }`}>
                       {unlockedBadges.includes(hoveredBadge.id) ? '✓ Unlocked' : '🔒 Locked'}
                     </span>
@@ -2726,8 +2767,8 @@ ${(currentLife.narrative || []).join('\n\n')}
                       }}
                       title="Click to view this soul's story"
                       className={`p-3 rounded-xl border text-xs cursor-pointer transition-all ${isCurrent
-                          ? 'bg-indigo-950/60 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.25)]'
-                          : 'bg-slate-800/40 border-slate-700/30 hover:border-indigo-500/40 hover:bg-slate-800/80'
+                        ? 'bg-indigo-950/60 border-indigo-500 shadow-[0_0_15px_rgba(99,102,241,0.25)]'
+                        : 'bg-slate-800/40 border-slate-700/30 hover:border-indigo-500/40 hover:bg-slate-800/80'
                         }`}
                     >
                       <div className="flex justify-between items-start mb-1.5">

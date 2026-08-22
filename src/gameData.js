@@ -355,13 +355,82 @@ export const MODERN_COUNTRIES = [
     minorityClassBias: { working: 1.7, middle: 0.70, upper: 0.40 }
   },
   {
-    // Catch-all for remaining ~10% of world population
-    name: "Rest of the World", weight: 9.4, lang: "a regional language",
-    lat: 5.0, lng: 20.0, urbanStart: 0.10, urbanEnd: 0.50, lifeExpectancy: 68,
-    minorities: ["a significant regional ethnic or religious minority"],
+    name: "Colombia", weight: 1.2, lang: "Spanish",
+    lat: 4.57, lng: -74.30, urbanStart: 0.20, urbanEnd: 0.77, lifeExpectancy: 76,
+    minorities: ["Afro-Colombian (Pacific/Caribbean coast)", "Indigenous Wayuu, Nasa, or Embera", "Raizal Creole (San Andrés)"],
     minorityChance: 0.15,
+    minorityClassBias: { working: 1.8, middle: 0.65, upper: 0.35 }
+  },
+  {
+    name: "Peru", weight: 0.9, lang: "Spanish, Quechua, or Aymara",
+    lat: -9.19, lng: -75.01, urbanStart: 0.18, urbanEnd: 0.76, lifeExpectancy: 74,
+    minorities: ["Indigenous Quechua (Andean highlands)", "Indigenous Aymara", "Amazonian indigenous (Asháninka)", "Afro-Peruvian", "Tusán (Chinese Peruvian)"],
+    minorityChance: 0.30,
+    minorityClassBias: { working: 1.9, middle: 0.60, upper: 0.30 }
+  },
+  {
+    name: "Chile", weight: 0.5, lang: "Spanish",
+    lat: -35.67, lng: -71.54, urbanStart: 0.35, urbanEnd: 0.88, lifeExpectancy: 80,
+    minorities: ["Indigenous Mapuche", "Aymara minority (northern Chile)", "Rapa Nui (Easter Island)"],
+    minorityChance: 0.10,
+    minorityClassBias: { working: 1.8, middle: 0.65, upper: 0.35 }
+  },
+  {
+    name: "Cuba & Caribbean", weight: 0.8, lang: "Spanish or Caribbean Creole",
+    lat: 21.52, lng: -77.78, urbanStart: 0.25, urbanEnd: 0.75, lifeExpectancy: 77,
+    minorities: ["Afro-Cuban / Afro-Caribbean", "Mulatto / Mixed Creole", "Haitian immigrant worker"],
+    minorityChance: 0.35,
     minorityClassBias: { working: 1.7, middle: 0.70, upper: 0.40 }
   },
+  {
+    name: "Morocco & Maghreb", weight: 1.0, lang: "Moroccan Arabic (Darija) or Tamazight (Berber)",
+    lat: 31.79, lng: -7.09, urbanStart: 0.10, urbanEnd: 0.62, lifeExpectancy: 74,
+    minorities: ["Amazigh (Berber) speaker", "Moroccan Jewish (Mellah community)", "Gnawa / Haratin heritage", "Saharan Sahrawi"],
+    minorityChance: 0.28,
+    minorityClassBias: { working: 1.8, middle: 0.65, upper: 0.35 }
+  },
+  {
+    name: "Iraq & Levant", weight: 1.0, lang: "Arabic, Kurdish, or Aramaic",
+    lat: 33.22, lng: 43.67, urbanStart: 0.18, urbanEnd: 0.70, lifeExpectancy: 71,
+    minorities: ["Kurdish minority", "Assyrian / Chaldean Christian", "Yazidi minority", "Turkmen minority", "Marsh Arab (Ahwar)"],
+    minorityChance: 0.22,
+    minorityClassBias: { working: 1.8, middle: 0.65, upper: 0.35 }
+  },
+  {
+    name: "Saudi Arabia & Gulf", weight: 0.6, lang: "Arabic",
+    lat: 23.88, lng: 45.07, urbanStart: 0.10, urbanEnd: 0.84, lifeExpectancy: 76,
+    minorities: ["Shia Muslim minority (Eastern Province)", "Bedouin nomadic heritage", "Yemeni migrant lineage", "South Asian expatriate worker lineage"],
+    minorityChance: 0.15,
+    minorityClassBias: { working: 1.9, middle: 0.60, upper: 0.30 }
+  },
+  {
+    name: "Thailand", weight: 1.2, lang: "Thai or Isan",
+    lat: 15.87, lng: 100.99, urbanStart: 0.10, urbanEnd: 0.50, lifeExpectancy: 77,
+    minorities: ["Thai Chinese (Sino-Thai)", "Malay Muslim (southern Thailand)", "Isan / Lao-speaking (northeast)", "Karen / Hmong hill tribe"],
+    minorityChance: 0.18,
+    minorityClassBias: { working: 1.7, middle: 0.65, upper: 0.35 }
+  },
+  {
+    name: "Myanmar (Burma)", weight: 0.8, lang: "Burmese or an ethnic language",
+    lat: 21.91, lng: 95.95, urbanStart: 0.08, urbanEnd: 0.31, lifeExpectancy: 67,
+    minorities: ["Shan minority", "Karen (Kayin) minority", "Rakhine / Rohingya minority", "Kachin minority", "Anglo-Burmese"],
+    minorityChance: 0.32,
+    minorityClassBias: { working: 1.8, middle: 0.65, upper: 0.30 }
+  },
+  {
+    name: "Australia & New Zealand", weight: 0.6, lang: "English",
+    lat: -25.27, lng: 133.77, urbanStart: 0.45, urbanEnd: 0.89, lifeExpectancy: 83,
+    minorities: ["Aboriginal Australian & Torres Strait Islander", "Māori (Aotearoa / New Zealand)", "Greek / Italian post-war immigrant", "Asian Australian/New Zealander"],
+    minorityChance: 0.12,
+    minorityClassBias: { working: 2.0, middle: 0.60, upper: 0.30 }
+  },
+  {
+    name: "Ghana & West Africa", weight: 0.8, lang: "Twi, Fante, Ga, or Ewe",
+    lat: 7.94, lng: -1.02, urbanStart: 0.08, urbanEnd: 0.55, lifeExpectancy: 64,
+    minorities: ["Ewe minority", "Ga-Adangbe minority", "Northern Dagomba / Mole-Dagbon", "Fula pastoralist"],
+    minorityChance: 0.20,
+    minorityClassBias: { working: 1.7, middle: 0.70, upper: 0.40 }
+  }
 ];
 
 // ─────────────────────────────────────────────────
