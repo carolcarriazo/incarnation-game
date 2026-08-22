@@ -528,6 +528,14 @@ const generateFallbackNarrative = (lifeData) => {
     lifeData.isAlive ? { year: `2026 CE`, event: `Living today at age ${lifeData.age}.` } : { year: `${formatYear(lifeData.birthYear + lifeData.age)}`, event: `Passed away at age ${lifeData.age} from ${lifeData.causeOfDeath}.` }
   ].filter(Boolean);
 
+  const fallbackWiki = lifeData.isRoyaltyOrHistoric ? [
+    {
+      title: `Monarchy in ${lifeData.region}`,
+      url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(lifeData.region + ' monarchy dynasty')}`,
+      description: `Historical monarchy and ruling dynasties of ${lifeData.region}.`
+    }
+  ] : [];
+
   return {
     specificLocation: lifeData.region,
     deathSpecificLocation: lifeData.deathRegion || null,
@@ -535,7 +543,7 @@ const generateFallbackNarrative = (lifeData) => {
     timeline,
     historicalEncounters: [],
     historicalEventsLivedThrough: [],
-    wikiLinks: []
+    wikiLinks: fallbackWiki
   };
 };
 
@@ -601,7 +609,13 @@ CRITICAL RULES:
 13. PHYSICAL APPEARANCE & BEAUTY (FOR ATTRACTIVE PEOPLE):
     - When describing an attractive female character (Beauty > 75), you may freely use the word "beautiful", and describe specifically how others in her community or station perceived her appearance, graceful carriage, or features, and the attention or suitors she drew.
     - When describing an attractive male character (Beauty > 75), you may use words like "handsome", "striking", and "well-formed", and be specific about his distinct features (e.g. sharp facial features, commanding height, athletic build, clear eyes) and the notice, social regard, or romantic attention he commanded.
-14. JSON OUTPUT ONLY. Adhere strictly to the requested schema.`;
+14. ROYALTY & HISTORICAL FIGURES (REAL BIOGRAPHY & MANDATORY WIKIPEDIA LINKS):
+    - When the character is 'Royalty / Reigning Dynasty' or 'Royalty / Imperial Dynasty' (or any historical monarch/dynasty):
+      a) REAL HISTORICAL PERSON: You MUST base the life on a real historical monarch, prince/princess, emperor/empress, or royal dynasty figure who was born in that region/country around that era.
+      b) FACT-BASED NARRATIVE: Ground the story, dynastic house, reign, marriages, and events in real historical facts.
+      c) MANDATORY WIKIPEDIA LINK: You MUST provide the exact English Wikipedia URL for the real royal person, their dynasty/house, or their kingdom in the wikiLinks array (e.g. {"title": "House of Orléans-Braganza", "url": "https://en.wikipedia.org/wiki/House_of_Orl%C3%A9ans-Braganza", "description": "Imperial house of Brazil"} or {"title": "Prince Bertrand of Orléans-Braganza", "url": "https://en.wikipedia.org/wiki/Prince_Bertrand_of_Orl%C3%A9ans-Braganza", "description": "Head of the Imperial House of Brazil"}).
+    - FOR ALL LIVES: Always provide 1 to 3 valid, rich Wikipedia links in the wikiLinks array referencing the relevant monarch, dynasty, historical event, or region/culture so the player can delve into the real history.
+15. JSON OUTPUT ONLY. Adhere strictly to the requested schema.`;
 
   const userPrompt = `
 Generate a structured life profile based strictly on these parameters:
@@ -615,6 +629,7 @@ Generate a structured life profile based strictly on these parameters:
 - Ethnicity / Ancestry (EXPLICIT): ${lifeData.ethnicity || 'Native local lineage'}. CRITICAL RULE: Explicitly state and weave the character's exact ethnicity and ancestry (${lifeData.ethnicity || 'local ancestry'}) into the narrative, reflecting their lived reality and cultural station in this society.
 - Gender Identity: ${lifeData.isTransgender ? `Transgender (${lifeData.transgenderDetails})` : 'Cisgender (aligns with birth sex)'}
 - Social Class: ${lifeData.socialClass}
+${lifeData.isRoyaltyOrHistoric ? `- REAL HISTORICAL ROYALTY / MONARCH: This soul is born into Royalty / Imperial Dynasty in ${lifeData.region} around ${formatYear(lifeData.birthYear)}. You MUST identify an actual real historical royal, prince/princess, monarch, or dynasty member of this land, narrate their factual life story, and include their exact Wikipedia article URL in the wikiLinks array.` : ''}
 - Identity Group: ${lifeData.isMinority
       ? `Minority member — specifically ${lifeData.minorityGroupHint || lifeData.ethnicity || 'a demographically significant ethnic or religious minority for this location and era'}. Weave their minority identity authentically into the narrative.`
       : 'Majority / Dominant Group'}
@@ -765,6 +780,29 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
           if (!Array.isArray(parsed.historicalEncounters)) parsed.historicalEncounters = [];
           if (!Array.isArray(parsed.historicalEventsLivedThrough)) parsed.historicalEventsLivedThrough = [];
           if (!Array.isArray(parsed.wikiLinks)) parsed.wikiLinks = [];
+          parsed.wikiLinks = parsed.wikiLinks.map(link => {
+            if (!link || (!link.title && !link.url)) return null;
+            let title = (link.title || 'Historical Reference').trim();
+            let url = (link.url || '').trim();
+            if (!url.startsWith('http')) {
+              url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/\s+/g, '_'))}`;
+            }
+            return {
+              title,
+              url,
+              description: (link.description || 'Encyclopedia reference.').trim()
+            };
+          }).filter(Boolean);
+
+          // If royal but AI returned no wiki links, provide default dynasty link
+          if (lifeData.isRoyaltyOrHistoric && parsed.wikiLinks.length === 0) {
+            parsed.wikiLinks.push({
+              title: `Monarchy of ${lifeData.region}`,
+              url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(lifeData.region + ' royal dynasty')}`,
+              description: `Historical royal house and dynasty of ${lifeData.region}.`
+            });
+          }
+
           if (parsed.narrative.length > 0) return parsed;
         }
       }
