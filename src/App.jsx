@@ -462,10 +462,57 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
 // --- GEMINI API INTEGRATION ---
 const DEFAULT_API_KEY = [65, 81, 46, 65, 98, 56, 82, 78, 54, 76, 73, 86, 72, 54, 95, 66, 80, 71, 99, 79, 98, 118, 54, 51, 120, 57, 107, 116, 81, 73, 83, 56, 111, 85, 112, 107, 73, 113, 109, 77, 85, 54, 73, 79, 106, 67, 49, 95, 100, 84, 45, 57, 65].map(c => String.fromCharCode(c)).join("");
 
+const generateFallbackNarrative = (lifeData) => {
+  const isMale = lifeData.sex === 'Male';
+  const year = formatYear(lifeData.birthYear);
+  const loc = lifeData.region;
+  const cls = lifeData.socialClass;
+
+  const p1 = `You were born a ${lifeData.sex.toLowerCase()} in ${year} in ${loc} into the ${cls} tier of society. ` +
+    (lifeData.wasExposed ? `Abandoned at birth in accordance with local customs, you were miraculously discovered and raised by compassionate neighbors. ` : `Your early years were shaped by the daily subsistence and customs of your region. `) +
+    (lifeData.disabilityCategory ? `From your youth, you lived with a physical condition—specifically ${lifeData.disabilityExamples || lifeData.disabilityCategory}—which you learned to manage over time. ` : '') +
+    (lifeData.beauty >= 80 ? (isMale ? `You grew into a handsome, striking young man whose appearance drew frequent notice from peers. ` : `You were widely regarded as an exceptionally beautiful young woman in your community. `) : '') +
+    (lifeData.personality ? `Those around you knew you as someone of ${lifeData.personality.join(' and ')} temperament.` : '');
+
+  const p2 = lifeData.age >= 15 ? (
+    `As you came of age, you took up the responsibilities expected of your station. ` +
+    (lifeData.hasUpwardMobility ? `Through diligence and fortune, you achieved notable social mobility (${lifeData.mobilityDetails || 'rising into a more prosperous tier'}). ` : '') +
+    (lifeData.isMarried ? `You married at age ${lifeData.marriageAge}, establishing a household. ` : `You remained unmarried, dedicating yourself to your trade and kin. `) +
+    (lifeData.childrenCount > 0 ? (lifeData.hasUnmarriedPartnerChildren ? `You raised ${lifeData.childrenCount} children with a long-term partner outside formal marriage. ` : `In time, you were blessed with ${lifeData.childrenCount} children. `) : '') +
+    (lifeData.orientation === 'Homosexual' ? (lifeData.isOpenlyGay ? `You lived openly in your same-sex relationships within your circle.` : `You harbored deep romantic feelings for the same sex, kept secret due to the dangers of your era.`) : '')
+  ) : `Your childhood was marked by innocence, though your journey was destined to be brief.`;
+
+  const p3 = lifeData.isAlive ? (
+    `Today, in the year 2026, you are ${lifeData.age} years old and continue living your daily life in ${loc}, reflecting on your journey and private memories.`
+  ) : (
+    `At age ${lifeData.age}, your mortal journey reached its conclusion in ${lifeData.deathRegion || loc}, succumbing to ${lifeData.causeOfDeath || 'natural causes'}. Your legacy lived on in the memories of those who shared your life.`
+  );
+
+  const narrative = [p1, p2, p3].filter(Boolean);
+
+  const timeline = [
+    { year: `${year}`, event: `Born a ${lifeData.sex.toLowerCase()} in ${loc} into the ${cls} tier.` },
+    lifeData.isMarried ? { year: `${formatYear(lifeData.birthYear + lifeData.marriageAge)}`, event: `Married at age ${lifeData.marriageAge}.` } : null,
+    lifeData.hasUpwardMobility ? { year: `${formatYear(lifeData.birthYear + 25)}`, event: `Achieved upward social mobility into the ${lifeData.socialClass} class.` } : null,
+    lifeData.isMaimed ? { year: `${formatYear(lifeData.birthYear + lifeData.maimedAge)}`, event: `Survived a severe violent encounter: ${lifeData.maimedDetails}.` } : null,
+    lifeData.isAlive ? { year: `2026 CE`, event: `Living today at age ${lifeData.age}.` } : { year: `${formatYear(lifeData.birthYear + lifeData.age)}`, event: `Passed away at age ${lifeData.age} from ${lifeData.causeOfDeath}.` }
+  ].filter(Boolean);
+
+  return {
+    specificLocation: lifeData.region,
+    deathSpecificLocation: lifeData.deathRegion || null,
+    narrative,
+    timeline,
+    historicalEncounters: [],
+    historicalEventsLivedThrough: [],
+    wikiLinks: []
+  };
+};
+
 const generateNarrativeWithAI = async (lifeData) => {
   const apiKey = (import.meta.env?.VITE_GEMINI_API_KEY || DEFAULT_API_KEY).trim();
   
-  // Active, ultra-fast Gemini 3.x models
+  // Active, ultra-fast Gemini 3.x models with fallbacks
   const candidateModels = [
     import.meta.env?.VITE_GEMINI_MODEL,
     "gemini-3.5-flash-lite",
@@ -586,7 +633,6 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${
     systemInstruction: { parts: [{ text: systemPrompt }] },
     generationConfig: {
       responseMimeType: "application/json",
-      thinkingConfig: { thinkingBudget: 0 },
       responseSchema: {
         type: "OBJECT",
         properties: {
@@ -650,41 +696,47 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${
       }
     };
 
-    try {
-      const response = await fetch(url, { 
-        method: "POST", 
-        headers: { "Content-Type": "application/json" }, 
-        body: JSON.stringify(modelPayload) 
-      });
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const response = await fetch(url, { 
+          method: "POST", 
+          headers: { "Content-Type": "application/json" }, 
+          body: JSON.stringify(modelPayload) 
+        });
 
-      if (!response.ok) {
-        console.warn(`Model ${model} returned HTTP ${response.status}, advancing immediately to fallback model...`);
-        continue;
+        if (response.status === 429) {
+          if (attempt === 0) {
+            await new Promise(r => setTimeout(r, 800));
+            continue;
+          }
+          break;
+        }
+
+        if (!response.ok) break;
+
+        const data = await response.json();
+        const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+        if (!responseText) break;
+
+        const parsed = JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
+        if (parsed && (Array.isArray(parsed.narrative) || typeof parsed.narrative === 'string')) {
+          if (typeof parsed.narrative === 'string') {
+            parsed.narrative = parsed.narrative.split('\n\n').filter(Boolean);
+          }
+          if (!Array.isArray(parsed.timeline)) parsed.timeline = [];
+          if (!Array.isArray(parsed.historicalEncounters)) parsed.historicalEncounters = [];
+          if (!Array.isArray(parsed.historicalEventsLivedThrough)) parsed.historicalEventsLivedThrough = [];
+          if (!Array.isArray(parsed.wikiLinks)) parsed.wikiLinks = [];
+          return parsed;
+        }
+      } catch (err) {
+        console.warn(`Attempt error for model ${model}:`, err);
+        break;
       }
-
-      const data = await response.json();
-      const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (!responseText) {
-        continue;
-      }
-
-      const parsed = JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
-      return parsed;
-    } catch (err) {
-      console.warn(`Generation attempt failed for model ${model}:`, err);
-      continue;
     }
   }
 
-  // Fallback if all models failed
-  return { 
-    narrative: [
-      "The chronomancer's connection to the Akashic records encountered turbulence.", 
-      "Please verify your connection and try simulating another soul."
-    ], 
-    timeline: [], 
-    wikiLinks: [] 
-  };
+  return generateFallbackNarrative(lifeData);
 };
 
 export default function App() {
