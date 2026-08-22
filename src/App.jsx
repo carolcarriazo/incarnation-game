@@ -1178,7 +1178,7 @@ ${(currentLife.narrative || []).join('\n\n')}
 
       // 2b. Base Genetics
       const intelligence = randomGaussian(50, 15);
-      const beauty = randomGaussian(50, 15);
+      const beauty = import.meta.env.DEV ? 100 : randomGaussian(50, 15);
 
       // 3. Mortality Setup
       let baseInfantMortality = selectedEra.infantMortality;
