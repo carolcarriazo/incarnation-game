@@ -509,12 +509,12 @@ const generateFallbackNarrative = (lifeData) => {
     { year: `${year}`, event: `Born a ${lifeData.sex.toLowerCase()} in ${loc} into the ${cls} tier.` },
     lifeData.isJewish && lifeData.antisemitismExperience && lifeData.antisemitismExperience.level !== 'Peaceful Coexistence' ? { year: `${formatYear(lifeData.birthYear + (lifeData.emigrationAge || Math.min(lifeData.age, 22)))}`, event: lifeData.antisemitismExperience.details } : null,
     lifeData.minorityPersecution && lifeData.minorityPersecution.level !== 'None' ? { year: `${formatYear(lifeData.birthYear + (lifeData.emigrationAge || Math.min(lifeData.age, 22)))}`, event: lifeData.minorityPersecution.details } : null,
-    lifeData.wasEnslavedLater ? { year: `${formatYear(lifeData.birthYear + lifeData.enslavedAge)}`, event: `Enslaved at age ${lifeData.enslavedAge}: ${lifeData.enslavementDetails}.` } : null,
-    lifeData.escapedSlavery ? { year: `${formatYear(lifeData.birthYear + lifeData.escapeAge)}`, event: `Gained freedom from enslavement at age ${lifeData.escapeAge}: ${lifeData.escapeMethod}.` } : null,
-    lifeData.modelingCareer && lifeData.modelingCareer.accepted ? { year: `${formatYear(lifeData.birthYear + 19)}`, event: `Scouted for exceptional beauty; entered modeling: ${lifeData.modelingCareer.details}` } : null,
-    lifeData.isMarried ? { year: `${formatYear(lifeData.birthYear + lifeData.marriageAge)}`, event: lifeData.isInterfaithMarriage ? `Interfaith marriage: ${lifeData.interfaithDetails}` : `Married at age ${lifeData.marriageAge}.` } : null,
-    lifeData.hasUpwardMobility ? { year: `${formatYear(lifeData.birthYear + 25)}`, event: `Achieved upward social mobility into the ${lifeData.socialClass} class.` } : null,
-    lifeData.isMaimed ? { year: `${formatYear(lifeData.birthYear + lifeData.maimedAge)}`, event: `Survived a traumatic injury: ${lifeData.maimedDetails}.` } : null,
+    lifeData.wasEnslavedLater && lifeData.enslavedAge <= lifeData.age ? { year: `${formatYear(lifeData.birthYear + lifeData.enslavedAge)}`, event: `Enslaved at age ${lifeData.enslavedAge}: ${lifeData.enslavementDetails}.` } : null,
+    lifeData.escapedSlavery && lifeData.escapeAge <= lifeData.age ? { year: `${formatYear(lifeData.birthYear + lifeData.escapeAge)}`, event: `Gained freedom from enslavement at age ${lifeData.escapeAge}: ${lifeData.escapeMethod}.` } : null,
+    lifeData.modelingCareer && lifeData.modelingCareer.accepted && lifeData.age >= 18 ? { year: `${formatYear(lifeData.birthYear + Math.min(lifeData.age, 19))}`, event: `Scouted for exceptional beauty; entered modeling: ${lifeData.modelingCareer.details}` } : null,
+    lifeData.isMarried && lifeData.marriageAge <= lifeData.age ? { year: `${formatYear(lifeData.birthYear + lifeData.marriageAge)}`, event: lifeData.isInterfaithMarriage ? `Interfaith marriage: ${lifeData.interfaithDetails}` : `Married at age ${lifeData.marriageAge}.` } : null,
+    lifeData.hasUpwardMobility && lifeData.age >= 18 ? { year: `${formatYear(lifeData.birthYear + Math.min(lifeData.age, 25))}`, event: `Achieved upward social mobility into the ${lifeData.socialClass} class.` } : null,
+    lifeData.isMaimed && lifeData.maimedAge <= lifeData.age ? { year: `${formatYear(lifeData.birthYear + lifeData.maimedAge)}`, event: `Survived a traumatic injury: ${lifeData.maimedDetails}.` } : null,
     lifeData.isAlive ? { year: `2026 CE`, event: `Living today at age ${lifeData.age}.` } : { year: `${formatYear(lifeData.birthYear + lifeData.age)}`, event: `Passed away at age ${lifeData.age} from ${lifeData.causeOfDeath}.` }
   ].filter(Boolean);
 
@@ -573,6 +573,7 @@ CRITICAL RULES:
     - "year": MUST strictly contain ONLY the calendar year with its era indicator (e.g. "1908 CE", "1926 CE", "450 BCE"). Do NOT put location or story narrative inside the "year" string.
     - "event": MUST contain a clear, descriptive 1-2 sentence summary of what occurred in that year (e.g. "Born in a hillside village in Basilicata, Italy to an impoverished agricultural family.").
 12. HISTORICAL FIGURES & EYEWITNESS EVENTS (EXHAUSTIVE & AUTHENTIC):
+    - INFANT / CHILD MORTALITY LIFESPAN RULES (CRITICAL): If the character passed away in infancy or childhood (age < 12), they MUST NOT be given adult careers, adult upward mobility, adult marriages, or historical encounters that occurred after their year of death.
     - HISTORICAL ENCOUNTERS: Carefully evaluate the character's exact lifespan (birth year to death year), region/city, and class. If real historical figures (monarchs, artists, philosophers, generals, revolutionaries, scientists—e.g. Richard II, Van Gogh, Leonardo da Vinci, Socrates, Joan of Arc, Marie Antoinette, Napoleon, Abraham Lincoln, Mansa Musa, Caravaggio, Tokugawa Ieyasu, Confucius, etc.) lived or operated in that area during their lifetime:
       - Provide an authentic encounter or observation (e.g. catching a glimpse during a royal progress, hearing them speak, drinking in the same tavern, observing their public works, serving in their unit, or direct acquaintance).
       - If an encounter occurs, populate the historicalEncounters array with figure, year, and context. If no plausible figure exists in that exact time and place, return an empty array.
@@ -636,9 +637,9 @@ ${lifeData.isJewish ? `- JEWISH IDENTITY & HISTORICAL REALITIES: This soul is Je
 ${lifeData.minorityPersecution ? `- MINORITY HISTORICAL EXPERIENCE: As a member of ${lifeData.minorityGroupHint}, historical context: ${lifeData.minorityPersecution.level}: ${lifeData.minorityPersecution.details}. Weave this authentic context respectfully into the narrative.` : ''}
 ${lifeData.isInterfaithMarriage ? `- INTERFAITH JEWISH-CHRISTIAN MARRIAGE: This character entered into an interfaith marriage with a ${lifeData.interfaithSpouse} partner: ${lifeData.interfaithDetails}. CRUCIAL: Specifically explore the cultural, religious, and familial dynamics (family reactions, syncretism, holidays, conversion, or social navigation) in the story.` : ''}
 ${lifeData.modelingCareer ? `- MODELING INDUSTRY OPPORTUNITY (BEAUTY 90+ IN MODERN ERA): ${lifeData.modelingCareer.offered ? (lifeData.modelingCareer.accepted ? `Offered a modeling career due to extraordinary beauty and ACCEPTED: ${lifeData.modelingCareer.details}` : `Offered a modeling career due to extraordinary beauty but DECLINED based on personality: ${lifeData.modelingCareer.details}`) : ''}. Reflect their personality and choices in the story.` : ''}
-${lifeData.wasEnslavedLater ? `- ENSLAVEMENT / CAPTIVE SERVITUDE: Not born enslaved, but at age ${lifeData.enslavedAge} was captured and enslaved: ${lifeData.enslavementDetails}. Explicitly chronicle this harrowing turning point, the harsh reality of their captive servitude, and its lifelong impact in the narrative and timeline.` : ''}
-${lifeData.escapedSlavery ? `- ESCAPED / EMANCIPATED FROM SLAVERY: At age ${lifeData.escapeAge}, this soul successfully broke the chains of enslavement: ${lifeData.escapeMethod}. Explicitly chronicle this daring escape / emancipation milestone, their journey to freedom, and their life as a free person in the narrative and timeline.` : ''}
-${lifeData.hasUpwardMobility ? `- UPWARD SOCIAL MOBILITY: Born into ${lifeData.birthSocialClass}, but achieved notable upward mobility in adulthood: ${lifeData.mobilityDetails}. Their attained station is ${lifeData.socialClass}. Explicitly chronicle their rise from humble beginnings to their elevated station in the narrative and timeline.` : ''}
+${lifeData.wasEnslavedLater && lifeData.age >= 6 ? `- ENSLAVEMENT / CAPTIVE SERVITUDE: Not born enslaved, but at age ${lifeData.enslavedAge} was captured and enslaved: ${lifeData.enslavementDetails}. Explicitly chronicle this harrowing turning point, the harsh reality of their captive servitude, and its lifelong impact in the narrative and timeline.` : ''}
+${lifeData.escapedSlavery && lifeData.age >= 12 ? `- ESCAPED / EMANCIPATED FROM SLAVERY: At age ${lifeData.escapeAge}, this soul successfully broke the chains of enslavement: ${lifeData.escapeMethod}. Explicitly chronicle this daring escape / emancipation milestone, their journey to freedom, and their life as a free person in the narrative and timeline.` : ''}
+${showAdult && lifeData.hasUpwardMobility ? `- UPWARD SOCIAL MOBILITY: Born into ${lifeData.birthSocialClass}, but achieved notable upward mobility in adulthood: ${lifeData.mobilityDetails}. Their attained station is ${lifeData.socialClass}. Explicitly chronicle their rise from humble beginnings to their elevated station in the narrative and timeline.` : ''}
 ${showTraits ? `- Base Intelligence (1-100): ${lifeData.intelligence}` : ''}
 ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${
   lifeData.beauty >= 80 
@@ -1414,7 +1415,7 @@ ${(currentLife.narrative || []).join('\n\n')}
     let mobilityDetails = null;
     let birthSocialClass = socialClass;
 
-    if (!isRoyaltyOrHistoric && !socialClass.includes('Royalt') && !socialClass.includes('Nobility') && !socialClass.includes('Patrician')) {
+    if (!isRoyaltyOrHistoric && age >= 18 && !wasExposed && !socialClass.includes('Royalt') && !socialClass.includes('Nobility') && !socialClass.includes('Patrician')) {
       let mobilityChance = 0.02; // baseline rare luck
       
       // Intellectual advancement
