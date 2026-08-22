@@ -723,11 +723,12 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${
           if (typeof parsed.narrative === 'string') {
             parsed.narrative = parsed.narrative.split('\n\n').filter(Boolean);
           }
+          if (!parsed.specificLocation) parsed.specificLocation = lifeData.region;
           if (!Array.isArray(parsed.timeline)) parsed.timeline = [];
           if (!Array.isArray(parsed.historicalEncounters)) parsed.historicalEncounters = [];
           if (!Array.isArray(parsed.historicalEventsLivedThrough)) parsed.historicalEventsLivedThrough = [];
           if (!Array.isArray(parsed.wikiLinks)) parsed.wikiLinks = [];
-          return parsed;
+          if (parsed.narrative.length > 0) return parsed;
         }
       } catch (err) {
         console.warn(`Attempt error for model ${model}:`, err);
@@ -1323,7 +1324,17 @@ ${(currentLife.narrative || []).join('\n\n')}
     };
 
     // 10. GENERATE & SET DATA
-    const generatedData = await generateNarrativeWithAI(rawLifeData);
+    let generatedData = null;
+    try {
+      generatedData = await generateNarrativeWithAI(rawLifeData);
+    } catch (err) {
+      console.warn("Generation error, employing local historical biographer:", err);
+      generatedData = generateFallbackNarrative(rawLifeData);
+    }
+
+    if (!generatedData || !generatedData.narrative || generatedData.narrative.length === 0) {
+      generatedData = generateFallbackNarrative(rawLifeData);
+    }
 
     const lifeDataWithEncounters = {
       ...rawLifeData,
@@ -1346,7 +1357,7 @@ ${(currentLife.narrative || []).join('\n\n')}
     const newLife = {
       id: Date.now(),
       birthYear, region: regionText, lat, lng,
-      specificLocation: generatedData?.specificLocation || null,
+      specificLocation: generatedData?.specificLocation || rawLifeData.region,
       deathRegion: rawLifeData.deathRegion || null,
       deathLat: rawLifeData.deathLat || null,
       deathLng: rawLifeData.deathLng || null,
@@ -1371,8 +1382,8 @@ ${(currentLife.narrative || []).join('\n\n')}
       badges: earnedBadges,
       historicalEncounters: generatedData?.historicalEncounters || [],
       historicalEventsLivedThrough: generatedData?.historicalEventsLivedThrough || [],
-      narrative: generatedData?.narrative || ["The chronomancer's connection to the Akashic records failed.", "Please try simulating another life."],
-      timeline: generatedData?.timeline || [],
+      narrative: generatedData?.narrative || generateFallbackNarrative(rawLifeData).narrative,
+      timeline: generatedData?.timeline || generateFallbackNarrative(rawLifeData).timeline,
       wikiLinks: generatedData?.wikiLinks || [],
       eraName: selectedEra.name
     };
