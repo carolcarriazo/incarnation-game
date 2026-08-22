@@ -471,82 +471,6 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
 // --- GEMINI API INTEGRATION ---
 const DEFAULT_API_KEY = [65, 81, 46, 65, 98, 56, 82, 78, 54, 76, 73, 86, 72, 54, 95, 66, 80, 71, 99, 79, 98, 118, 54, 51, 120, 57, 107, 116, 81, 73, 83, 56, 111, 85, 112, 107, 73, 113, 109, 77, 85, 54, 73, 79, 106, 67, 49, 95, 100, 84, 45, 57, 65].map(c => String.fromCharCode(c)).join("");
 
-const generateFallbackNarrative = (lifeData) => {
-  const isMale = lifeData.sex === 'Male';
-  const year = formatYear(lifeData.birthYear);
-  const loc = lifeData.region;
-  const cls = lifeData.socialClass;
-  const ethStr = lifeData.ethnicity ? ` of ${lifeData.ethnicity} heritage` : '';
-
-  const p1 = `You were born a ${lifeData.sex.toLowerCase()}${ethStr} in ${year} in ${loc} into the ${cls} tier of society. ` +
-    (lifeData.wasExposed ? `Abandoned at birth in accordance with local customs, you were miraculously discovered and raised by compassionate neighbors. ` : `Your early years were shaped by the daily subsistence and customs of your region. `) +
-    (lifeData.disabilityCategory ? `From your youth, you lived with a physical condition—specifically ${lifeData.disabilityExamples || lifeData.disabilityCategory}—which you learned to manage over time. ` : '') +
-    (lifeData.beauty >= 80 ? (isMale ? `You grew into a handsome, striking young man whose appearance drew frequent notice from peers. ` : `You were widely regarded as an exceptionally beautiful young woman in your community. `) : '') +
-    (lifeData.personality && lifeData.personality.length >= 2 ? `Those around you knew you as someone who was ${lifeData.personality[0]} and ${lifeData.personality[1]}. ` : '');
-
-  const p2 = lifeData.age >= 15 ? (
-    `As you came of age, you took up the responsibilities expected of your station. ` +
-    (lifeData.isJewish && lifeData.antisemitismExperience ? (lifeData.antisemitismExperience.level === 'Peaceful Coexistence' ? `As a member of the Jewish community, you lived in a period of peaceful coexistence and cultural tradition. ` : `As a Jewish person in this era, your life was impacted by historical events: ${lifeData.antisemitismExperience.details} `) : '') +
-    (lifeData.minorityPersecution && lifeData.minorityPersecution.level !== 'None' ? `Belonging to the ${lifeData.minorityGroupHint} community, your journey was shaped by historical realities: ${lifeData.minorityPersecution.details} ` : '') +
-    (lifeData.wasEnslavedLater ? `Tragically, at age ${lifeData.enslavedAge}, your freedom was violently stripped away: ${lifeData.enslavementDetails}. ` : '') +
-    (lifeData.escapedSlavery ? `In a triumphant turning point at age ${lifeData.escapeAge}, you reclaimed your freedom: ${lifeData.escapeMethod}. ` : '') +
-    (lifeData.modelingCareer ? (lifeData.modelingCareer.accepted ? `Endowed with rare physical beauty, you worked as a successful model: ${lifeData.modelingCareer.details} ` : `Though scouted in your youth for extraordinary beauty, you declined to enter the modeling industry: ${lifeData.modelingCareer.details} `) : '') +
-    (lifeData.hasUpwardMobility ? `Through diligence and fortune, you achieved notable social mobility (${lifeData.mobilityDetails || 'rising into a more prosperous tier'}). ` : '') +
-    (lifeData.isMarried 
-      ? (lifeData.isInterfaithMarriage 
-          ? `You entered into an interfaith marriage with a ${lifeData.interfaithSpouse} spouse at age ${lifeData.marriageAge}: ${lifeData.interfaithDetails} ` 
-          : `You married at age ${lifeData.marriageAge}, establishing a household. `) 
-      : (lifeData.sex === 'Female' && !lifeData.isModernEra 
-          ? (lifeData.orientation === 'Homosexual' 
-              ? `Unable to enter a heterosexual union true to your heart, you remained unwed, keeping your romantic feelings guarded. ` 
-              : (lifeData.socialClass.includes('Nobility') || lifeData.socialClass.includes('Upper') || lifeData.socialClass.includes('Patrician') || lifeData.personality?.some(p => p.includes('independent')) 
-                  ? `Possessing noble independence and private means, you exercised the rare autonomy to refuse arranged suitors and remain unmarried. ` 
-                  : `Severe economic hardship, lack of a dowry, or family dependence prevented you from contracting a marriage, remaining unwed in your kinship home. `)) 
-          : `You remained unmarried, dedicating yourself to your trade and kin. `)) +
-    (lifeData.childrenCount > 0 ? (lifeData.hasUnmarriedPartnerChildren ? (lifeData.orientation === 'Homosexual' ? `In your later years, you raised a child through modern adoption / surrogacy with your partner. ` : `You raised ${lifeData.childrenCount} children with a long-term partner outside formal marriage. `) : `In time, you were blessed with ${lifeData.childrenCount} children. `) : '') +
-    (lifeData.orientation === 'Homosexual' ? (lifeData.isOpenlyGay ? `You lived openly in your same-sex relationships within your circle.` : `You harbored deep romantic feelings for the same sex, kept secret due to the dangers of your era.`) : '')
-  ) : `Your childhood was marked by innocence, though your journey was destined to be brief.`;
-
-  const p3 = lifeData.isAlive ? (
-    `Today, in the year 2026, you are ${lifeData.age} years old and continue living your daily life in ${loc}, reflecting on your journey and private memories.`
-  ) : (
-    `At age ${lifeData.age}, your mortal journey reached its conclusion in ${lifeData.deathRegion || loc}, succumbing to ${lifeData.causeOfDeath || 'natural causes'}. Your legacy lived on in the memories of those who shared your life.`
-  );
-
-  const narrative = [p1, p2, p3].filter(Boolean);
-
-  const timeline = [
-    { year: `${year}`, event: `Born a ${lifeData.sex.toLowerCase()} in ${loc} into the ${cls} tier.` },
-    lifeData.isJewish && lifeData.antisemitismExperience && lifeData.antisemitismExperience.level !== 'Peaceful Coexistence' ? { year: `${formatYear(lifeData.birthYear + (lifeData.emigrationAge || Math.min(lifeData.age, 22)))}`, event: lifeData.antisemitismExperience.details } : null,
-    lifeData.minorityPersecution && lifeData.minorityPersecution.level !== 'None' ? { year: `${formatYear(lifeData.birthYear + (lifeData.emigrationAge || Math.min(lifeData.age, 22)))}`, event: lifeData.minorityPersecution.details } : null,
-    lifeData.wasEnslavedLater && lifeData.enslavedAge <= lifeData.age ? { year: `${formatYear(lifeData.birthYear + lifeData.enslavedAge)}`, event: `Enslaved at age ${lifeData.enslavedAge}: ${lifeData.enslavementDetails}.` } : null,
-    lifeData.escapedSlavery && lifeData.escapeAge <= lifeData.age ? { year: `${formatYear(lifeData.birthYear + lifeData.escapeAge)}`, event: `Gained freedom from enslavement at age ${lifeData.escapeAge}: ${lifeData.escapeMethod}.` } : null,
-    lifeData.modelingCareer && lifeData.modelingCareer.accepted && lifeData.age >= 18 ? { year: `${formatYear(lifeData.birthYear + Math.min(lifeData.age, 19))}`, event: `Scouted for exceptional beauty; entered modeling: ${lifeData.modelingCareer.details}` } : null,
-    lifeData.isMarried && lifeData.marriageAge <= lifeData.age ? { year: `${formatYear(lifeData.birthYear + lifeData.marriageAge)}`, event: lifeData.isInterfaithMarriage ? `Interfaith marriage: ${lifeData.interfaithDetails}` : `Married at age ${lifeData.marriageAge}.` } : null,
-    lifeData.hasUpwardMobility && lifeData.age >= 18 ? { year: `${formatYear(lifeData.birthYear + Math.min(lifeData.age, 25))}`, event: `Achieved upward social mobility into the ${lifeData.socialClass} class.` } : null,
-    lifeData.isMaimed && lifeData.maimedAge <= lifeData.age ? { year: `${formatYear(lifeData.birthYear + lifeData.maimedAge)}`, event: `Survived a traumatic injury: ${lifeData.maimedDetails}.` } : null,
-    lifeData.isAlive ? { year: `2026 CE`, event: `Living today at age ${lifeData.age}.` } : { year: `${formatYear(lifeData.birthYear + lifeData.age)}`, event: `Passed away at age ${lifeData.age} from ${lifeData.causeOfDeath}.` }
-  ].filter(Boolean);
-
-  const fallbackWiki = lifeData.isRoyaltyOrHistoric ? [
-    {
-      title: `Monarchy in ${lifeData.region}`,
-      url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(lifeData.region + ' monarchy dynasty')}`,
-      description: `Historical monarchy and ruling dynasties of ${lifeData.region}.`
-    }
-  ] : [];
-
-  return {
-    specificLocation: lifeData.region,
-    deathSpecificLocation: lifeData.deathRegion || null,
-    narrative,
-    timeline,
-    historicalEncounters: [],
-    historicalEventsLivedThrough: [],
-    wikiLinks: fallbackWiki
-  };
-};
-
 const generateNarrativeWithAI = async (lifeData) => {
   const apiKey = (import.meta.env?.VITE_GEMINI_API_KEY || DEFAULT_API_KEY).trim();
 
@@ -755,7 +679,7 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
   const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 9500); // 9.5s timeout for deep narrative generation
+  const timeoutId = setTimeout(() => controller.abort(), 14000); // 14.0s timeout for deep narrative generation
 
   try {
     const response = await fetch(url, {
@@ -766,53 +690,66 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
     });
     clearTimeout(timeoutId);
 
-    if (response.ok) {
-      const data = await response.json();
-      const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-      if (responseText) {
-        const parsed = JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
-        if (parsed && (Array.isArray(parsed.narrative) || typeof parsed.narrative === 'string')) {
-          if (typeof parsed.narrative === 'string') {
-            parsed.narrative = parsed.narrative.split('\n\n').filter(Boolean);
-          }
-          if (!parsed.specificLocation) parsed.specificLocation = lifeData.region;
-          if (!Array.isArray(parsed.timeline)) parsed.timeline = [];
-          if (!Array.isArray(parsed.historicalEncounters)) parsed.historicalEncounters = [];
-          if (!Array.isArray(parsed.historicalEventsLivedThrough)) parsed.historicalEventsLivedThrough = [];
-          if (!Array.isArray(parsed.wikiLinks)) parsed.wikiLinks = [];
-          parsed.wikiLinks = parsed.wikiLinks.map(link => {
-            if (!link || (!link.title && !link.url)) return null;
-            let title = (link.title || 'Historical Reference').trim();
-            let url = (link.url || '').trim();
-            if (!url.startsWith('http')) {
-              url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/\s+/g, '_'))}`;
-            }
-            return {
-              title,
-              url,
-              description: (link.description || 'Encyclopedia reference.').trim()
-            };
-          }).filter(Boolean);
-
-          // If royal but AI returned no wiki links, provide default dynasty link
-          if (lifeData.isRoyaltyOrHistoric && parsed.wikiLinks.length === 0) {
-            parsed.wikiLinks.push({
-              title: `Monarchy of ${lifeData.region}`,
-              url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(lifeData.region + ' royal dynasty')}`,
-              description: `Historical royal house and dynasty of ${lifeData.region}.`
-            });
-          }
-
-          if (parsed.narrative.length > 0) return parsed;
-        }
-      }
+    if (!response.ok) {
+      const errBody = await response.text().catch(() => '');
+      throw new Error(`Gemini API Error (HTTP ${response.status} ${response.statusText}): ${errBody || 'No response body'}`);
     }
+
+    const data = await response.json();
+    const responseText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!responseText) {
+      const finishReason = data?.candidates?.[0]?.finishReason || 'NO_CANDIDATES';
+      throw new Error(`Gemini API returned no content (Finish Reason: ${finishReason})`);
+    }
+
+    const parsed = JSON.parse(responseText.replace(/```json/g, '').replace(/```/g, '').trim());
+    if (!parsed || (!Array.isArray(parsed.narrative) && typeof parsed.narrative !== 'string')) {
+      throw new Error("Failed to parse valid narrative array from Gemini response JSON");
+    }
+
+    if (typeof parsed.narrative === 'string') {
+      parsed.narrative = parsed.narrative.split('\n\n').filter(Boolean);
+    }
+    if (!parsed.specificLocation) parsed.specificLocation = lifeData.region;
+    if (!Array.isArray(parsed.timeline)) parsed.timeline = [];
+    if (!Array.isArray(parsed.historicalEncounters)) parsed.historicalEncounters = [];
+    if (!Array.isArray(parsed.historicalEventsLivedThrough)) parsed.historicalEventsLivedThrough = [];
+    if (!Array.isArray(parsed.wikiLinks)) parsed.wikiLinks = [];
+    parsed.wikiLinks = parsed.wikiLinks.map(link => {
+      if (!link || (!link.title && !link.url)) return null;
+      let title = (link.title || 'Historical Reference').trim();
+      let url = (link.url || '').trim();
+      if (!url.startsWith('http')) {
+        url = `https://en.wikipedia.org/wiki/${encodeURIComponent(title.replace(/\s+/g, '_'))}`;
+      }
+      return {
+        title,
+        url,
+        description: (link.description || 'Encyclopedia reference.').trim()
+      };
+    }).filter(Boolean);
+
+    // If royal but AI returned no wiki links, provide default dynasty link
+    if (lifeData.isRoyaltyOrHistoric && parsed.wikiLinks.length === 0) {
+      parsed.wikiLinks.push({
+        title: `Monarchy of ${lifeData.region}`,
+        url: `https://en.wikipedia.org/wiki/Special:Search?search=${encodeURIComponent(lifeData.region + ' royal dynasty')}`,
+        description: `Historical royal house and dynasty of ${lifeData.region}.`
+      });
+    }
+
+    if (parsed.narrative.length === 0) {
+      throw new Error("Gemini returned an empty narrative array");
+    }
+
+    return parsed;
   } catch (err) {
     clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error("Gemini API request timed out after 14 seconds.");
+    }
+    throw err;
   }
-
-  // Instant local procedural biography (0ms) on any network issue or timeout
-  return generateFallbackNarrative(lifeData);
 };
 
 export default function App() {
@@ -820,6 +757,7 @@ export default function App() {
   const [history, setHistory] = useState([]);
   const [stats, setStats] = useState({ totalLived: 0, highestAge: 0 });
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationError, setGenerationError] = useState(null);
   const [unlockedBadges, setUnlockedBadges] = useState(() => {
     try { return JSON.parse(localStorage.getItem('incarnationBadges')) || []; }
     catch { return []; }
@@ -1150,6 +1088,7 @@ ${(currentLife.narrative || []).join('\n\n')}
 
   const simulateLife = async () => {
     if (isGenerating) return;
+    setGenerationError(null);
     setBadgeModalQueue([]); // Clear any open badge celebration so it never blocks the view or clicks
     try { playUiSound('incarnate'); } catch (e) { }
     setIsGenerating(true);
@@ -2239,18 +2178,19 @@ ${(currentLife.narrative || []).join('\n\n')}
         intelligence, beauty, schizophrenia: Math.random() < 0.01, depression: Math.random() < 0.06
       };
 
-      // 10. GENERATE & SET DATA (Generous 10.0s window for deep, high-quality AI chronicles)
+      // 10. GENERATE & SET DATA
       let generatedData = null;
       try {
-        const aiPromise = generateNarrativeWithAI(rawLifeData);
-        const hardCeilingPromise = new Promise(resolve => setTimeout(() => resolve(null), 10000));
-        generatedData = await Promise.race([aiPromise, hardCeilingPromise]);
+        generatedData = await generateNarrativeWithAI(rawLifeData);
       } catch (err) {
-        generatedData = generateFallbackNarrative(rawLifeData);
-      }
-
-      if (!generatedData || !generatedData.narrative || generatedData.narrative.length === 0) {
-        generatedData = generateFallbackNarrative(rawLifeData);
+        console.error("AI Generation Error:", err);
+        if (import.meta.env.DEV) {
+          setGenerationError(`[DEV ERROR] Gemini API Generation Failed:\n${err.message || err}\n\nRegion: ${rawLifeData.region} (${formatYear(rawLifeData.birthYear)})\nClass: ${rawLifeData.socialClass}`);
+        } else {
+          setGenerationError("The Akashic connection was interrupted. Please tap 'Incarnate' to weave your thread of fate again.");
+        }
+        setIsGenerating(false);
+        return;
       }
 
       const lifeDataWithEncounters = {
@@ -2312,9 +2252,9 @@ ${(currentLife.narrative || []).join('\n\n')}
         badges: earnedBadges,
         historicalEncounters: generatedData?.historicalEncounters || [],
         historicalEventsLivedThrough: generatedData?.historicalEventsLivedThrough || [],
-        narrative: generatedData?.narrative || generateFallbackNarrative(rawLifeData).narrative,
-        timeline: generatedData?.timeline || generateFallbackNarrative(rawLifeData).timeline,
-        wikiLinks: generatedData?.wikiLinks || [],
+        narrative: generatedData.narrative,
+        timeline: generatedData.timeline || [],
+        wikiLinks: generatedData.wikiLinks || [],
         eraName: selectedEra.name
       };
 
@@ -2434,6 +2374,28 @@ ${(currentLife.narrative || []).join('\n\n')}
 
         {/* Main Display: Timeline & Narrative */}
         <section className="lg:col-span-2 space-y-6" aria-label="Life Chronicle">
+          {generationError && (
+            <div className="p-6 bg-red-950/80 border-2 border-red-500/80 rounded-2xl text-red-200 shadow-[0_0_30px_rgba(239,68,68,0.3)] animate-fade-in">
+              <div className="flex items-center gap-2 font-bold text-red-300 mb-2">
+                <AlertTriangle className="w-5 h-5 text-red-400 shrink-0" />
+                <span>{import.meta.env.DEV ? '[DEV ERROR] Gemini AI Generation Failed' : 'Akashic Connection Issue'}</span>
+              </div>
+              <p className="font-mono text-xs text-red-200 mb-4 whitespace-pre-wrap leading-relaxed">{generationError}</p>
+              {import.meta.env.DEV && (
+                <p className="text-[11px] text-slate-400 mb-4">
+                  Procedural fallback generator has been disabled. Inspect your browser console or network tab for detailed payload/response diagnostics.
+                </p>
+              )}
+              <button
+                onClick={simulateLife}
+                disabled={isGenerating}
+                className="px-5 py-2.5 bg-red-800 hover:bg-red-700 active:scale-95 text-white font-sans text-xs font-bold rounded-xl transition-all shadow-md cursor-pointer"
+              >
+                Retry Incarnation
+              </button>
+            </div>
+          )}
+
           {isGenerating ? (
             <div className="h-96 flex flex-col items-center justify-center border border-indigo-500/20 bg-indigo-950/20 backdrop-blur-md rounded-2xl text-indigo-300 shadow-2xl p-8 text-center animate-pulse">
               <div className="relative mb-6">
