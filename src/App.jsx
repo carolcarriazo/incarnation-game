@@ -1165,9 +1165,9 @@ ${(currentLife.narrative || []).join('\n\n')}
                          socialClass.includes('Palace Elite') || socialClass.includes('Aristocra') || 
                          socialClass.includes('Upper Class') || socialClass.includes('Chieftain');
     
-    // In premodern eras, royalty is ~2.5% of the nobility (~0.05% of all births, 1 in 2,000).
-    // In modern era, royalty is ~0.2% of the upper class (~0.02% of all births).
-    const royalSubChance = selectedEra.id === 'MODERN' ? 0.002 : 0.025;
+    // In premodern eras, royalty is ~8.0% of the upper class / nobility (~1% of all births).
+    // In modern era, royalty/dynasty is ~2.0% of the upper class (~0.2% of all births).
+    const royalSubChance = selectedEra.id === 'MODERN' ? 0.02 : 0.08;
     const isRoyaltyOrHistoric = isEliteClass && Math.random() < royalSubChance;
 
     if (isRoyaltyOrHistoric) {
@@ -1192,10 +1192,10 @@ ${(currentLife.narrative || []).join('\n\n')}
       const startExpectancy = 60;
       baselineAdultLifespan = Math.floor(startExpectancy + (baseLifeExpectancy - startExpectancy) * modernProgress);
       if (sex === 'Female') baselineAdultLifespan += 4;
-      baseInfantMortality = 0.12 * Math.pow(0.015, modernProgress);
-      baseChildMortality = 0.04 * Math.pow(0.02, modernProgress);
+      baseInfantMortality = 0.04 * Math.pow(0.015, modernProgress);
+      baseChildMortality = 0.02 * Math.pow(0.02, modernProgress);
     } else if (selectedEra.id === 'EARLY_MODERN') {
-      baseInfantMortality = 0.22 - (progress * 0.06);
+      baseInfantMortality = 0.08 - (progress * 0.03);
     }
 
     let classMultiplier = 1.0;
@@ -1295,7 +1295,7 @@ ${(currentLife.narrative || []).join('\n\n')}
     
     if (isRoyaltyOrHistoric) {
       fame = "Properly Famous (Historical Monarch / Royal Dynasty Figure)";
-    } else if (fameRoll < 0.005) { 
+    } else if (fameRoll < 0.02) { 
         if (selectedEra.id === 'PALEOLITHIC' || selectedEra.id === 'NEOLITHIC') {
              fame = "Archaeological Discovery (Your remarkably preserved remains were unearthed in the 20th/21st century).";
         } else if ((selectedEra.id === 'BRONZE_IRON' || selectedEra.id === 'CLASSICAL' || selectedEra.id === 'MEDIEVAL') && !socialClass.includes('Upper') && !socialClass.includes('Patrician') && !socialClass.includes('Nobility') && !socialClass.includes('Elite')) {
@@ -1303,11 +1303,11 @@ ${(currentLife.narrative || []).join('\n\n')}
         } else {
              fame = "Properly Famous (Your name, deeds, or creations are permanently etched into global history).";
         }
-    } else if (fameRoll < 0.015) { 
+    } else if (fameRoll < 0.06) { 
         if (selectedEra.id !== 'PALEOLITHIC' && selectedEra.id !== 'NEOLITHIC') {
              fame = "Mildly Infamous (You committed a scandalous act, notorious crime, or localized rebellion; fading into obscurity after a generation).";
         }
-    } else if (fameRoll < 0.030) { 
+    } else if (fameRoll < 0.12) { 
         if (selectedEra.id !== 'PALEOLITHIC' && selectedEra.id !== 'NEOLITHIC') {
              fame = "Mildly Famous (You did something notable and were celebrated for a while before history forgot you).";
         }
@@ -1416,17 +1416,18 @@ ${(currentLife.narrative || []).join('\n\n')}
     let birthSocialClass = socialClass;
 
     if (!isRoyaltyOrHistoric && age >= 18 && !wasExposed && !socialClass.includes('Royalt') && !socialClass.includes('Nobility') && !socialClass.includes('Patrician')) {
-      let mobilityChance = 0.02; // baseline rare luck
+      let mobilityChance = 0.08; // baseline lucky break (up from 0.02)
       
       // Intellectual advancement
-      if (intelligence >= 88) mobilityChance += 0.55;
-      else if (intelligence >= 78) mobilityChance += 0.30;
-      else if (intelligence >= 68) mobilityChance += 0.12;
+      if (intelligence >= 85) mobilityChance += 0.55;
+      else if (intelligence >= 75) mobilityChance += 0.35;
+      else if (intelligence >= 65) mobilityChance += 0.20;
 
-      // Aesthetic & social advancement (especially for women in premodern/early modern eras)
+      // Aesthetic & social advancement
       if (sex === 'Female') {
-        if (beauty >= 90) mobilityChance += 0.60;
-        else if (beauty >= 80) mobilityChance += 0.35;
+        if (beauty >= 85) mobilityChance += 0.55;
+        else if (beauty >= 75) mobilityChance += 0.35;
+        else if (beauty >= 65) mobilityChance += 0.18;
       }
 
       if (Math.random() < Math.min(0.85, mobilityChance)) {

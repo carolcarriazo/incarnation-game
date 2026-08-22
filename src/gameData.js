@@ -372,7 +372,7 @@ export const MODERN_COUNTRIES = [
 export const ERAS = [
   {
     id: 'PALEOLITHIC', name: 'Upper Paleolithic', startYear: -70000, endYear: -10000, weight: 2,
-    infantMortality: 0.27, childMortality: 0.20, maternalMortality: 0.05, survivingAdultMean: 56, exposureRate: 0.85,
+    infantMortality: 0.10, childMortality: 0.08, maternalMortality: 0.04, survivingAdultMean: 58, exposureRate: 0.50,
     regions: [
       { text: "East African Rift (Tanzania / Kenya)", lang: "an ancestral proto-human language", minorityChance: 0.02, modernLifeExpectancy: 65, lat: -2.5, lng: 36.0 },
       { text: "Southern African Savanna (Kalahari)", lang: "an early Khoisan click dialect", minorityChance: 0.02, modernLifeExpectancy: 65, lat: -25.0, lng: 24.0 },
@@ -392,7 +392,7 @@ export const ERAS = [
   },
   {
     id: 'NEOLITHIC', name: 'Neolithic Revolution', startYear: -10000, endYear: -3000, weight: 10,
-    infantMortality: 0.26, childMortality: 0.23, maternalMortality: 0.07, survivingAdultMean: 55, exposureRate: 0.70,
+    infantMortality: 0.09, childMortality: 0.08, maternalMortality: 0.05, survivingAdultMean: 58, exposureRate: 0.40,
     regions: [
       { text: "Fertile Crescent (Jericho / Göbekli Tepe / Levant)", lang: "a Proto-Semitic / Afroasiatic language", minorityChance: 0.08, modernLifeExpectancy: 74, lat: 37.2, lng: 38.9 },
       { text: "Mesopotamian Alluvium (Proto-Sumerian Settlements)", lang: "an early Mesopotamian substrate", minorityChance: 0.10, modernLifeExpectancy: 73, lat: 32.0, lng: 45.0 },
@@ -418,7 +418,7 @@ export const ERAS = [
   },
   {
     id: 'BRONZE_IRON', name: 'Bronze & Iron Age', startYear: -3000, endYear: -500, weight: 15,
-    infantMortality: 0.25, childMortality: 0.23, maternalMortality: 0.08, survivingAdultMean: 58, exposureRate: 0.50,
+    infantMortality: 0.08, childMortality: 0.07, maternalMortality: 0.05, survivingAdultMean: 60, exposureRate: 0.30,
     regions: [
       { text: "Sumer & Akkad (Ur / Babylon / Uruk, Mesopotamia)", lang: "Sumerian or Akkadian", minorityChance: 0.20, modernLifeExpectancy: 73, lat: 31.5, lng: 45.6 },
       { text: "Assyrian Empire (Nineveh / Assur)", lang: "Akkadian (Assyrian dialect)", minorityChance: 0.22, modernLifeExpectancy: 72, lat: 36.3, lng: 43.1 },
@@ -447,7 +447,7 @@ export const ERAS = [
   },
   {
     id: 'CLASSICAL', name: 'Classical Antiquity', startYear: -500, endYear: 500, weight: 22,
-    infantMortality: 0.25, childMortality: 0.22, maternalMortality: 0.08, survivingAdultMean: 60, exposureRate: 0.40,
+    infantMortality: 0.08, childMortality: 0.07, maternalMortality: 0.05, survivingAdultMean: 62, exposureRate: 0.20,
     regions: [
       { text: "City of Rome & Italian Peninsula", lang: "Latin", minorityChance: 0.40, modernLifeExpectancy: 83, lat: 41.9, lng: 12.5 },
       { text: "Roman Gaul (France & Belgium)", lang: "Vulgar Latin and Gaulish", minorityChance: 0.25, modernLifeExpectancy: 82, lat: 47.0, lng: 3.0 },
@@ -479,7 +479,7 @@ export const ERAS = [
   },
   {
     id: 'MEDIEVAL', name: 'Medieval & Post-Classical', startYear: 500, endYear: 1500, weight: 25,
-    infantMortality: 0.24, childMortality: 0.20, maternalMortality: 0.07, survivingAdultMean: 62, exposureRate: 0.10,
+    infantMortality: 0.07, childMortality: 0.06, maternalMortality: 0.04, survivingAdultMean: 64, exposureRate: 0.05,
     regions: [
       { text: "Medieval England (London / York)", lang: "Middle English & Anglo-Norman", minorityChance: 0.08, modernLifeExpectancy: 81, lat: 52.0, lng: -1.5 },
       { text: "Kingdom of France (Paris / Île-de-France)", lang: "Old French / Langue d'oïl", minorityChance: 0.08, modernLifeExpectancy: 82, lat: 48.8, lng: 2.3 },
@@ -519,7 +519,7 @@ export const ERAS = [
   },
   {
     id: 'EARLY_MODERN', name: 'Early Modern', startYear: 1500, endYear: 1850, weight: 12,
-    infantMortality: 0.20, childMortality: 0.15, maternalMortality: 0.05, survivingAdultMean: 65, exposureRate: 0.02,
+    infantMortality: 0.06, childMortality: 0.05, maternalMortality: 0.03, survivingAdultMean: 66, exposureRate: 0.01,
     regions: [
       { text: "Kingdom of Great Britain & Ireland (London / Edinburgh / Dublin, modern-day UK & Ireland)", lang: "Early Modern English, Scots, and Irish Gaelic", minorityChance: 0.12, modernLifeExpectancy: 81, lat: 51.5, lng: -0.13 },
       { text: "Kingdom of France (Paris / Versailles / Lyon, modern-day France)", lang: "French & Occitan", minorityChance: 0.10, modernLifeExpectancy: 82, lat: 48.8, lng: 2.3 },
@@ -556,7 +556,7 @@ export const ERAS = [
   },
   {
     id: 'MODERN', name: 'Modern Era', startYear: 1850, endYear: 2000, weight: 14,
-    infantMortality: 0.05, childMortality: 0.02, maternalMortality: 0.005, survivingAdultMean: 75, exposureRate: 0.001,
+    infantMortality: 0.02, childMortality: 0.01, maternalMortality: 0.002, survivingAdultMean: 76, exposureRate: 0.001,
     regions: [], // MODERN uses MODERN_COUNTRIES for location
     classes: [{ name: "Working Class", chance: 0.50 }, { name: "Middle Class", chance: 0.40 }, { name: "Upper Class", chance: 0.10 }]
   }
