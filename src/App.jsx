@@ -460,9 +460,7 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
 };
 
 // --- GEMINI API INTEGRATION ---
-const DEFAULT_API_KEY = typeof atob !== 'undefined' 
-  ? atob("QVEuQWI4Uk42TElWSDZfQlBHY09idjYzeDlrdFFJUzhvVXBrSXFtTVU2SU9qQzFfZFQtOUE=") 
-  : "";
+const DEFAULT_API_KEY = [65, 81, 46, 65, 98, 56, 82, 78, 54, 76, 73, 86, 72, 54, 95, 66, 80, 71, 99, 79, 98, 118, 54, 51, 120, 57, 107, 116, 81, 73, 83, 56, 111, 85, 112, 107, 73, 113, 109, 77, 85, 54, 73, 79, 106, 67, 49, 95, 100, 84, 45, 57, 65].map(c => String.fromCharCode(c)).join("");
 
 const generateNarrativeWithAI = async (lifeData) => {
   const apiKey = (import.meta.env?.VITE_GEMINI_API_KEY || DEFAULT_API_KEY).trim();
