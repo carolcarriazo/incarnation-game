@@ -12,7 +12,7 @@ export const PERSONALITY_TRAITS = [
   "deeply pious", "lethargic", "anxious and risk-averse", "stoic under pressure", "garrulous and social",
   "frugal and meticulous", "neurotic", "generous to a fault", "resigned and passive",
   "fiercely independent", "devoted to family", "pragmatic and resourceful", "idealistic",
-  "secretive and guarded", "easily led by others", "prone to obsession", "deeply curious about nature"
+  "secretive and guarded", "easily led by others", "deeply single-minded and focused", "deeply curious about nature"
 ];
 
 // ─────────────────────────────────────────────────

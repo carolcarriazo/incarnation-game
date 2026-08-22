@@ -492,7 +492,17 @@ const generateFallbackNarrative = (lifeData) => {
     (lifeData.escapedSlavery ? `In a triumphant turning point at age ${lifeData.escapeAge}, you reclaimed your freedom: ${lifeData.escapeMethod}. ` : '') +
     (lifeData.modelingCareer ? (lifeData.modelingCareer.accepted ? `Endowed with rare physical beauty, you worked as a successful model: ${lifeData.modelingCareer.details} ` : `Though scouted in your youth for extraordinary beauty, you declined to enter the modeling industry: ${lifeData.modelingCareer.details} `) : '') +
     (lifeData.hasUpwardMobility ? `Through diligence and fortune, you achieved notable social mobility (${lifeData.mobilityDetails || 'rising into a more prosperous tier'}). ` : '') +
-    (lifeData.isMarried ? (lifeData.isInterfaithMarriage ? `You entered into an interfaith marriage with a ${lifeData.interfaithSpouse} spouse at age ${lifeData.marriageAge}: ${lifeData.interfaithDetails} ` : `You married at age ${lifeData.marriageAge}, establishing a household. `) : `You remained unmarried, dedicating yourself to your trade and kin. `) +
+    (lifeData.isMarried 
+      ? (lifeData.isInterfaithMarriage 
+          ? `You entered into an interfaith marriage with a ${lifeData.interfaithSpouse} spouse at age ${lifeData.marriageAge}: ${lifeData.interfaithDetails} ` 
+          : `You married at age ${lifeData.marriageAge}, establishing a household. `) 
+      : (lifeData.sex === 'Female' && !lifeData.isModernEra 
+          ? (lifeData.orientation === 'Homosexual' 
+              ? `Unable to enter a heterosexual union true to your heart, you remained unwed, keeping your romantic feelings guarded. ` 
+              : (lifeData.socialClass.includes('Nobility') || lifeData.socialClass.includes('Upper') || lifeData.socialClass.includes('Patrician') || lifeData.personality?.some(p => p.includes('independent')) 
+                  ? `Possessing noble independence and private means, you exercised the rare autonomy to refuse arranged suitors and remain unmarried. ` 
+                  : `Severe economic hardship, lack of a dowry, or family dependence prevented you from contracting a marriage, remaining unwed in your kinship home. `)) 
+          : `You remained unmarried, dedicating yourself to your trade and kin. `)) +
     (lifeData.childrenCount > 0 ? (lifeData.hasUnmarriedPartnerChildren ? (lifeData.orientation === 'Homosexual' ? `In your later years, you raised a child through modern adoption / surrogacy with your partner. ` : `You raised ${lifeData.childrenCount} children with a long-term partner outside formal marriage. `) : `In time, you were blessed with ${lifeData.childrenCount} children. `) : '') +
     (lifeData.orientation === 'Homosexual' ? (lifeData.isOpenlyGay ? `You lived openly in your same-sex relationships within your circle.` : `You harbored deep romantic feelings for the same sex, kept secret due to the dangers of your era.`) : '')
   ) : `Your childhood was marked by innocence, though your journey was destined to be brief.`;
@@ -554,6 +564,8 @@ CRITICAL RULES:
 3. NATURAL, ACCESSIBLE LANGUAGE FOR MEDICAL CONDITIONS & ILLNESSES (CRUCIAL):
    - AVOID dense, clinical, Latinate textbook jargon that hinders readability or player immersion (e.g. NEVER write "severe congenital amblyopia combined with high astigmatism" or "talipes equinovarus").
    - ALWAYS use plain, natural, vivid English descriptions that any reader immediately grasps (e.g. "crossed eyes and severely impaired vision", "a clubfoot", "a severe hunchback", "a cleft palate", "shaking palsy / tremors", "a heart defect causing blue skin and chronic exhaustion", "childhood reading blindness").
+   - AUTISM & NEURODIVERGENCE (BE EXPLICIT & CLEAR): If the character has an autism spectrum condition, be EXPLICIT about their neurodivergence. In the modern era, explicitly identify it as autism. In premodern eras, vividly depict their distinct autistic traits: their intense hyperfocus on specialized interests, deep sensory sensitivities (to sounds, touch, crowded markets), literal communication style, strong preference for predictable routines, and difficulty navigating unspoken social cues or diplomatic subtext, while explaining how peers perceived their unique mind (e.g. an eccentric solitary savant, singularly gifted craftsperson, or misunderstood thinker).
+   - HOBBIES OBSESSIVENESS RULE: Hobbies and pastimes MUST NOT be described as "obsessive" or "all-consuming" UNLESS the character is specifically autistic / neurodivergent. For neurotypical characters, pastimes must be depicted as enjoyable, relaxing, communal, creative, or casual recreational pursuits.
    - SCOLIOSIS & SPINAL CURVATURE ONSET: Idiopathic scoliosis develops during childhood or adolescent growth spurts (ages 10–14) or from adult physical toll, rather than being evident at birth. Describe its gradual development as they grow.
    - FOR PREMODERN LIVES (Before 1850): First describe how historical peers perceived their condition (e.g. wandering eye, touched by spirits, eccentric, melancholy). If referencing modern medical understanding, keep it conversational and plain (e.g. "In today's terms, you had crossed eyes and poor vision in one eye", "In modern terms, you were born on the autism spectrum").
 4. TRANSGENDER & GENDER DIVERGENCE: If rolled as Transgender, authentically reflect their experience according to their era, culture, and personality. In premodern/early modern eras, people navigating this often lived in disguise, assumed alternate societal roles (e.g. military enlistment, monastic life, sailors like Catalina de Erauso), joined culturally recognized roles (Two-Spirit, Hijra, Galli, Public Universal Friend, Chevalier d'Éon), or repressed it depending on bravery and fear. In the 20th/21st century, reflect the emergence of medical transition (like Lili Elbe) or underground communities.
@@ -562,7 +574,12 @@ CRITICAL RULES:
    - FOR DECEASED CHARACTERS: Weave their assigned Primary Cause of Death seamlessly into their final paragraph. Cancer was extremely rare in premodern eras; rely only on the provided premodern diseases. If they died of old age diseases, describe the physical slowing down of their golden years.
    - WARTIME RAIDS & OLDER ADULTS (AGE 40+): For mature women (age 40+) who perish or suffer trauma in settlement raids or warfare, depict the tragedy realistically as defending their homestead, family protection, arson, or collateral violence (NEVER frame violence against mature women past 40 as sexual assault/attempted violation).
    - FOR LIVING CHARACTERS (STILL ALIVE IN 2026): NEVER say they are "forgotten by history" or speak of their life in past tense as a closed ancient chapter. Write about their ongoing daily life today in the year 2026, their contemporary routine, reflections on modern times, family/community, and how they navigate life today.
-7. PREMODERN MARRIAGE (CRUCIAL): In premodern eras, marriage was a near-universal economic survival necessity. If a premodern adult remained UNMARRIED, you MUST provide a strict historical reason (e.g. extreme poverty, joined a monastery/convent, enslaved, severe disability, or escaping to a bachelor military/sailor life to hide homosexuality/transgender/asexuality).
+7. PREMODERN MARRIAGE & UNMARRIED WOMEN (STRICT HISTORICAL AGENCY CONSTRAINT):
+   - In premodern eras (before 1900), marriage was a near-universal economic survival institution; women did NOT have the societal or economic independence to casually "choose" lifelong spinsterhood.
+   - A PREMODERN WOMAN COULD ONLY VOLUNTARILY REFUSE / EVADE MARRIAGE IF:
+     a) She was BORN NOBLE / UPPER CLASS AND was INDEPENDENT (possessing the wealth, private inheritance, or family station to resist arranged matches), OR
+     b) She was HOMOSEXUAL / LESBIAN (actively resisting male marriage, taking holy vows in a convent, adopting male dress, or living in secret female companionhood).
+   - FOR ALL OTHER PREMODERN COMMONER WOMEN WHO REMAINED UNWED, IT WAS NOT A FREE "CHOICE": It must be driven by external hardship (e.g. extreme family destitution / unable to afford a dowry, lifelong enslavement/bondage, monastic nunnery devotion, severe physical impairment, or unpaid lifelong labor dependence in her father's/brother's household).
 8. FAME & HOBBIES / PASTIMES: Incorporate their assigned Fame level. Even for commoners and poor folk, incorporate their natural casual pastimes (e.g. folk songs, storytelling, dice games, tavern banter, communal dancing, whittling, foraging, fishing, local sports) based on their personality.
 9. SIBLINGS & FAMILY: ONLY mention exact sibling survival numbers if it is narratively crucial (e.g. sole survivor). Do NOT mechanically list "4 of 6 siblings survived" as a robotic fact.
 10. SEXUAL ORIENTATION & BISEXUALITY (CRUCIAL):
@@ -618,8 +635,16 @@ ${showEarlyCrushes ? `- Orientation: ${lifeData.orientation} ${lifeData.orientat
           : '')
       }` : ''}
 ${showTraits ? `- Personality: ${lifeData.personality.join(' and ')}` : ''}
-${showAdult ? `- Pastimes & Leisure: ${lifeData.hobbyData}` : ''}
-${showAdult ? `- Marriage / Structure: ${lifeData.isMarried ? `Married/Bonded at age ${lifeData.marriageAge}` : 'Never Married/Bonded'}. ${lifeData.hadAffair ? `Had an extramarital affair / clandestine lover ${lifeData.sameSexAffair ? '(specifically with someone of the same sex)' : '(with an opposite-sex partner)'}.` : ''}` : ''}
+${showAdult ? `- Pastimes & Leisure: ${lifeData.hobbyData} (CRITICAL: Do NOT describe hobbies as obsessive or compulsive unless the person is autistic).` : ''}
+${showAdult ? `- Marriage / Structure: ${lifeData.isMarried 
+    ? `Married/Bonded at age ${lifeData.marriageAge}` 
+    : `Never Married/Bonded (PREMODERN AGENCY RULE: ${lifeData.sex === 'Female' && !lifeData.isModernEra 
+        ? (lifeData.orientation === 'Homosexual' 
+            ? 'Refused/avoided male marriage due to homosexuality' 
+            : (lifeData.socialClass.includes('Nobility') || lifeData.socialClass.includes('Upper') || lifeData.socialClass.includes('Patrician') 
+                ? 'Noble/Upper-class independence and private wealth allowing autonomous refusal of suitors' 
+                : 'Unwed due to poverty, lack of dowry, family labor dependence, severe disability, or monastic life — NOT a casual modern lifestyle choice')) 
+        : 'Dedicated to trade, labor, military, or kin'})`}. ${lifeData.hadAffair ? `Had an extramarital affair / clandestine lover ${lifeData.sameSexAffair ? '(specifically with someone of the same sex)' : '(with an opposite-sex partner)'}.` : ''}` : ''}
 ${showAdult ? `- Children: ${lifeData.effectiveInfertility ? '0 children (Infertile)' : `${lifeData.childrenCount} children`} ${lifeData.hasUnmarriedPartnerChildren
         ? (lifeData.orientation === 'Homosexual' ? '(Modern adoption or donor parenthood with long-term partner)' : '(Had children with an unmarried long-term cohabiting partner / outside formal marriage)')
         : (lifeData.outOfWedlock ? '(Includes child/children born out of wedlock / outside primary union)' : '')
@@ -1310,49 +1335,52 @@ ${(currentLife.narrative || []).join('\n\n')}
         }
       }
 
-      // 7. Hobby & Pastimes Engine (Rich casual pastimes for ordinary & working classes)
-      const isNeurodivergent = disabilityCategory === "Neurodivergent developmental condition";
-      const isUpperClass = socialClass.includes("Upper") || socialClass.includes("Nobility") || socialClass.includes("Aristocrat") || socialClass.includes("Patrician");
-      const isSocialOrCurious = [personality1, personality2].some(p =>
-        p.includes("social") || p.includes("curious") || p.includes("empathetic") || p.includes("creative") || p.includes("garrulous") || p.includes("contemplative")
-      );
+    // 7. Hobby & Pastimes Engine (Rich casual pastimes for ordinary & working classes)
+    const isAutistic = disabilityCategory === "Neurodivergent condition" && (disabilityExamples || '').toLowerCase().includes('autism');
+    const isNeurodivergent = disabilityCategory === "Neurodivergent condition";
+    const isUpperClass = socialClass.includes("Upper") || socialClass.includes("Nobility") || socialClass.includes("Aristocrat") || socialClass.includes("Patrician");
+    const isSocialOrCurious = [personality1, personality2].some(p => 
+      p.includes("social") || p.includes("curious") || p.includes("empathetic") || p.includes("creative") || p.includes("garrulous") || p.includes("contemplative")
+    );
 
-      let hobbyData = "No formal hobbies (daily life centered on labor and sustenance).";
+    let hobbyData = "No formal hobbies (daily life centered on labor and sustenance).";
+    
+    // Casual pastimes pool for commoners/poor
+    const commonPastimes = [
+      "folk singing and learning traditional ballads",
+      "communal folk dancing at village feasts and seasonal festivals",
+      "storytelling and recounting local folklore by the hearth or town fountain",
+      "dice, knucklebone, or coin-tossing games in taverns and public squares",
+      "fishing along local rivers and coastal waters",
+      "whittling decorative wood figurines, utensils, or whistles",
+      "playing a handmade pipe, reed flute, or drum",
+      "foraging for wild herbs, berries, and medicinal plants",
+      "casual wrestling, footraces, or traditional stone-lifting games",
+      "stargazing and tracking the constellations",
+      "gardening a small patch of flowers, herbs, or vegetables"
+    ];
 
-      // Casual pastimes pool for commoners/poor
-      const commonPastimes = [
-        "folk singing and learning traditional ballads",
-        "communal folk dancing at village feasts and seasonal festivals",
-        "storytelling and recounting local folklore by the hearth or town fountain",
-        "dice, knucklebone, or coin-tossing games in taverns and public squares",
-        "fishing along local rivers and coastal waters",
-        "whittling decorative wood figurines, utensils, or whistles",
-        "playing a handmade pipe, reed flute, or drum",
-        "foraging for wild herbs, berries, and medicinal plants",
-        "casual wrestling, footraces, or traditional stone-lifting games",
-        "stargazing and tracking the constellations",
-        "gardening a small patch of flowers, herbs, or vegetables"
-      ];
-
-      if (isNeurodivergent) {
-        hobbyData = Math.random() < 0.8
-          ? "an obsessive, all-consuming special interest (historically grounded in their era)"
-          : "a deep, quiet, repetitive craft or specialized fascination";
-      } else if (isUpperClass) {
-        hobbyData = pickRandomItem([
-          "formal equestrian riding, hunting, or falconry",
-          "patronage of fine arts, collecting ancient coins or curiosities",
-          "scholarly reading, poetry composition, and philosophical correspondence",
-          "fencing, music composition, or playing the lute/harpsichord/guqin",
-          "botanical cultivation and ornate estate gardening"
-        ]);
-      } else {
-        // 80% of commoners/poor have enjoyable casual pastimes, especially if personality is compatible
-        const commonPastimeChance = isSocialOrCurious ? 0.88 : 0.70;
-        if (Math.random() < commonPastimeChance) {
-          hobbyData = `a casual pastime: ${pickRandomItem(commonPastimes)}`;
-        }
+    if (isAutistic) {
+      hobbyData = Math.random() < 0.8
+        ? "an intense, all-consuming autistic special interest and hyperfocus (historically grounded in their era)"
+        : "a deep, quiet, repetitive autistic craft or specialized fascination";
+    } else if (isNeurodivergent) {
+      hobbyData = "a dedicated, absorbing focus on a specific manual craft or technical pursuit";
+    } else if (isUpperClass) {
+      hobbyData = pickRandomItem([
+        "formal equestrian riding, hunting, or falconry",
+        "patronage of fine arts, collecting ancient coins or curiosities",
+        "scholarly reading, poetry composition, and philosophical correspondence",
+        "fencing, music composition, or playing the lute/harpsichord/guqin",
+        "botanical cultivation and ornate estate gardening"
+      ]);
+    } else {
+      // 80% of commoners/poor have enjoyable casual pastimes, especially if personality is compatible
+      const commonPastimeChance = isSocialOrCurious ? 0.88 : 0.70;
+      if (Math.random() < commonPastimeChance) {
+        hobbyData = `a casual, relaxing pastime: ${pickRandomItem(commonPastimes)}`;
       }
+    }
 
       if (intelligence > 75 && Math.random() < 0.22) {
         hobbyData += " Through sharp intellect and skill, they eventually turned this pastime into an auxiliary trade or respected community renown.";
