@@ -1182,19 +1182,9 @@ ${(currentLife.narrative || []).join('\n\n')}
       let cumClass = 0;
       for (const cls of classPool) { cumClass += cls.chance; if (classRoll <= cumClass) { socialClass = cls.name; break; } }
 
-      // Royalty / Historic Ruling Dynasty sub-roll (conditioned on Upper Class / Nobility)
-      const isEliteClass = socialClass.includes('Nobility') || socialClass.includes('Patrician') ||
-        socialClass.includes('Palace Elite') || socialClass.includes('Aristocra') ||
-        socialClass.includes('Upper Class') || socialClass.includes('Chieftain');
-
-      // In premodern eras, royalty is ~8.0% of the upper class / nobility (~1% of all births).
-      // In modern era, royalty/dynasty is ~2.0% of the upper class (~0.2% of all births).
-      const royalSubChance = selectedEra.id === 'MODERN' ? 0.02 : 0.08;
-      const isRoyaltyOrHistoric = isEliteClass && Math.random() < royalSubChance;
-
-      if (isRoyaltyOrHistoric) {
-        socialClass = selectedEra.id === 'MODERN' ? 'Royalty / Reigning Dynasty' : 'Royalty / Imperial Dynasty';
-      }
+      // Royalty / Historic Ruling Dynasty sub-roll (FORCED 100% FOR TESTING)
+      const isRoyaltyOrHistoric = true;
+      socialClass = selectedEra.id === 'MODERN' ? 'Royalty / Reigning Dynasty' : 'Royalty / Imperial Dynasty';
 
       // 3b. Detailed Ethnicity & Ancestry Determination
       const ethnicity = determineDetailedEthnicity(selectedEra.id, regionText, isMinority, minorityGroupHint, socialClass);
