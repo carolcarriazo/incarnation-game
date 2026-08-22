@@ -723,16 +723,21 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${
     };
 
     for (let attempt = 0; attempt < 2; attempt++) {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4500); // 4.5s strict timeout to prevent hangs
+
       try {
         const response = await fetch(url, { 
           method: "POST", 
           headers: { "Content-Type": "application/json" }, 
-          body: JSON.stringify(modelPayload) 
+          body: JSON.stringify(modelPayload),
+          signal: controller.signal
         });
+        clearTimeout(timeoutId);
 
         if (response.status === 429) {
           if (attempt === 0) {
-            await new Promise(r => setTimeout(r, 800));
+            await new Promise(r => setTimeout(r, 600));
             continue;
           }
           break;
@@ -757,7 +762,8 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${
           if (parsed.narrative.length > 0) return parsed;
         }
       } catch (err) {
-        console.warn(`Attempt error for model ${model}:`, err);
+        clearTimeout(timeoutId);
+        console.warn(`Attempt error for model ${model}:`, err.name === 'AbortError' ? 'Request timed out' : err.message);
         break;
       }
     }
@@ -1479,168 +1485,171 @@ ${(currentLife.narrative || []).join('\n\n')}
       }
     }
 
-    // 3e. Jewish Identity & Antisemitism Spectrum Engine
-    let isJewish = (minorityGroupHint || '').toLowerCase().includes('jewish');
-    if (!isJewish && isMinority && selectedEra.id !== 'PALEOLITHIC' && selectedEra.id !== 'NEOLITHIC') {
-      const reg = (regionText || '').toLowerCase();
-      if (reg.includes('judea') || reg.includes('jerusalem') || reg.includes('levant')) {
-        isJewish = true;
-        minorityGroupHint = 'Jewish (Judean)';
-      } else if (reg.includes('andalus') || reg.includes('spain') || reg.includes('iberia') || reg.includes('portugal')) {
-        if (Math.random() < 0.22) { isJewish = true; minorityGroupHint = 'Jewish (Sephardic)'; }
-      } else if (reg.includes('poland') || reg.includes('lithuania') || reg.includes('rus') || reg.includes('rhineland') || reg.includes('germany') || reg.includes('holy roman')) {
-        if (Math.random() < 0.28) { isJewish = true; minorityGroupHint = 'Jewish (Ashkenazi)'; }
-      } else if (reg.includes('caliphate') || reg.includes('egypt') || reg.includes('baghdad') || reg.includes('ottoman') || reg.includes('constantinople')) {
-        if (Math.random() < 0.20) { isJewish = true; minorityGroupHint = 'Jewish (Mizrahi/Sephardic)'; }
-      } else if (reg.includes('rome') || reg.includes('italy') || reg.includes('byzantine') || reg.includes('greece')) {
-        if (Math.random() < 0.16) { isJewish = true; minorityGroupHint = 'Jewish (Romaniote/Italki)'; }
-      }
-    }
-
+    // 3e. Jewish Identity & Antisemitism Spectrum Engine (Early Exit if not minority or not applicable)
+    let isJewish = false;
     let antisemitismExperience = null;
 
-    if (isJewish && age >= 4 && !wasExposed) {
-      const by = birthYear;
-      const dy = birthYear + age;
-      const rName = (regionText || '').toLowerCase();
-      const isEurope = rName.includes('germany') || rName.includes('poland') || rName.includes('russia') || rName.includes('ukraine') || rName.includes('france') || rName.includes('netherlands') || rName.includes('austria') || rName.includes('czech') || rName.includes('hungary') || rName.includes('italy') || rName.includes('greece') || rName.includes('lithuania') || rName.includes('latvia') || rName.includes('belarus') || rName.includes('romania');
-
-      // 1. THE HOLOCAUST (1933-1945 in Nazi Europe)
-      if (selectedEra.id === 'MODERN' && isEurope && by <= 1944 && dy >= 1933) {
-        if (by <= 1928 && Math.random() < 0.28) {
-          isEmigrant = true;
-          emigrationAge = Math.min(age, Math.max(8, 1938 - by));
-          const refugeDests = [
-            { name: "United States", lat: 40.71, lng: -74.00 },
-            { name: "United Kingdom", lat: 51.50, lng: -0.12 },
-            { name: "Mandatory Palestine", lat: 31.76, lng: 35.21 },
-            { name: "Argentina", lat: -34.60, lng: -58.38 }
-          ];
-          const chosenDest = pickRandomItem(refugeDests);
-          deathRegion = chosenDest.name;
-          deathLat = chosenDest.lat;
-          deathLng = chosenDest.lng;
-          antisemitismExperience = {
-            level: "Holocaust Refugee",
-            details: `Fled escalating Nazi persecution, Nuremberg racial laws, and antisemitic violence in the 1930s, successfully emigrating as a refugee to ${deathRegion}.`
-          };
-        } else if (dy >= 1939) {
-          if (Math.random() < 0.68) {
-            const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 45)));
-            age = Math.max(0, deathY - by);
-            isAlive = false;
-            causeOfDeath = pickRandomItem([
-              "murdered in the extermination camps during the Holocaust in Nazi-occupied Europe (Auschwitz-Birkenau)",
-              "murdered in the gas chambers during the Holocaust (Treblinka / Sobibor)",
-              "murdered in a mass shooting by Nazi Einsatzgruppen mobile killing squads",
-              "starvation, typhus, and brutal exhaustion inside an enclosed Nazi ghetto (Warsaw / Lodz Ghetto)"
-            ]);
-            antisemitismExperience = {
-              level: "The Holocaust (Victim)",
-              details: "Perished in the Holocaust during the Nazi genocide of European Jewry."
-            };
-          } else {
-            antisemitismExperience = {
-              level: "The Holocaust (Survivor)",
-              details: pickRandomItem([
-                "Endured the horrors of the Holocaust, surviving in hiding with underground partisans in the forests and emerging after liberation in 1945.",
-                "Survived the Holocaust through the courage of righteous neighbors who sheltered your family in hidden quarters until liberation.",
-                "Survived imprisonment in Nazi concentration camps, enduring until Allied liberation in 1945 and rebuilding your life in the post-war era."
-              ])
-            };
-            if (Math.random() < 0.65) {
-              isEmigrant = true;
-              emigrationAge = Math.min(age, Math.max(16, 1947 - by));
-              const dest = pickRandomItem([
-                { name: "Israel", lat: 31.76, lng: 35.21 },
-                { name: "United States", lat: 40.71, lng: -74.00 },
-                { name: "Canada", lat: 45.50, lng: -73.56 }
-              ]);
-              deathRegion = dest.name;
-              deathLat = dest.lat;
-              deathLng = dest.lng;
-              antisemitismExperience.details += ` Emigrated after the war to build a new life in ${deathRegion}.`;
-            }
-          }
+    if (isMinority && selectedEra.id !== 'PALEOLITHIC' && selectedEra.id !== 'NEOLITHIC') {
+      isJewish = (minorityGroupHint || '').toLowerCase().includes('jewish');
+      if (!isJewish) {
+        const reg = (regionText || '').toLowerCase();
+        if (reg.includes('judea') || reg.includes('jerusalem') || reg.includes('levant')) {
+          isJewish = true;
+          minorityGroupHint = 'Jewish (Judean)';
+        } else if (reg.includes('andalus') || reg.includes('spain') || reg.includes('iberia') || reg.includes('portugal')) {
+          if (Math.random() < 0.22) { isJewish = true; minorityGroupHint = 'Jewish (Sephardic)'; }
+        } else if (reg.includes('poland') || reg.includes('lithuania') || reg.includes('rus') || reg.includes('rhineland') || reg.includes('germany') || reg.includes('holy roman')) {
+          if (Math.random() < 0.28) { isJewish = true; minorityGroupHint = 'Jewish (Ashkenazi)'; }
+        } else if (reg.includes('caliphate') || reg.includes('egypt') || reg.includes('baghdad') || reg.includes('ottoman') || reg.includes('constantinople')) {
+          if (Math.random() < 0.20) { isJewish = true; minorityGroupHint = 'Jewish (Mizrahi/Sephardic)'; }
+        } else if (reg.includes('rome') || reg.includes('italy') || reg.includes('byzantine') || reg.includes('greece')) {
+          if (Math.random() < 0.16) { isJewish = true; minorityGroupHint = 'Jewish (Romaniote/Italki)'; }
         }
       }
 
-      // 2. PREMODERN & GENERAL ANTISEMITISM SPECTRUM
-      if (!antisemitismExperience) {
-        const roll = Math.random();
+      if (isJewish && age >= 4 && !wasExposed) {
+        const by = birthYear;
+        const dy = birthYear + age;
+        const rName = (regionText || '').toLowerCase();
+        const isEurope = rName.includes('germany') || rName.includes('poland') || rName.includes('russia') || rName.includes('ukraine') || rName.includes('france') || rName.includes('netherlands') || rName.includes('austria') || rName.includes('czech') || rName.includes('hungary') || rName.includes('italy') || rName.includes('greece') || rName.includes('lithuania') || rName.includes('latvia') || rName.includes('belarus') || rName.includes('romania');
 
-        if (roll < 0.25) {
-          antisemitismExperience = {
-            level: "Peaceful Coexistence",
-            details: "Lived in an era and community of cultural coexistence, religious autonomy, and peace with neighboring populations."
-          };
-        } else if (roll < 0.50) {
-          antisemitismExperience = {
-            level: "Social Prejudice",
-            details: "Navigated quiet social prejudice, exclusionary social barriers, and subtle neighborly disdain while maintaining vibrant Jewish communal and family traditions."
-          };
-        } else if (roll < 0.75) {
-          antisemitismExperience = {
-            level: "Institutional Discrimination",
-            details: pickRandomItem([
-              "Subjected to municipal residency restrictions, confined to live within the locked gates of the Jewish quarter / ghetto (such as the Venetian Ghetto or Mellah).",
-              "Subjected to special sumptuary clothing codes (yellow badge / distinctive hat) and special protection taxes (Leibzoll / Jizya) imposed on religious minorities.",
-              "Barred by law from owning agricultural land or entering trade guilds, channeling your livelihood into permitted mercantile and artisan trades."
-            ])
-          };
-        } else {
-          let persecutionScenario = "Faced acute anti-Jewish hostility and localized unrest, relying on community solidarity to endure.";
-          let causesFlight = false;
-
-          if ((rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) && by <= 1492 && dy >= 1492) {
-            persecutionScenario = "Confronted by the 1492 Alhambra Decree expelling all practicing Jews from Spain upon pain of death.";
-            causesFlight = true;
-          } else if ((rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) && by >= 1860 && dy >= 1881) {
-            persecutionScenario = "Survived violent Tsarist pogroms in the Pale of Settlement where armed mobs attacked Jewish homes and shops.";
-            causesFlight = true;
-          } else if (selectedEra.id === 'MEDIEVAL' && by <= 1350 && dy >= 1348) {
-            persecutionScenario = "Narrowly escaped violent mob massacres and scapegoating during the Black Death hysteria in 1348–1349.";
-            causesFlight = true;
-          } else if (by <= 136 && dy >= 66 && (rName.includes('judea') || rName.includes('levant') || rName.includes('rome'))) {
-            persecutionScenario = "Lived through the devastating Roman siege and destruction of Jerusalem during the Jewish-Roman wars.";
-            causesFlight = true;
-          } else {
-            persecutionScenario = pickRandomItem([
-              "Faced escalating localized anti-Jewish riots and violent mob intimidation targeting the Jewish quarter.",
-              "Threatened with arbitrary arrest and confiscation of property during an outbreak of religious hysteria."
-            ]);
-            causesFlight = Math.random() < 0.55;
-          }
-
-          antisemitismExperience = {
-            level: "Pogrom & Persecution",
-            details: persecutionScenario
-          };
-
-          if (causesFlight && age >= 14 && !isEmigrant) {
+        // 1. THE HOLOCAUST (1933-1945 in Nazi Europe)
+        if (selectedEra.id === 'MODERN' && isEurope && by <= 1944 && dy >= 1933) {
+          if (by <= 1928 && Math.random() < 0.28) {
             isEmigrant = true;
-            emigrationAge = randomInt(14, Math.min(age, 38));
-            
-            if (rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) {
-              const dest = pickRandomItem([
-                { name: "Ottoman Empire (Salonica / Constantinople)", lat: 40.64, lng: 22.94 },
-                { name: "North Africa (Morocco / Tunisia)", lat: 34.03, lng: -5.00 },
-                { name: "Netherlands (Amsterdam)", lat: 52.37, lng: 4.89 }
+            emigrationAge = Math.min(age, Math.max(8, 1938 - by));
+            const refugeDests = [
+              { name: "United States", lat: 40.71, lng: -74.00 },
+              { name: "United Kingdom", lat: 51.50, lng: -0.12 },
+              { name: "Mandatory Palestine", lat: 31.76, lng: 35.21 },
+              { name: "Argentina", lat: -34.60, lng: -58.38 }
+            ];
+            const chosenDest = pickRandomItem(refugeDests);
+            deathRegion = chosenDest.name;
+            deathLat = chosenDest.lat;
+            deathLng = chosenDest.lng;
+            antisemitismExperience = {
+              level: "Holocaust Refugee",
+              details: `Fled escalating Nazi persecution, Nuremberg racial laws, and antisemitic violence in the 1930s, successfully emigrating as a refugee to ${deathRegion}.`
+            };
+          } else if (dy >= 1939) {
+            if (Math.random() < 0.68) {
+              const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 45)));
+              age = Math.max(0, deathY - by);
+              isAlive = false;
+              causeOfDeath = pickRandomItem([
+                "murdered in the extermination camps during the Holocaust in Nazi-occupied Europe (Auschwitz-Birkenau)",
+                "murdered in the gas chambers during the Holocaust (Treblinka / Sobibor)",
+                "murdered in a mass shooting by Nazi Einsatzgruppen mobile killing squads",
+                "starvation, typhus, and brutal exhaustion inside an enclosed Nazi ghetto (Warsaw / Lodz Ghetto)"
               ]);
-              deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
-            } else if (rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) {
-              const dest = pickRandomItem([
-                { name: "United States (New York Lower East Side)", lat: 40.71, lng: -73.99 },
-                { name: "United Kingdom (London East End)", lat: 51.52, lng: -0.06 },
-                { name: "Argentina (Buenos Aires)", lat: -34.60, lng: -58.38 }
-              ]);
-              deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
+              antisemitismExperience = {
+                level: "The Holocaust (Victim)",
+                details: "Perished in the Holocaust during the Nazi genocide of European Jewry."
+              };
             } else {
-              const destPool = selectedEra.regions.filter(r => r.text !== regionText);
-              const dest = destPool.length > 0 ? pickRandomItem(destPool) : selectedEra.regions[0];
-              deathRegion = dest.text; deathLat = dest.lat; deathLng = dest.lng;
+              antisemitismExperience = {
+                level: "The Holocaust (Survivor)",
+                details: pickRandomItem([
+                  "Endured the horrors of the Holocaust, surviving in hiding with underground partisans in the forests and emerging after liberation in 1945.",
+                  "Survived the Holocaust through the courage of righteous neighbors who sheltered your family in hidden quarters until liberation.",
+                  "Survived imprisonment in Nazi concentration camps, enduring until Allied liberation in 1945 and rebuilding your life in the post-war era."
+                ])
+              };
+              if (Math.random() < 0.65) {
+                isEmigrant = true;
+                emigrationAge = Math.min(age, Math.max(16, 1947 - by));
+                const dest = pickRandomItem([
+                  { name: "Israel", lat: 31.76, lng: 35.21 },
+                  { name: "United States", lat: 40.71, lng: -74.00 },
+                  { name: "Canada", lat: 45.50, lng: -73.56 }
+                ]);
+                deathRegion = dest.name;
+                deathLat = dest.lat;
+                deathLng = dest.lng;
+                antisemitismExperience.details += ` Emigrated after the war to build a new life in ${deathRegion}.`;
+              }
             }
-            antisemitismExperience.details += ` To escape persecution, emigrated to find safety and rebuild in ${deathRegion}.`;
+          }
+        }
+
+        // 2. PREMODERN & GENERAL ANTISEMITISM SPECTRUM
+        if (!antisemitismExperience) {
+          const roll = Math.random();
+
+          if (roll < 0.25) {
+            antisemitismExperience = {
+              level: "Peaceful Coexistence",
+              details: "Lived in an era and community of cultural coexistence, religious autonomy, and peace with neighboring populations."
+            };
+          } else if (roll < 0.50) {
+            antisemitismExperience = {
+              level: "Social Prejudice",
+              details: "Navigated quiet social prejudice, exclusionary social barriers, and subtle neighborly disdain while maintaining vibrant Jewish communal and family traditions."
+            };
+          } else if (roll < 0.75) {
+            antisemitismExperience = {
+              level: "Institutional Discrimination",
+              details: pickRandomItem([
+                "Subjected to municipal residency restrictions, confined to live within the locked gates of the Jewish quarter / ghetto (such as the Venetian Ghetto or Mellah).",
+                "Subjected to special sumptuary clothing codes (yellow badge / distinctive hat) and special protection taxes (Leibzoll / Jizya) imposed on religious minorities.",
+                "Barred by law from owning agricultural land or entering trade guilds, channeling your livelihood into permitted mercantile and artisan trades."
+              ])
+            };
+          } else {
+            let persecutionScenario = "Faced acute anti-Jewish hostility and localized unrest, relying on community solidarity to endure.";
+            let causesFlight = false;
+
+            if ((rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) && by <= 1492 && dy >= 1492) {
+              persecutionScenario = "Confronted by the 1492 Alhambra Decree expelling all practicing Jews from Spain upon pain of death.";
+              causesFlight = true;
+            } else if ((rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) && by >= 1860 && dy >= 1881) {
+              persecutionScenario = "Survived violent Tsarist pogroms in the Pale of Settlement where armed mobs attacked Jewish homes and shops.";
+              causesFlight = true;
+            } else if (selectedEra.id === 'MEDIEVAL' && by <= 1350 && dy >= 1348) {
+              persecutionScenario = "Narrowly escaped violent mob massacres and scapegoating during the Black Death hysteria in 1348–1349.";
+              causesFlight = true;
+            } else if (by <= 136 && dy >= 66 && (rName.includes('judea') || rName.includes('levant') || rName.includes('rome'))) {
+              persecutionScenario = "Lived through the devastating Roman siege and destruction of Jerusalem during the Jewish-Roman wars.";
+              causesFlight = true;
+            } else {
+              persecutionScenario = pickRandomItem([
+                "Faced escalating localized anti-Jewish riots and violent mob intimidation targeting the Jewish quarter.",
+                "Threatened with arbitrary arrest and confiscation of property during an outbreak of religious hysteria."
+              ]);
+              causesFlight = Math.random() < 0.55;
+            }
+
+            antisemitismExperience = {
+              level: "Pogrom & Persecution",
+              details: persecutionScenario
+            };
+
+            if (causesFlight && age >= 14 && !isEmigrant) {
+              isEmigrant = true;
+              emigrationAge = randomInt(14, Math.min(age, 38));
+              
+              if (rName.includes('spain') || rName.includes('iberia') || rName.includes('andalus')) {
+                const dest = pickRandomItem([
+                  { name: "Ottoman Empire (Salonica / Constantinople)", lat: 40.64, lng: 22.94 },
+                  { name: "North Africa (Morocco / Tunisia)", lat: 34.03, lng: -5.00 },
+                  { name: "Netherlands (Amsterdam)", lat: 52.37, lng: 4.89 }
+                ]);
+                deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
+              } else if (rName.includes('russia') || rName.includes('ukraine') || rName.includes('poland')) {
+                const dest = pickRandomItem([
+                  { name: "United States (New York Lower East Side)", lat: 40.71, lng: -73.99 },
+                  { name: "United Kingdom (London East End)", lat: 51.52, lng: -0.06 },
+                  { name: "Argentina (Buenos Aires)", lat: -34.60, lng: -58.38 }
+                ]);
+                deathRegion = dest.name; deathLat = dest.lat; deathLng = dest.lng;
+              } else {
+                const destPool = selectedEra.regions.filter(r => r.text !== regionText);
+                const dest = destPool.length > 0 ? pickRandomItem(destPool) : selectedEra.regions[0];
+                deathRegion = dest.text; deathLat = dest.lat; deathLng = dest.lng;
+              }
+              antisemitismExperience.details += ` To escape persecution, emigrated to find safety and rebuild in ${deathRegion}.`;
+            }
           }
         }
       }
