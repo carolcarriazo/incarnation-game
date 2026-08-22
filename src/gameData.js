@@ -24,67 +24,114 @@ export const DISABILITY_POOL = [
   {
     category: "Visual impairment",
     weight: 30,
-    examples: "crossed eyes (strabismus) and poor eyesight, clouded eye lenses (congenital cataracts), colour-blindness, severe near-sightedness, rapid involuntary eye twitching",
+    examples: [
+      "crossed eyes (strabismus) and poor eyesight",
+      "clouded eye lenses (congenital cataracts)",
+      "congenital colour-blindness",
+      "severe congenital near-sightedness",
+      "rapid involuntary eye twitching (nystagmus)"
+    ],
     visibleAtBirth: false, heartDefect: false
   },
   {
     category: "Musculoskeletal condition",
     weight: 20,
-    examples: "a curved spine developing during childhood or adolescent growth (scoliosis / adolescent hunchback), a turned foot (clubfoot), a dislocated hip resulting in a pronounced limp, a stiff twisted neck, webbed fingers or toes",
+    examples: [
+      "a curved spine developing during childhood growth (scoliosis)",
+      "a turned foot (clubfoot)",
+      "a congenital dislocated hip resulting in a pronounced limp",
+      "a stiff twisted neck (torticollis)",
+      "webbed fingers or toes (syndactyly)"
+    ],
     visibleAtBirth: false, heartDefect: false
   },
   {
     category: "Hearing impairment",
     weight: 16,
-    examples: "partial hardness of hearing, complete congenital deafness in both ears, deafness in one ear, ringing and muffled hearing",
+    examples: [
+      "partial hardness of hearing",
+      "complete congenital deafness in both ears",
+      "chronic deafness in one ear",
+      "persistent ringing and muffled hearing"
+    ],
     visibleAtBirth: false, heartDefect: false
   },
   {
     category: "Congenital heart condition",
     weight: 8,
-    examples: "a heart murmur causing chronic fatigue and shortness of breath upon exertion, a hole in the heart (septal defect), poor circulation causing bluish skin and weak stamina",
+    examples: [
+      "a heart murmur causing chronic fatigue and shortness of breath upon exertion",
+      "a hole in the heart (septal defect)",
+      "poor circulation causing bluish skin and reduced stamina"
+    ],
     visibleAtBirth: false, heartDefect: true
   },
   {
     category: "Neurological or motor condition",
     weight: 6,
-    examples: "stiff muscle spasms and awkward walking gait (palsy / cerebral palsy), nerve weakness in the lower spine, chronic muscle weakness and poor coordination",
+    examples: [
+      "stiff muscle spasms and awkward walking gait (cerebral palsy)",
+      "nerve weakness in the lower spine",
+      "chronic muscle weakness and poor coordination"
+    ],
     visibleAtBirth: false, heartDefect: false
   },
   {
     category: "Neurodivergent condition",
     weight: 5,
-    examples: "autism spectrum (deep sensory sensitivity, social eccentricity, and obsessive specialized focus), severe reading/symbol blindness (dyslexia), inability to speak in public (selective mutism), intense restlessness and impulsivity (ADHD)",
+    examples: [
+      "autism spectrum (deep sensory sensitivity, social eccentricity, and specialized focus)",
+      "reading and symbol difficulty (dyslexia)",
+      "inability to speak in public or unfamiliar settings (selective mutism)",
+      "intense restlessness and impulsivity (ADHD)"
+    ],
     visibleAtBirth: false, heartDefect: false
   },
   {
     category: "Intellectual developmental condition",
     weight: 3,
-    examples: "Down syndrome (distinct gentle facial features, slow speech, and lifelong childlike dependency), significant developmental learning delays",
+    examples: [
+      "Down syndrome (gentle facial features, slow speech, and lifelong dependency)",
+      "significant developmental learning delays"
+    ],
     visibleAtBirth: true, heartDefect: false
   },
   {
     category: "Facial anomaly",
     weight: 1.5,
-    examples: "a cleft lip and palate affecting speech and eating, a large dark red birthmark (port-wine stain) covering part of the face, asymmetry in the facial bones",
+    examples: [
+      "a cleft lip and palate affecting speech and feeding",
+      "a large dark birthmark (port-wine stain) covering part of the face",
+      "asymmetry in the facial bones"
+    ],
     visibleAtBirth: true, heartDefect: false
   },
   {
     category: "Limb or digit difference",
     weight: 1,
-    examples: "an extra finger or toe (polydactyly), a missing or shortened hand/arm, fused fingers",
+    examples: [
+      "an extra finger or toe (polydactyly)",
+      "a shortened limb or missing fingers",
+      "fused fingers"
+    ],
     visibleAtBirth: true, heartDefect: false
   },
   {
     category: "Metabolic condition",
     weight: 0.8,
-    examples: "severe digestive intolerance to mother's milk (galactosemia), thyroid deficiency causing stunted physical and mental growth",
+    examples: [
+      "severe digestive intolerance to milk (galactosemia)",
+      "thyroid deficiency causing stunted physical and mental growth"
+    ],
     visibleAtBirth: false, heartDefect: false
   },
   {
     category: "Short stature condition",
     weight: 0.4,
-    examples: "dwarfism (disproportionate short stature with shortened limbs and prominent forehead), brittle bones prone to frequent fractures",
+    examples: [
+      "dwarfism (disproportionate short stature with shortened limbs)",
+      "brittle bones prone to frequent fractures"
+    ],
     visibleAtBirth: false, heartDefect: false
   },
 ];
@@ -474,36 +521,36 @@ export const ERAS = [
     id: 'EARLY_MODERN', name: 'Early Modern', startYear: 1500, endYear: 1850, weight: 12,
     infantMortality: 0.20, childMortality: 0.15, maternalMortality: 0.05, survivingAdultMean: 65, exposureRate: 0.02,
     regions: [
-      { text: "Kingdom of Great Britain & Ireland (London / Edinburgh / Dublin)", lang: "Early Modern English, Scots, and Irish Gaelic", minorityChance: 0.12, modernLifeExpectancy: 81, lat: 51.5, lng: -0.13 },
-      { text: "Kingdom of France (Paris / Versailles / Lyon)", lang: "French & Occitan", minorityChance: 0.10, modernLifeExpectancy: 82, lat: 48.8, lng: 2.3 },
-      { text: "Habsburg Spain & Empire (Madrid / Seville / Toledo)", lang: "Spanish (Castilian)", minorityChance: 0.16, modernLifeExpectancy: 83, lat: 40.4, lng: -3.7 },
-      { text: "Holy Roman Empire & German States (Vienna / Berlin / Frankfurt)", lang: "German", minorityChance: 0.15, modernLifeExpectancy: 81, lat: 48.2, lng: 16.4 },
-      { text: "Dutch Republic & Low Countries (Amsterdam / Antwerp)", lang: "Dutch / Flemish", minorityChance: 0.14, modernLifeExpectancy: 82, lat: 52.37, lng: 4.9 },
-      { text: "Italian States (Papal States / Naples / Venice / Milan)", lang: "Italian dialects (Neapolitan, Venetian, Tuscan)", minorityChance: 0.12, modernLifeExpectancy: 83, lat: 41.9, lng: 12.5 },
-      { text: "Tsardom & Empire of Russia (Moscow / St. Petersburg)", lang: "Russian", minorityChance: 0.22, modernLifeExpectancy: 72, lat: 59.9, lng: 30.3 },
-      { text: "Polish-Lithuanian Commonwealth (Warsaw / Vilnius / Krakow)", lang: "Polish, Ruthenian, and Yiddish", minorityChance: 0.32, modernLifeExpectancy: 78, lat: 52.2, lng: 21.0 },
-      { text: "Scandinavian Kingdoms (Stockholm / Copenhagen)", lang: "Swedish & Danish", minorityChance: 0.06, modernLifeExpectancy: 83, lat: 59.3, lng: 18.0 },
-      { text: "Ottoman Empire (Istanbul / Cairo / Damascus / Balkans)", lang: "Ottoman Turkish, Arabic, and Greek", minorityChance: 0.45, modernLifeExpectancy: 77, lat: 41.0, lng: 29.0 },
-      { text: "Safavid & Qajar Persia (Isfahan / Tehran, Iran)", lang: "Persian and Azerbaijani", minorityChance: 0.24, modernLifeExpectancy: 74, lat: 32.6, lng: 51.7 },
-      { text: "Ming & Qing Dynasties (Beijing / Guangzhou / Nanjing, China)", lang: "Mandarin Chinese, Cantonese, and Manchu", minorityChance: 0.12, modernLifeExpectancy: 76, lat: 39.9, lng: 116.4 },
-      { text: "Tokugawa Shogunate (Edo / Kyoto / Osaka, Japan)", lang: "Early Modern Japanese", minorityChance: 0.03, modernLifeExpectancy: 84, lat: 35.7, lng: 139.7 },
-      { text: "Joseon Dynasty (Hanyang / Seoul, Korea)", lang: "Early Modern Korean", minorityChance: 0.03, modernLifeExpectancy: 83, lat: 37.5, lng: 127.0 },
-      { text: "Mughal Empire (Delhi / Agra / Lahore, India)", lang: "Hindustani, Urdu, and Persian", minorityChance: 0.28, modernLifeExpectancy: 70, lat: 28.6, lng: 77.2 },
-      { text: "Maratha Empire & Deccan Kingdoms (Pune / Hyderabad, India)", lang: "Marathi and Telugu", minorityChance: 0.18, modernLifeExpectancy: 71, lat: 18.5, lng: 73.8 },
-      { text: "Kingdom of Ayutthaya & Siam (Bangkok / Ayutthaya, Thailand)", lang: "Thai", minorityChance: 0.12, modernLifeExpectancy: 75, lat: 14.3, lng: 100.5 },
-      { text: "Maritime Southeast Asia (Batavia / Malacca / Manila / Aceh)", lang: "Malay, Tagalog, and Javanese", minorityChance: 0.25, modernLifeExpectancy: 72, lat: -6.2, lng: 106.8 },
-      { text: "Viceroyalty of New Spain (Mexico City / Guadalajara / Puebla)", lang: "Spanish, Nahuatl, and Zapotec", minorityChance: 0.55, modernLifeExpectancy: 75, lat: 19.4, lng: -99.1 },
-      { text: "Viceroyalty of Peru & Alto Peru (Lima / Cusco / Potosí)", lang: "Spanish, Quechua, and Aymara", minorityChance: 0.60, modernLifeExpectancy: 73, lat: -12.0, lng: -77.0 },
-      { text: "Colonial Brazil (Salvador da Bahia / Rio de Janeiro / Minas Gerais)", lang: "Portuguese, Tupi, and Yoruba dialects", minorityChance: 0.50, modernLifeExpectancy: 74, lat: -12.9, lng: -38.5 },
-      { text: "British North America & Early United States (Boston / Virginia / New York)", lang: "English", minorityChance: 0.22, modernLifeExpectancy: 78, lat: 40.7, lng: -74.0 },
-      { text: "French Canada & Acadia (Quebec / Montreal)", lang: "French", minorityChance: 0.15, modernLifeExpectancy: 82, lat: 46.8, lng: -71.2 },
-      { text: "Caribbean Sugar Colonies (Jamaica / Saint-Domingue / Cuba)", lang: "Creole, English, French, and Spanish", minorityChance: 0.75, modernLifeExpectancy: 73, lat: 18.1, lng: -77.3 },
-      { text: "Kingdom of Dahomey & Ashanti Empire (West Africa)", lang: "Fon & Twi", minorityChance: 0.10, modernLifeExpectancy: 59, lat: 6.7, lng: -1.6 },
-      { text: "Kingdom of Kongo & Ndongo (Central Africa)", lang: "Kikongo & Kimbundu", minorityChance: 0.10, modernLifeExpectancy: 58, lat: -6.2, lng: 14.2 },
-      { text: "Zulu Kingdom & Cape Colony (Southern Africa)", lang: "isiZulu, Dutch/Afrikaans, and Xhosa", minorityChance: 0.30, modernLifeExpectancy: 64, lat: -29.0, lng: 31.0 },
-      { text: "Kingdom of Madagascar (Merina Kingdom / Antananarivo)", lang: "Malagasy", minorityChance: 0.08, modernLifeExpectancy: 65, lat: -18.9, lng: 47.5 },
-      { text: "Kingdom of Hawaii & Polynesian Islands", lang: "Hawaiian and Polynesian languages", minorityChance: 0.04, modernLifeExpectancy: 81, lat: 21.3, lng: -157.8 },
-      { text: "Aotearoa / New Zealand (Māori Iwi)", lang: "Māori language", minorityChance: 0.03, modernLifeExpectancy: 82, lat: -36.8, lng: 174.7 }
+      { text: "Kingdom of Great Britain & Ireland (London / Edinburgh / Dublin, modern-day UK & Ireland)", lang: "Early Modern English, Scots, and Irish Gaelic", minorityChance: 0.12, modernLifeExpectancy: 81, lat: 51.5, lng: -0.13 },
+      { text: "Kingdom of France (Paris / Versailles / Lyon, modern-day France)", lang: "French & Occitan", minorityChance: 0.10, modernLifeExpectancy: 82, lat: 48.8, lng: 2.3 },
+      { text: "Habsburg Spain & Empire (Madrid / Seville / Toledo, modern-day Spain)", lang: "Spanish (Castilian)", minorityChance: 0.16, modernLifeExpectancy: 83, lat: 40.4, lng: -3.7 },
+      { text: "Holy Roman Empire & German States (Vienna / Berlin / Frankfurt, modern-day Germany & Austria)", lang: "German", minorityChance: 0.15, modernLifeExpectancy: 81, lat: 48.2, lng: 16.4 },
+      { text: "Dutch Republic & Low Countries (Amsterdam / Antwerp, modern-day Netherlands & Belgium)", lang: "Dutch / Flemish", minorityChance: 0.14, modernLifeExpectancy: 82, lat: 52.37, lng: 4.9 },
+      { text: "Italian States (Papal States / Naples / Venice / Milan, modern-day Italy)", lang: "Italian dialects (Neapolitan, Venetian, Tuscan)", minorityChance: 0.12, modernLifeExpectancy: 83, lat: 41.9, lng: 12.5 },
+      { text: "Tsardom & Empire of Russia (Moscow / St. Petersburg, modern-day Russia)", lang: "Russian", minorityChance: 0.22, modernLifeExpectancy: 72, lat: 59.9, lng: 30.3 },
+      { text: "Polish-Lithuanian Commonwealth (Warsaw / Vilnius / Krakow, modern-day Poland & Lithuania)", lang: "Polish, Ruthenian, and Yiddish", minorityChance: 0.32, modernLifeExpectancy: 78, lat: 52.2, lng: 21.0 },
+      { text: "Scandinavian Kingdoms (Stockholm / Copenhagen, modern-day Sweden & Denmark)", lang: "Swedish & Danish", minorityChance: 0.06, modernLifeExpectancy: 83, lat: 59.3, lng: 18.0 },
+      { text: "Ottoman Empire (Istanbul / Cairo / Damascus / Balkans, modern-day Turkey & Middle East)", lang: "Ottoman Turkish, Arabic, and Greek", minorityChance: 0.45, modernLifeExpectancy: 77, lat: 41.0, lng: 29.0 },
+      { text: "Safavid & Qajar Persia (Isfahan / Tehran, modern-day Iran)", lang: "Persian and Azerbaijani", minorityChance: 0.24, modernLifeExpectancy: 74, lat: 32.6, lng: 51.7 },
+      { text: "Ming & Qing Dynasties (Beijing / Guangzhou / Nanjing, modern-day China)", lang: "Mandarin Chinese, Cantonese, and Manchu", minorityChance: 0.12, modernLifeExpectancy: 76, lat: 39.9, lng: 116.4 },
+      { text: "Tokugawa Shogunate (Edo / Kyoto / Osaka, modern-day Japan)", lang: "Early Modern Japanese", minorityChance: 0.03, modernLifeExpectancy: 84, lat: 35.7, lng: 139.7 },
+      { text: "Joseon Dynasty (Hanyang / Seoul, modern-day Korea)", lang: "Early Modern Korean", minorityChance: 0.03, modernLifeExpectancy: 83, lat: 37.5, lng: 127.0 },
+      { text: "Mughal Empire (Delhi / Agra / Lahore, modern-day India & Pakistan)", lang: "Hindustani, Urdu, and Persian", minorityChance: 0.28, modernLifeExpectancy: 70, lat: 28.6, lng: 77.2 },
+      { text: "Maratha Empire & Deccan Kingdoms (Pune / Hyderabad, modern-day India)", lang: "Marathi and Telugu", minorityChance: 0.18, modernLifeExpectancy: 71, lat: 18.5, lng: 73.8 },
+      { text: "Kingdom of Ayutthaya & Siam (Bangkok / Ayutthaya, modern-day Thailand)", lang: "Thai", minorityChance: 0.12, modernLifeExpectancy: 75, lat: 14.3, lng: 100.5 },
+      { text: "Maritime Southeast Asia (Batavia / Malacca / Manila, modern-day Indonesia & Philippines)", lang: "Malay, Tagalog, and Javanese", minorityChance: 0.25, modernLifeExpectancy: 72, lat: -6.2, lng: 106.8 },
+      { text: "Viceroyalty of New Spain (Mexico City / Guadalajara / Puebla, modern-day Mexico)", lang: "Spanish, Nahuatl, and Zapotec", minorityChance: 0.55, modernLifeExpectancy: 75, lat: 19.4, lng: -99.1 },
+      { text: "Viceroyalty of Peru & Alto Peru (Lima / Cusco / Potosí, modern-day Peru & Bolivia)", lang: "Spanish, Quechua, and Aymara", minorityChance: 0.60, modernLifeExpectancy: 73, lat: -12.0, lng: -77.0 },
+      { text: "Colonial Brazil (Salvador da Bahia / Rio de Janeiro, modern-day Brazil)", lang: "Portuguese, Tupi, and Yoruba dialects", minorityChance: 0.50, modernLifeExpectancy: 74, lat: -12.9, lng: -38.5 },
+      { text: "British North America & Early USA (Boston / Virginia / New York, modern-day United States)", lang: "English", minorityChance: 0.22, modernLifeExpectancy: 78, lat: 40.7, lng: -74.0 },
+      { text: "French Canada & Acadia (Quebec / Montreal, modern-day Canada)", lang: "French", minorityChance: 0.15, modernLifeExpectancy: 82, lat: 46.8, lng: -71.2 },
+      { text: "Caribbean Sugar Colonies (Jamaica / Saint-Domingue / Cuba, modern-day Caribbean)", lang: "Creole, English, French, and Spanish", minorityChance: 0.75, modernLifeExpectancy: 73, lat: 18.1, lng: -77.3 },
+      { text: "Kingdom of Dahomey & Ashanti Empire (West Africa, modern-day Ghana & Benin)", lang: "Fon & Twi", minorityChance: 0.10, modernLifeExpectancy: 59, lat: 6.7, lng: -1.6 },
+      { text: "Kingdom of Kongo & Ndongo (Central Africa, modern-day Angola & DR Congo)", lang: "Kikongo & Kimbundu", minorityChance: 0.10, modernLifeExpectancy: 58, lat: -6.2, lng: 14.2 },
+      { text: "Zulu Kingdom & Cape Colony (modern-day South Africa)", lang: "isiZulu, Dutch/Afrikaans, and Xhosa", minorityChance: 0.30, modernLifeExpectancy: 64, lat: -29.0, lng: 31.0 },
+      { text: "Kingdom of Madagascar (Merina Kingdom, modern-day Madagascar)", lang: "Malagasy", minorityChance: 0.08, modernLifeExpectancy: 65, lat: -18.9, lng: 47.5 },
+      { text: "Kingdom of Hawaii & Polynesian Islands (modern-day Hawaii / Polynesia)", lang: "Hawaiian and Polynesian languages", minorityChance: 0.04, modernLifeExpectancy: 81, lat: 21.3, lng: -157.8 },
+      { text: "Aotearoa / New Zealand (Māori Iwi, modern-day New Zealand)", lang: "Māori language", minorityChance: 0.03, modernLifeExpectancy: 82, lat: -36.8, lng: 174.7 }
     ],
     classes: [{ name: "Lower Class/Peasant/Laborer", chance: 0.74 }, { name: "Middle Class/Merchant/Artisan", chance: 0.20 }, { name: "Upper Class/Aristocracy", chance: 0.06 }]
   },
