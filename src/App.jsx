@@ -1411,7 +1411,7 @@ ${(currentLife.narrative || []).join('\n\n')}
 
       // 2b. Base Genetics
       const intelligence = randomGaussian(50, 15);
-      const beauty = randomGaussian(50, 15);
+      let beauty = randomGaussian(50, 15);
 
       // 3. Mortality Setup
       let baseInfantMortality = selectedEra.infantMortality;
@@ -1453,6 +1453,28 @@ ${(currentLife.narrative || []).join('\n\n')}
         isHeartDefect = picked.heartDefect;
       }
       if (isVisibleAtBirth && Math.random() < selectedEra.exposureRate) wasExposed = true;
+
+      // Physical deformity beauty cap: someone with a physical deformity cannot have beauty over 50 (it reduces it)
+      const isPhysicalDeformity = disabilityCategory && (
+        disabilityCategory === "Facial anomaly" ||
+        disabilityCategory === "Musculoskeletal condition" ||
+        disabilityCategory === "Limb or digit difference" ||
+        disabilityCategory === "Skeletal dysplasia or short stature condition" ||
+        (disabilityExamples && (
+          disabilityExamples.toLowerCase().includes('cleft') ||
+          disabilityExamples.toLowerCase().includes('scoliosis') ||
+          disabilityExamples.toLowerCase().includes('clubfoot') ||
+          disabilityExamples.toLowerCase().includes('deform') ||
+          disabilityExamples.toLowerCase().includes('shortened limb') ||
+          disabilityExamples.toLowerCase().includes('birthmark') ||
+          disabilityExamples.toLowerCase().includes('asymmetry') ||
+          disabilityExamples.toLowerCase().includes('hunchback')
+        ))
+      );
+
+      if (isPhysicalDeformity) {
+        beauty = Math.min(50, beauty > 50 ? Math.floor(50 - (beauty - 50) * 0.5) : beauty);
+      }
 
       // 5. Identity & Personality
       const isImmigrant = Math.random() < (selectedEra.id === 'MODERN' ? 0.15 : 0.02);
@@ -2497,6 +2519,9 @@ ${(currentLife.narrative || []).join('\n\n')}
           ];
           maimedDetails = `${pickRandomItem(eventScenarios)} (left with ${pickedSeverity.desc})`;
           maimedContributedToDeath = Math.random() < 0.35 && age > 40;
+          if (maimedSeverity !== "mild scarring" || maimedDetails.includes("burn")) {
+            beauty = Math.min(50, beauty > 50 ? Math.floor(50 - (beauty - 50) * 0.5) : beauty);
+          }
         }
       }
 
