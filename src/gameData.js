@@ -8,11 +8,11 @@
 export const PERSONALITY_TRAITS = [
   "traditional and bound by custom", "open-minded and curious", "stubborn and unyielding",
   "deeply empathetic", "highly ambitious", "cynical and guarded", "quick to anger",
-  "melancholic and contemplative", "brave", "quietly observant", "charming and persuasive",
-  "deeply pious", "lethargic", "anxious and risk-averse", "stoic under pressure", "garrulous and social",
+  "melancholic and contemplative", "brave", "observant", "charming and persuasive",
+  "deeply pious", "lazy", "anxious and risk-averse", "stoic under pressure", "talkative and social",
   "frugal and meticulous", "neurotic", "generous to a fault", "resigned and passive",
   "fiercely independent", "devoted to family", "pragmatic and resourceful", "idealistic",
-  "secretive and guarded", "easily led by others", "deeply single-minded and focused", "deeply curious about nature"
+  "secretive and guarded", "easily led by others", "single-minded and focused"
 ];
 
 // ─────────────────────────────────────────────────
@@ -28,9 +28,7 @@ export const DISABILITY_POOL = [
       "crossed eyes (strabismus) and poor eyesight",
       "clouded eye lenses (congenital cataracts)",
       "congenital colour-blindness",
-      "severe congenital near-sightedness",
-      "rapid involuntary eye twitching (nystagmus)"
-    ],
+      "severe congenital near-sightedness"],
     visibleAtBirth: false, heartDefect: false
   },
   {

@@ -2,10 +2,19 @@ import {
   Award, ShieldAlert, Baby, Sparkles, Ghost, 
   Swords, Droplets, HeartHandshake, Brain, 
   DoorClosed, Rainbow, UserX, Crown, Compass,
-  Bone, Flag, Hourglass, PersonStanding, HeartCrack, Sun, Unlock
+  Bone, Flag, Hourglass, PersonStanding, HeartCrack, Sun, Unlock,
+  Skull
 } from 'lucide-react';
 
 export const BADGE_DEFINITIONS = [
+  {
+    id: 'mask_of_sanity',
+    name: 'Mask of Sanity',
+    icon: Skull,
+    description: 'Born without the faculty of emotional empathy, remorse, or guilt — navigating humanity behind a calculated mask.',
+    colorClass: 'bg-zinc-950/60 border-zinc-400/60 text-zinc-200 shadow-[0_0_12px_rgba(161,161,170,0.25)]',
+    condition: (life) => life.isPsychopath === true
+  },
   {
     id: 'bye_baby',
     name: 'Bye, Baby',

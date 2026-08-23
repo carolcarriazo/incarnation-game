@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   RefreshCw, ScrollText, Skull, Heart, Star, Clock, Globe2,
   Sparkles, BookOpen, Loader2, Link as LinkIcon, Calendar, MapPin, Medal,
-  X, Lock, Crown, Landmark, Users, User, Share2, Check, AlertTriangle
+  X, Lock, Crown, Landmark, Users, User, Share2, Check, AlertTriangle, Briefcase
 } from 'lucide-react';
 import { PERSONALITY_TRAITS, DISABILITY_POOL, MODERN_COUNTRIES, ERAS } from './gameData.js';
 import { BADGE_DEFINITIONS, evaluateBadges } from './badgeData.js';
@@ -21,6 +21,19 @@ const pickWeighted = (pool) => {
   let rand = Math.random() * total;
   for (const item of pool) { rand -= item.weight; if (rand <= 0) return item; }
   return pool[pool.length - 1];
+};
+
+// Epidemiologically weighted cause of death picker
+const pickWeightedCause = (pool) => {
+  const total = pool.reduce((s, item) => s + (item.weight != null ? item.weight : 1), 0);
+  let rand = Math.random() * total;
+  for (const item of pool) {
+    const w = item.weight != null ? item.weight : 1;
+    rand -= w;
+    if (rand <= 0) return typeof item === 'object' && item.name ? item.name : item;
+  }
+  const last = pool[pool.length - 1];
+  return typeof last === 'object' && last.name ? last.name : last;
 };
 
 const cleanRegionName = (region) => {
@@ -98,7 +111,7 @@ const checkHistoricalCatastropheDeath = (region, deathYear, isFemale, socialClas
 
   // Great Fire of Rome (64 CE)
   if ((regLower.includes('rome') || regLower.includes('italy')) && deathYear === 64) {
-    return "Perished in the raging inferno of the Great Fire of Rome under Emperor Nero";
+    return "Died in the raging inferno of the Great Fire of Rome under Emperor Nero";
   }
 
   // Mount Vesuvius Eruption (79 CE)
@@ -118,7 +131,7 @@ const checkHistoricalCatastropheDeath = (region, deathYear, isFemale, socialClas
 
   // Mongol Sack of Baghdad (1258 CE)
   if ((regLower.includes('baghdad') || regLower.includes('mesopotamia') || regLower.includes('iraq') || regLower.includes('caliphate')) && deathYear === 1258) {
-    return "Massacred during the catastrophic Mongol siege and sack of Baghdad by Hulagu Khan";
+    return "Massacred during the Mongol siege and sack of Baghdad by Hulagu Khan";
   }
 
   // Siege of Tenochtitlan (1521 CE)
@@ -133,13 +146,13 @@ const checkHistoricalCatastropheDeath = (region, deathYear, isFemale, socialClas
 
   // Taiping Rebellion (1850-1864 CE)
   if (regLower.includes('china') && (deathYear >= 1851 && deathYear <= 1864)) {
-    return "Perished amidst the devastating warfare and starvation of the Taiping Rebellion";
+    return "Perished amidst the warfare and starvation of the Taiping Rebellion";
   }
 
   // Red Terror / Russian Civil War (1918-1922 CE)
   if ((regLower.includes('russia') || regLower.includes('soviet')) && (deathYear >= 1918 && deathYear <= 1922)) {
     if (isUpper) return "Executed by the Bolshevik Cheka as a bourgeois class enemy during the Red Terror";
-    return "Killed during the brutal clashes and famine of the Russian Civil War";
+    return "Killed during the fighting and famine of the Russian Civil War";
   }
 
   // Thirty Years' War (1618-1648 CE Germany / Central Europe)
@@ -175,15 +188,15 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
   if (age === 0) {
     if (conditions.wasExposed) return "Exposure / Infanticide at birth due to visible structural deformity present at delivery";
     if (conditions.isHeartDefect) return "Congenital heart defect (infant cardiac failure)";
-    return pickRandomItem([
-      "sudden infant fever of unknown origin",
-      "puerperal or neonatal infection",
-      "congenital respiratory failure",
-      "gastrointestinal infection (infantile dysentery/diarrhea)",
-      "neonatal tetanus ('seven-day sickness')",
-      "infantile wasting / failure to thrive",
-      "acute bronchopneumonia in winter",
-      "congenital biliary atresia"
+    return pickWeightedCause([
+      { name: "acute bronchopneumonia in winter", weight: 28 },
+      { name: "gastrointestinal infection (infantile dysentery/diarrhea)", weight: 26 },
+      { name: "neonatal tetanus ('seven-day sickness')", weight: 20 },
+      { name: "puerperal or neonatal infection", weight: 18 },
+      { name: "infantile wasting / failure to thrive", weight: 15 },
+      { name: "sudden infant fever of unknown origin", weight: 12 },
+      { name: "congenital respiratory failure", weight: 8 },
+      { name: "congenital biliary atresia", weight: 1 }
     ]);
   }
   if (age < 15) {
@@ -192,35 +205,35 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
     // 90% of early childhood deaths are infectious illness, respiratory, waterborne, or epidemics
     if (childRoll < 0.90) {
       if (era.id === 'MODERN' && deathYear > 1950) {
-        return pickRandomItem([
-          "acute lymphoblastic leukemia (childhood cancer)",
-          "severe viral myocarditis",
-          "bacterial meningitis (meningococcal infection)",
-          "congenital metabolic crisis",
-          "severe acute asthma exacerbation",
-          "fulminant peritonitis from a ruptured appendix"
+        return pickWeightedCause([
+          { name: "acute lymphoblastic leukemia (childhood cancer)", weight: 22 },
+          { name: "bacterial meningitis (meningococcal infection)", weight: 18 },
+          { name: "congenital metabolic crisis", weight: 15 },
+          { name: "type 1 diabetes", weight: 12 },
+          { name: "severe viral myocarditis", weight: 8 },
+          { name: "severe acute asthma exacerbation", weight: 8 },
+          { name: "fulminant peritonitis from a ruptured appendix", weight: 6 }
         ]);
       }
-      return pickRandomItem([
-        "acute dysentery / waterborne gastrointestinal infection",
-        "pulmonary infection / severe lobar pneumonia",
-        "smallpox epidemic with fulminant pustular fever",
-        "scarlet fever with severe streptococcal complications",
-        "measles complicated by secondary bacterial bronchopneumonia or encephalitis",
-        "diphtheria ('the strangling angel') causing severe airway obstruction",
-        "whooping cough (pertussis) with acute respiratory exhaustion",
-        "epidemic typhus fever transmitted by lice in winter quarters",
-        "severe childhood cholera outbreak with rapid dehydration",
-        "tuberculous meningitis (the white plague in youth)",
-        "summer diarrheal disease / cholera infantum",
-        "malaria (tertian ague) causing severe anemia and high-fever convulsion",
-        "acute tonsillitis leading to quinsy and systemic septicemia",
-        "severe nutritional deficiency and scurvy during a harsh winter famine",
-        "severe enteric fever (typhoid) from contaminated drinking water",
-        "acute infantile convulsions brought on by high febrile illness"
+      return pickWeightedCause([
+        { name: "acute dysentery / waterborne gastrointestinal infection", weight: 28 },
+        { name: "pulmonary infection / severe lobar pneumonia", weight: 25 },
+        { name: "measles complicated by secondary bacterial bronchopneumonia or encephalitis", weight: 20 },
+        { name: "smallpox epidemic with fulminant pustular fever", weight: 18 },
+        { name: "diphtheria ('the strangling angel') causing severe airway obstruction", weight: 16 },
+        { name: "whooping cough (pertussis) with acute respiratory exhaustion", weight: 15 },
+        { name: "cholera", weight: 12 },
+        { name: "scarlet fever with severe streptococcal complications", weight: 12 },
+        { name: "tuberculous meningitis (the white plague in youth)", weight: 10 },
+        { name: "malaria (tertian ague) causing severe anemia and high-fever convulsion", weight: 10 },
+        { name: "epidemic typhus fever transmitted by lice in winter quarters", weight: 8 },
+        { name: "severe enteric fever (typhoid) from contaminated drinking water", weight: 8 },
+        { name: "acute infantile convulsions brought on by high febrile illness", weight: 8 },
+        { name: "severe nutritional deficiency and scurvy during a harsh winter famine", weight: 6 },
+        { name: "acute tonsillitis leading to sepsis", weight: 4 }
       ]);
     } else if (childRoll < 0.97) {
-      // Accidents / Trauma (very rare compared to disease; animal kicks are just one of many rare accidents)
+      // Accidents / Trauma (very rare compared to disease)
       if (era.id === 'MODERN') {
         return pickRandomItem([
           "fatal road traffic accident / vehicle collision",
@@ -234,7 +247,7 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
         "fatal skull fracture from an accidental fall from a tree, haystack, or rooftop",
         "severe dwelling fire / fatal smoke inhalation and thermal burns",
         "accidental scalding from an overturned boiling cooking cauldron",
-        "fatal asphyxiation / smothering during winter sleep in cramped, unventilated quarters",
+        "asphyxiation / smothering during winter sleep in cramped, unventilated quarters",
         "accidental kick from a spooked draft animal in the barn"
       ]);
     } else {
@@ -255,62 +268,65 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
 
   if (era.id === 'MODERN') {
     if (age >= 85) return "peaceful decline of extreme old age";
-    if (age >= 75) return pickRandomItem(["bacterial pneumonia (the old person's friend)", "congestive heart failure", "massive ischemic cerebral infarction (ischemic stroke)", "complications following a severe fall with a fractured femoral neck", "advanced Alzheimer's disease / neurodegenerative decline"]);
+    if (age >= 75) {
+      return pickWeightedCause([
+        { name: "congestive heart failure", weight: 30 },
+        { name: "massive ischemic cerebral infarction (ischemic stroke)", weight: 26 },
+        { name: "bacterial pneumonia (the old person's friend)", weight: 20 },
+        { name: "advanced Alzheimer's disease / neurodegenerative decline", weight: 15 },
+        { name: "hospital complications following a severe fall and fractured hip in old age", weight: 10 }
+      ]);
+    }
 
     const modernRoll = Math.random();
     if (age >= 55) {
       if (modernRoll < 0.85) {
         if (isFemale) {
-          return pickRandomItem([
-            "breast cancer",
-            "ovarian cancer",
-            "bowel / colon cancer",
-            "acute heart attack (coronary thrombosis)",
-            "massive ischemic stroke",
-            "congestive heart failure",
-            "lung cancer",
-            "pancreatic cancer",
-            "stomach cancer",
-            "cervical cancer",
-            "liver cancer",
-            "motor neuron disease (ALS)",
-            "ruptured brain aneurysm",
-            "advanced multiple sclerosis (MS) with secondary respiratory complications"
+          return pickWeightedCause([
+            { name: "acute heart attack (coronary thrombosis)", weight: 28 },
+            { name: "massive ischemic stroke", weight: 22 },
+            { name: "congestive heart failure", weight: 18 },
+            { name: "lung cancer", weight: 15 },
+            { name: "breast cancer", weight: 14 },
+            { name: "bowel / colon cancer", weight: 10 },
+            { name: "pancreatic cancer", weight: 5 },
+            { name: "ovarian cancer", weight: 4 },
+            { name: "stomach cancer", weight: 4 },
+            { name: "cervical cancer", weight: 3 },
+            { name: "liver cancer", weight: 3 },
+            { name: "ruptured brain aneurysm", weight: 1.5 },
+            { name: "motor neuron disease (ALS)", weight: 0.5 },
+            { name: "advanced multiple sclerosis (MS) with secondary respiratory complications", weight: 0.5 }
           ]);
         }
-        return pickRandomItem([
-          "lung cancer",
-          "pancreatic cancer",
-          "bowel / colon cancer",
-          "prostate cancer",
-          "stomach cancer",
-          "acute ischemic stroke",
-          "acute heart attack",
-          "congestive heart failure",
-          "esophageal cancer",
-          "liver cancer",
-          "motor neuron disease (ALS)",
-          "ruptured brain aneurysm",
-          "advanced multiple sclerosis (MS) with secondary complications"
+        return pickWeightedCause([
+          { name: "acute heart attack", weight: 32 },
+          { name: "massive ischemic stroke", weight: 20 },
+          { name: "lung cancer", weight: 18 },
+          { name: "congestive heart failure", weight: 16 },
+          { name: "prostate cancer", weight: 12 },
+          { name: "bowel / colon cancer", weight: 10 },
+          { name: "pancreatic cancer", weight: 5 },
+          { name: "stomach cancer", weight: 4 },
+          { name: "liver cancer", weight: 4 },
+          { name: "esophageal cancer", weight: 3 },
+          { name: "ruptured brain aneurysm", weight: 1.5 },
+          { name: "motor neuron disease (ALS)", weight: 0.5 },
+          { name: "advanced multiple sclerosis (MS) with secondary complications", weight: 0.5 }
         ]);
       }
-      return pickRandomItem([
-        "fatal motor vehicle collision",
-        "acute respiratory distress syndrome (ARDS)",
-        "postoperative pulmonary embolism",
-        "complications of type 2 diabetes"
+      return pickWeightedCause([
+        { name: "complications of type 2 diabetes", weight: 22 },
+        { name: "acute respiratory distress syndrome (ARDS)", weight: 16 },
+        { name: "postoperative pulmonary embolism", weight: 6 },
+        { name: "fatal motor vehicle collision", weight: 4 }
       ]);
     } else {
       // Young adults / early middle age (15 - 54)
       // HIV/AIDS Epidemic (1980 - 2005): Peak Era of HIV/AIDS Crisis for gay/bisexual men before widely available HAART
       if (!isFemale && (conditions.orientation === 'Homosexual' || (conditions.orientation === 'Bisexual' && conditions.actedOnBi)) && deathYear >= 1980 && deathYear <= 2005 && age >= 20) {
         if (Math.random() < 0.60) {
-          return pickRandomItem([
-            "complications of HIV/AIDS (fulminant Pneumocystis carinii pneumonia during the peak of the AIDS epidemic)",
-            "AIDS-related Kaposi's sarcoma and systemic opportunistic infections during the height of the AIDS crisis",
-            "severe immunosuppression and wasting syndrome from HIV/AIDS in the pre-HAART era",
-            "cryptococcal meningitis and systemic collapse secondary to advanced HIV/AIDS"
-          ]);
+          return "complications of HIV/AIDS during the epidemic";
         }
       }
 
@@ -318,46 +334,46 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
         return pickRandomItem(["fatal artillery shrapnel wound on the front lines", "combat gunshot wound sustained in battle"]);
       }
       if (deathYear >= 1918 && deathYear <= 1920 && Math.random() < 0.35) {
-        return "fulminant Spanish influenza with acute bilateral secondary bacterial bronchopneumonia";
+        return "Spanish influenza";
       }
 
       if (modernRoll < 0.40) {
-        return pickRandomItem([
-          "pulmonary embolism (blood clot traveling to the lungs)",
-          "sudden cardiac arrest secondary to an undiagnosed arrhythmia",
-          "ruptured brain aneurysm (sudden fatal brain hemorrhage)",
-          "motor neuron disease (ALS)",
-          "complications of muscular dystrophy causing progressive respiratory failure",
-          "acute bacterial endocarditis stemming from childhood rheumatic fever"
+        return pickWeightedCause([
+          { name: "sudden cardiac arrest secondary to an undiagnosed arrhythmia", weight: 24 },
+          { name: "pulmonary embolism (blood clot traveling to the lungs)", weight: 16 },
+          { name: "ruptured brain aneurysm (sudden fatal brain hemorrhage)", weight: 12 },
+          { name: "acute bacterial endocarditis stemming from childhood rheumatic fever", weight: 4 },
+          { name: "complications of muscular dystrophy causing progressive respiratory failure", weight: 1.5 },
+          { name: "motor neuron disease (ALS)", weight: 1.0 }
         ]);
       } else if (modernRoll < 0.70) {
         if (isFemale) {
-          return pickRandomItem([
-            "breast cancer",
-            "cervical cancer",
-            "acute leukemia",
-            "brain tumor (glioblastoma)",
-            "ovarian cancer",
-            "acute peritonitis secondary to a ruptured appendix",
-            "pulmonary tuberculosis",
-            "systemic lupus erythematosus with severe kidney failure"
+          return pickWeightedCause([
+            { name: "breast cancer", weight: 26 },
+            { name: "pulmonary tuberculosis", weight: 16 },
+            { name: "cervical cancer", weight: 14 },
+            { name: "acute leukemia", weight: 9 },
+            { name: "ovarian cancer", weight: 7 },
+            { name: "brain tumor (glioblastoma)", weight: 7 },
+            { name: "acute peritonitis secondary to a ruptured appendix", weight: 6 },
+            { name: "systemic lupus erythematosus with severe kidney failure", weight: 3 }
           ]);
         }
-        return pickRandomItem([
-          "acute peritonitis secondary to a ruptured appendix",
-          "pulmonary tuberculosis",
-          "acute leukemia",
-          "stomach cancer",
-          "brain tumor (glioblastoma)",
-          "lymphoma",
-          "severe acute pancreatitis"
+        return pickWeightedCause([
+          { name: "pulmonary tuberculosis", weight: 24 },
+          { name: "stomach cancer", weight: 12 },
+          { name: "brain tumor (glioblastoma)", weight: 9 },
+          { name: "acute leukemia", weight: 9 },
+          { name: "lymphoma", weight: 8 },
+          { name: "acute peritonitis secondary to a ruptured appendix", weight: 8 },
+          { name: "severe acute pancreatitis", weight: 5 }
         ]);
       } else if (modernRoll < 0.88) {
         if (isWorkingClass && !isFemale) return "industrial machinery entanglement / crushing workplace trauma";
-        return pickRandomItem([
-          "fatal motor vehicle collision",
-          "accidental drowning during a recreational excursion",
-          "severe dwelling fire / fatal smoke inhalation and thermal burns"
+        return pickWeightedCause([
+          { name: "fatal motor vehicle collision", weight: 35 },
+          { name: "accidental drowning during a recreational excursion", weight: 8 },
+          { name: "severe dwelling fire / fatal smoke inhalation and thermal burns", weight: 6 }
         ]);
       } else if (modernRoll < 0.95) {
         // Interpersonal violence
@@ -381,44 +397,58 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
   }
 
   if (age >= 85) return "peaceful decline of extreme old age";
-  if (age >= 70) return pickRandomItem(["pneumonia", "congestive heart failure", "a debilitating stroke", "complications from a severe fall or fracture", "natural decline exacerbated by harsh winter conditions"]);
+  if (age >= 70) {
+    return pickWeightedCause([
+      { name: "pneumonia", weight: 30 },
+      { name: "congestive heart failure", weight: 25 },
+      { name: "a debilitating stroke", weight: 22 },
+      { name: "natural decline exacerbated by harsh winter conditions", weight: 15 },
+      { name: "complications from a severe fall or fracture", weight: 8 }
+    ]);
+  }
 
-  // Syphilis Pandemic (1495 - 1945): Peak Era of Syphilis / Great Pox
+  // Syphilis Pandemic (1495 - 1945): Peak Era of Syphilis / Great Pox (Prevalent in Europe, Americas, Ottoman/Mediterranean, Asian & African maritime port cities)
   if (deathYear >= 1495 && deathYear <= 1945 && age >= 22) {
-    const syphilisRisk = conditions.hadAffair ? 0.35 : 0.08;
-    if (Math.random() < syphilisRisk) {
-      return pickRandomItem([
-        "tertiary neurosyphilis (general paresis of the insane) resulting in dementia and full motor paralysis",
-        "the Great Pox (chronic tertiary syphilis with cardiovascular aneurysm and destructive tissue lesions)",
-        "syphilitic aortitis (fatal rupture of a thoracic aortic aneurysm caused by untreated syphilis)",
-        "tabes dorsalis (advanced neurosyphilis with progressive paralysis, blindness, and organ failure)"
-      ]);
+    const regLower = (conditions.region || '').toLowerCase();
+    const hasSyphilisExposure = regLower.includes('europe') || regLower.includes('spain') || regLower.includes('portugal') ||
+      regLower.includes('france') || regLower.includes('britain') || regLower.includes('england') || regLower.includes('germany') ||
+      regLower.includes('italy') || regLower.includes('rome') || regLower.includes('russia') || regLower.includes('poland') ||
+      regLower.includes('ottoman') || regLower.includes('turk') || regLower.includes('levant') || regLower.includes('egypt') ||
+      regLower.includes('america') || regLower.includes('mexico') || regLower.includes('peru') || regLower.includes('brazil') ||
+      regLower.includes('caribbean') || regLower.includes('cuba') || regLower.includes('haiti') || regLower.includes('china') ||
+      regLower.includes('japan') || regLower.includes('india') || regLower.includes('philippines') || regLower.includes('africa') || regLower.includes('ghana') || regLower.includes('nigeria') || regLower.includes('senegal') ||
+      (deathYear >= 1800);
+
+    if (hasSyphilisExposure) {
+      const syphilisRisk = conditions.isSexWorker ? 0.45 : (conditions.hadAffair ? 0.35 : 0.08);
+      if (Math.random() < syphilisRisk) {
+        return "syphilis";
+      }
     }
   }
 
   const historicalRoll = Math.random();
   // 75% Disease / Epidemic / Internal illness
   if (historicalRoll < 0.75) {
-    return pickRandomItem([
-      "consumption (pulmonary tuberculosis) with severe wasting and coughing of blood",
-      "bubonic plague / regional epidemic pestilence",
-      "typhus fever transmitted by lice during winter quarters",
-      "acute dysentery / severe waterborne enteric illness",
-      "dropsy (congestive heart failure / severe fluid retention)",
-      "gangrenous sepsis stemming from a laceration",
-      "pneumonia following exposure to damp, freezing cold",
-      "summer cholera epidemic with rapid dehydration",
-      "malaria (severe ague) causing chronic chills, anemia, and weakness",
-      "smallpox epidemic with secondary bacterial infection",
-      "acute peritonitis from an undiagnosed internal rupture",
-      "a creeping, debilitating paralysis with loss of speech and muscle control (Today, we would call this motor neuron disease / ALS)",
-      "a sudden, violent cranial rupture causing instant collapse (Today, we would call this a ruptured brain aneurysm)",
-      "a progressive muscle-wasting condition causing weakness in the limbs from youth (Today, we would call this muscular dystrophy)",
-      "a chronic, progressive nerve illness causing tremors, loss of vision, and numbness (Today, we would call this multiple sclerosis)",
-      "a progressive, painful internal abdominal tumor (Today, we would call this stomach cancer)",
-      "a painful ulcerating breast tumor and severe wasting (Today, we would call this breast cancer)",
-      "a painful, bleeding bowel tumor (Today, we would call this colon / bowel cancer)",
-      "a mysterious, exhausting illness of the blood causing severe pallor and bruising (Today, we would call this leukemia)"
+    return pickWeightedCause([
+      { name: "consumption (pulmonary tuberculosis) with severe wasting and coughing of blood", weight: 28 },
+      { name: "pneumonia following exposure to damp, freezing cold", weight: 20 },
+      { name: "acute dysentery / severe waterborne enteric illness", weight: 18 },
+      { name: "bubonic plague / regional epidemic pestilence", weight: 14 },
+      { name: "typhus fever transmitted by lice during winter quarters", weight: 12 },
+      { name: "summer cholera epidemic with rapid dehydration", weight: 10 },
+      { name: "malaria (severe ague) causing chronic chills, anemia, and weakness", weight: 10 },
+      { name: "gangrenous sepsis stemming from a laceration", weight: 8 },
+      { name: "smallpox epidemic with secondary bacterial infection", weight: 8 },
+      { name: "acute peritonitis from an undiagnosed internal rupture", weight: 5 },
+      { name: "a progressive, painful internal abdominal tumor (Today, we would call this stomach cancer)", weight: 3.5 },
+      { name: "a painful ulcerating breast tumor and severe wasting (Today, we would call this breast cancer)", weight: 3.0 },
+      { name: "a painful, bleeding bowel tumor (Today, we would call this colon / bowel cancer)", weight: 2.5 },
+      { name: "a mysterious, exhausting illness of the blood causing severe pallor and bruising (Today, we would call this leukemia)", weight: 1.5 },
+      { name: "a ruptured brain aneurysm", weight: 1.5 },
+      { name: "a creeping, debilitating paralysis with loss of speech and muscle control (Today, we would call this motor neuron disease / ALS)", weight: 0.5 },
+      { name: "a chronic, progressive nerve illness causing tremors, loss of vision, and numbness (Today, we would call this multiple sclerosis)", weight: 0.5 },
+      { name: "a progressive muscle-wasting condition causing weakness in the limbs from youth (Today, we would call this muscular dystrophy)", weight: 0.5 }
     ]);
   }
   // 12% Accidents / Workplace & Domestic trauma
@@ -433,7 +463,7 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
       ]);
     }
     return pickRandomItem([
-      "crushed beneath the timber collapse of a dwelling or barn during a violent storm",
+      "crushed beneath the timber collapse of a dwelling or barn, due to causes you decide",
       "suffocation and crush trauma during a mine, trench, or stone quarry collapse",
       "fatal fall from high scaffolding, church masonry, or a steep mountain trail",
       "trampled and crushed by a runaway ox-cart or spooked team of heavy draft horses",
@@ -511,24 +541,28 @@ const generateNarrativeWithAI = async (lifeData) => {
   const showEarlyCrushes = lifeData.age >= 8;
   const showAdult = lifeData.age >= 15;
 
-  const systemPrompt = `You are a brilliant historian and storyteller running a reincarnation simulation of anatomically modern Homo sapiens. 
+  const systemPrompt = `You are a brilliant historian and storyteller running a reincarnation simulation of humans across time. 
 I will provide you with the raw, rolled statistics of a human life. 
 
 CRITICAL RULES:
 1. STRICT SECOND PERSON POV & OPENING SENTENCE: You MUST write exclusively in the second person ("You were born...", "You grew up...", "Your choices..."). NEVER use third person ("He lived...", "She survived...").
    - MANDATORY FIRST SENTENCE: Your very first sentence of the story's first paragraph MUST explicitly begin with either "You were born a male..." or "You were born a female..." based on the assigned birth sex (e.g. "You were born a male to peasant farmers in...", "You were born a female in a drafty timber house in...").
-2. TONE & PROSE: Use clear, grounded, and engaging historical language. AVOID excessively flowery, melodramatic, or poetic adjectives. Write like a straightforward, insightful historical biographer.
+2. TONE, PROSE & INSTITUTIONAL SPECIFICITY:
+   - Use clear, grounded, and engaging historical language. AVOID excessively flowery, melodramatic, or unnecessary adjectives. Write like a straightforward, insightful historical biographer.
+   - HISTORICAL INSTITUTIONAL & POLITICAL SPECIFICITY (MANDATORY): NEVER rely on vague, generic abstractions like "a bureaucrat", "government agency", "military unit", "provincial administration", or "regional supply bureau". Name real, specific historical institutions, ministries, work units (*danwei*), state enterprises, guilds, regiments, councils, or municipal organs appropriate for that exact country and decade (e.g. *Hebei Provincial Supply and Marketing Cooperative*, *State Planning Commission*, *Ministry of Metallurgical Industry*, *Danwei work unit*, *London County Council*, *British East India Company Board of Control*, *Roman Prefect of the Annona*, *Gosplan*).
 3. NATURAL, ACCESSIBLE LANGUAGE FOR MEDICAL CONDITIONS, ILLNESSES & CANCERS (CRUCIAL):
-   - AVOID dense, clinical, Latinate textbook jargon (e.g. NEVER write "lung adenocarcinoma", "invasive ductal carcinoma", "gastric adenocarcinoma", or "talipes equinovarus").
-   - ALWAYS use plain, natural, accessible English terms (e.g. "lung cancer", "breast cancer", "stomach cancer", "bowel cancer", "pancreatic cancer", "leukemia", "prostate cancer", "cervical cancer", "ovarian cancer", "liver cancer", "bone cancer", "brain tumor", "motor neuron disease / ALS", "a ruptured brain aneurysm", "muscular dystrophy", "multiple sclerosis", "crossed eyes", "a clubfoot", "a hunchback", "a cleft palate", "a heart defect causing blue skin and chronic fatigue").
-   - PREMODERN MEDICAL FRAMING RULE (CRITICAL): If someone in a premodern era (before 1850) suffers or dies from cancer, motor neuron disease, a brain aneurysm, muscular dystrophy, or multiple sclerosis, describe their progressive symptoms through the lens of historical peers (e.g. creeping paralysis, sudden unheralded stroke, progressive muscle wasting, or a deep lingering internal mass), and follow it with: "Today, we would call this [cancer / motor neuron disease / a ruptured brain aneurysm / muscular dystrophy / multiple sclerosis]."
+   - AVOID dense, clinical, Latinate textbook jargon or hyper-specific anatomical terms (e.g. NEVER write "femoral neck", "patella", "lung adenocarcinoma", "invasive ductal carcinoma", "gastric adenocarcinoma", or "talipes equinovarus").
+   - ALWAYS use plain, natural, accessible English terms (e.g. "a severe fall resulting in a fractured hip and fatal hospital complications", "lung cancer", "breast cancer", "stomach cancer", "bowel cancer", "pancreatic cancer", "leukemia", "heart attack", "heart failure", "motor neuron disease / ALS", "a ruptured brain aneurysm", "muscular dystrophy", "multiple sclerosis", "a clubfoot", "a hunchback", "a cleft palate").
+   - MODERN MEDICAL REALITIES (20th–21st CENTURY): Depict medical realities accurately for modern eras: an elderly person suffering a severe fall, stroke, or heart event receives hospital care, surgery, or hospice treatment, and fatal outcomes are contextualized within hospital or post-surgical recovery complications rather than dying untreated at home.
+   - PREMODERN MEDICAL FRAMING (CRITICAL): If someone in a premodern era (before 1850) suffers or dies from modern complex diagnoses (specifically cancers, motor neuron disease / ALS, multiple sclerosis, muscular dystrophy, or a ruptured brain aneurysm), describe their progressive symptoms through the lens of historical peers (e.g. creeping paralysis, sudden unheralded stroke, progressive muscle wasting, or a deep lingering internal mass), and follow it with: "Today, we would call this [cancer / ALS / a brain aneurysm / muscular dystrophy / multiple sclerosis]."
+   - STRICT BAN ON META-COMMENTARY FOR COMMON HISTORICAL DISEASES: NEVER use "Today, we would call this..." for well-known historical diseases (malaria, ague, dysentery, tuberculosis / consumption, cholera, smallpox, typhus, yellow fever, syphilis, or bubonic plague). Call them directly by their natural historical names (e.g. simply "malaria" or "the ague") without any anachronistic modern commentary.
    - AUTISM & NEURODIVERGENCE (BE EXPLICIT & CLEAR): If the character has an autism spectrum condition, be EXPLICIT about their neurodivergence. In the modern era, explicitly identify it as autism. In premodern eras, vividly depict their distinct autistic traits: their intense hyperfocus on specialized interests, deep sensory sensitivities (to sounds, touch, crowded markets), literal communication style, strong preference for predictable routines, and difficulty navigating unspoken social cues or diplomatic subtext, while explaining how peers perceived their unique mind (e.g. an eccentric solitary savant, singularly gifted craftsperson, or misunderstood thinker).
    - HOBBIES OBSESSIVENESS RULE: Hobbies and pastimes MUST NOT be described as "obsessive" or "all-consuming" UNLESS the character is specifically autistic / neurodivergent. For neurotypical characters, pastimes must be depicted as enjoyable, relaxing, communal, creative, or casual recreational pursuits.
    - SCOLIOSIS & SPINAL CURVATURE ONSET: Idiopathic scoliosis develops during childhood or adolescent growth spurts (ages 10–14) or from adult physical toll, rather than being evident at birth. Describe its gradual development as they grow.
 4. TRANSGENDER & GENDER DIVERGENCE: If rolled as Transgender, authentically reflect their experience according to their era, culture, and personality. In premodern/early modern eras, people navigating this often lived in disguise, assumed alternate societal roles (e.g. military enlistment, monastic life, sailors like Catalina de Erauso), joined culturally recognized roles (Two-Spirit, Hijra, Galli, Public Universal Friend, Chevalier d'Éon), or repressed it depending on bravery and fear. In the 20th/21st century, reflect the emergence of medical transition (like Lili Elbe) or underground communities.
 5. MODERN MEDICAL CANCER SURVIVAL: If flagged as a "Cancer Survivor" in a modern era, describe their harrowing but successful battle with modern oncology (surgery/radiation/chemo) and how it shifted their perspective before returning to remission.
 6. CAUSE OF DEATH & CONTEMPORARY LIVES (STILL ALIVE IN 2026):
-   - FOR DECEASED CHARACTERS: Weave their assigned Primary Cause of Death seamlessly into their final paragraph. Cancer was extremely rare in premodern eras; rely only on the provided premodern diseases. If they died of old age diseases, describe the physical slowing down of their golden years.
+   - FOR DECEASED CHARACTERS: Weave their assigned Primary Cause of Death seamlessly into their final paragraph. Cancer was extremely rare in premodern eras; rely only on the provided premodern diseases. If they died of old age, vividly describe the historical realities of advanced age (e.g., loss of teeth, dimming eyesight, severe joint pain, physical frailty) rather than a sterile modern "passing peacefully in their sleep."
    - BATTLEFIELD & CAVALRY CHARGE AGE LIMIT (AGE <= 45): Active frontline infantry clashes, shield wall melee, and battlefield cavalry charges MUST ONLY happen to combatants aged 15 to 45. Characters over age 45 who die in wartime MUST be depicted as civilian casualties of sieges, village sackings, burning of dwellings, starvation during military blockades, or defense against invading raiders—NEVER as aging elders actively fighting in frontline cavalry charges.
    - WARTIME RAIDS & OLDER ADULTS (AGE 40+): For mature women (age 40+) who perish or suffer trauma in settlement raids or warfare, depict the tragedy realistically as defending their homestead, family protection, arson, or collateral violence (NEVER frame violence against mature women past 40 as sexual assault/attempted violation).
    - FOR LIVING CHARACTERS (STILL ALIVE IN 2026): NEVER say they are "forgotten by history" or speak of their life in past tense as a closed ancient chapter. Write about their ongoing daily life today in the year 2026, their contemporary routine, reflections on modern times, family/community, and how they navigate life today.
@@ -538,7 +572,7 @@ CRITICAL RULES:
      a) She was BORN NOBLE / UPPER CLASS AND was INDEPENDENT (possessing the wealth, private inheritance, or family station to resist arranged matches), OR
      b) She was HOMOSEXUAL / LESBIAN (actively resisting male marriage, taking holy vows in a convent, adopting male dress, or living in secret female companionhood).
    - FOR ALL OTHER PREMODERN COMMONER WOMEN WHO REMAINED UNWED, IT WAS NOT A FREE "CHOICE": It must be driven by external hardship (e.g. extreme family destitution / unable to afford a dowry, lifelong enslavement/bondage, monastic nunnery devotion, severe physical impairment, or unpaid lifelong labor dependence in her father's/brother's household).
-8. FAME & HOBBIES / PASTIMES: Incorporate their assigned Fame level. Even for commoners and poor folk, incorporate their natural casual pastimes (e.g. folk songs, storytelling, dice games, tavern banter, communal dancing, whittling, foraging, fishing, local sports) based on their personality.
+8. FAME & HOBBIES / PASTIMES: Incorporate their assigned Fame level. Even for commoners and poor folk, incorporate their natural casual pastimes (e.g. folk songs, storytelling, dice games, tavern banter, communal dancing, whittling, foraging, fishing, local sports) based on their personality. Ensure hobbies match their social class—a working-class peasant should NEVER be described enjoying expensive, elite hobbies like falconry, collecting antiquities, or attending grand operas.
 9. SIBLINGS & FAMILY: ONLY mention exact sibling survival numbers if it is narratively crucial (e.g. sole survivor). Do NOT mechanically list "4 of 6 siblings survived" as a robotic fact.
 10. SEXUAL ORIENTATION & BISEXUALITY (CRUCIAL):
     - BISEXUALITY: Clearly articulate that the character experiences genuine romantic/sexual attraction to BOTH men and women. If they marry or take a primary partner, describe how they navigate their bisexual desires.
@@ -552,7 +586,9 @@ CRITICAL RULES:
     - HISTORICAL ENCOUNTERS: Carefully evaluate the character's exact lifespan (birth year to death year), region/city, and class. If real historical figures (monarchs, artists, philosophers, generals, revolutionaries, scientists—e.g. Richard II, Van Gogh, Leonardo da Vinci, Socrates, Joan of Arc, Marie Antoinette, Napoleon, Abraham Lincoln, Mansa Musa, Caravaggio, Tokugawa Ieyasu, Confucius, etc.) lived or operated in that area during their lifetime:
       - Provide an authentic encounter or observation (e.g. catching a glimpse during a royal progress, hearing them speak, drinking in the same tavern, observing their public works, serving in their unit, or direct acquaintance).
       - If an encounter occurs, populate the historicalEncounters array with figure, year, and context. If no plausible figure exists in that exact time and place, return an empty array.
-    - HISTORICAL EVENTS LIVED THROUGH: Provide an exhaustive list (1 to 4 major milestones) of monumental historical events, wars, revolutions, plagues, cultural shifts, colonization events, or civilization collapses that occurred during their lifespan in or near their region:
+    - MANDATORY INTEGRATION OF EPOCHAL HISTORICAL MILESTONES IN THE LIFE STORY:
+      * Do NOT merely list historical milestones in the timeline array while ignoring them in the narrative. If the character lived through monumental historical events (e.g. the Cultural Revolution, the Great Leap Forward, WWII, the Partition of India, the Fall of the Soviet Union, the French Revolution, the Meiji Restoration, the American Civil War, the Great Depression, the Taiping Rebellion), you MUST explicitly weave how they personally experienced, navigated, suffered under, or participated in these monumental events directly into the narrative paragraphs.
+    - HISTORICAL EVENTS LIVED THROUGH ARRAY: Provide an exhaustive list (1 to 4 major milestones) of monumental historical events, wars, revolutions, plagues, cultural shifts, colonization events, or civilization collapses that occurred during their lifespan in or near their region:
       - BRITISH COLONIZATION / CONQUEST: If they lived in a region colonized or invaded by the British Empire during their lifetime (e.g. India under the East India Company / British Raj, New Zealand Treaty of Waitangi, Australian colonization, Irish plantations/Famine, Opium Wars in China, Scramble for Africa in Nigeria/Kenya/Egypt/Sudan/South Africa, North American colonial wars), make sure to include this.
       - CIVILIZATION COLLAPSE / CONQUEST: If they witnessed the fall, sacking, collapse, or conquest of their empire/dynasty (e.g. Fall of Rome in 476 CE, Fall of Constantinople in 1453 CE, Spanish conquest of the Inca or Aztec Empires, Sacking of Baghdad in 1258 CE, Bronze Age Collapse ~1200 BCE, Fall of the Ming/Song/Qin Dynasties, Fall of Carthage in 146 BCE), prominently feature it.
       - Populate historicalEventsLivedThrough array with event, year, and impact.
@@ -563,9 +599,30 @@ CRITICAL RULES:
     - When the character is 'Royalty / Reigning Dynasty' or 'Royalty / Imperial Dynasty' (or any historical monarch/dynasty):
       a) REAL HISTORICAL PERSON: You MUST base the life on a real historical monarch, prince/princess, emperor/empress, or royal dynasty figure who was born in that region/country around that era.
       b) FACT-BASED NARRATIVE: Ground the story, dynastic house, reign, marriages, and events in real historical facts.
-      c) MANDATORY WIKIPEDIA LINK: You MUST provide the exact English Wikipedia URL for the real royal person, their dynasty/house, or their kingdom in the wikiLinks array (e.g. {"title": "House of Orléans-Braganza", "url": "https://en.wikipedia.org/wiki/House_of_Orl%C3%A9ans-Braganza", "description": "Imperial house of Brazil"} or {"title": "Prince Bertrand of Orléans-Braganza", "url": "https://en.wikipedia.org/wiki/Prince_Bertrand_of_Orl%C3%A9ans-Braganza", "description": "Head of the Imperial House of Brazil"}).
-    - FOR ALL LIVES: Always provide 1 to 3 valid, rich Wikipedia links in the wikiLinks array referencing the relevant monarch, dynasty, historical event, or region/culture so the player can delve into the real history.
-15. JSON OUTPUT ONLY. Adhere strictly to the requested schema.`;
+      c) REAL WIKIPEDIA LINKS (MANDATORY): You MUST provide 1 to 4 authentic, real Wikipedia articles directly related to their life.
+15. PSYCHOPATHY & ABERRANT PSYCHOLOGY (IF ROLLED AS PSYCHOPATH):
+    - If flagged with Psychopathy (approx 1% of the population):
+      - EMOTIONAL & COGNITIVE PROFILE: They possess an innate, lifelong neurological deficit in emotional empathy, remorse, guilt, and genuine moral attachment. They view other humans instrumentally—as pawns, tools, obstacles, or sources of personal gratification.
+      - BEHAVIORAL MANIFESTATION (HISTORICAL & AI DISCRETION): Whether their psychopathy manifests as violent predatory cruelty / extreme historical atrocities (e.g. historical parallels like Gilles de Rais, ruthless warlords, or predatory serial bandits), calculated political/mercantile cunning, manipulative charisma, or simply a cold, detached, self-interested survivor navigating their social station is up to YOUR historical judgement based on their era, social class, station, intelligence, and opportunities.
+      - CONSTRAINTS: They CANNOT feel genuine remorse, heartfelt guilt, or emotional empathy. Even in marriages, parentage, or positions of religious piety, their outward warmth or devotion is transactional, performative, power-seeking, or self-preserving.
+16. HIGHLY SPECIFIC, PERIOD-AUTHENTIC PROFESSION & VOCATION (CRITICAL RULES & CONSTRAINTS):
+    - For all characters reaching working age (age 12+), generate a concise, historically authentic title in the 'profession' field that reflects their exact era, culture, station, intelligence, and personality:
+      a) SEX WORK OVERRIDE: If flagged as 'isSexWorker' / Prostitute, her primary profession MUST explicitly be designated as sex work / prostitute tailored to her era (e.g. 'Victorian brothel sex worker', 'Roman lupanar courtesan', 'Medieval tavern sex worker', '1970s nightlife sex worker').
+      b) PREMODERN NOBILITY & ARISTOCRACY (NO COMMERCIAL/COMMON PROFESSION): In premodern eras (before 1900), members of the landed nobility, aristocracy, patricians, or wealthy gentry did NOT hold commercial trades or common jobs. Their station was living off land rents, family estates, court offices, or dynastic affairs. Return 'None (Landed Aristocracy / Gentleman of Leisure)', 'None (Noble Lady of the Estate)', or high court/military commissions like 'Imperial Court Magistrate' / 'Regimental Officer'.
+      c) PREMODERN RURAL COMMONERS & PEASANTS (FARMING SPECIFIC TO REGION): The vast majority (80–90%) of premodern rural folk were agricultural laborers or farmers cultivating crops specific to their region and climate (e.g. 'Nile Valley emmer wheat & barley cultivator', 'Mesoamerican milpa maize farmer', 'Yangtze Delta wetland rice grower', 'Castilian dryland wheat & olive farmer', 'Andean highland potato & quinoa cultivator', 'Scottish tenant crofter', 'West African yam & oil palm farmer').
+      d) URBAN WORKING CLASS & STREET TRADES (MAYHEW'S LONDON LABOUR & HISTORICAL CITY TRADES): For urban poor and working classes, draw on rich specific historical livelihoods: costermongers (fruit/nut street-sellers), mudlarks, knocker-ups, chimney sweeps, watercress sellers, laundresses, coal-whippers, scullery maids, tanners, dockers, nightsoil carters.
+      e) SCHOLARS, SCRIBES, ARTISANS & CRAFTS: Cuneiform scribes (*tupsharru*) in Mesopotamia, hieroglyphic scribes/embalmers in Egypt, Roman *argentarii* (bankers) / *tonsores* (barbers), medieval apothecaries, fullers, coopers, fletchers, chandlers, clockmakers, silversmiths.
+      f) 20th-21st CENTURY (MODERN TRADES): Factory assembly line workers, switchboard operators, radiologists, telegraphists, locomotive engineers, nurses, software developers, postal clerks, bus drivers.
+      g) INFANTS & CHILDREN (Age < 12): Must return 'None (Passed away in childhood)'.
+17. MATERIAL CULTURE, ECONOMIC REALISM & ASYNCHRONOUS TECHNOLOGICAL DEVELOPMENT:
+    - CRITICAL HISTORICAL PRINCIPLE: Technological breakthroughs, trade infrastructure, metallurgy, writing systems, monetization, and social institutions developed asynchronously at vastly different paces across different civilizations and continents.
+    - ALWAYS EVALUATE THE EXACT TIME AND GEOGRAPHY:
+      * METALLURGY: Only incorporate bronze, iron, or steel if that specific culture and region had developed or adopted metallurgy by that exact century (e.g. bronze emerged early in the Near East ~3300 BCE, but centuries/millennia later across other parts of Eurasia, and was not present in pre-Columbian North America or Australia).
+      * TRADE & ECONOMIC SYSTEMS: Commercial merchant markets, currency, and trade networks arose much earlier in some civilizations than others. In tribal, kinship, or early agrarian societies where merchant networks had not yet developed, economic life consisted of reciprocal gift exchange, barter, seasonal foraging, and communal storage—NEVER commercial investments, merchant gentry, loans, or peddler businesses.
+      * WRITING, RECORD-KEEPING & BUREAUCRACY: Do NOT mention written ledgers, bookkeeping, written decrees, civil magistrates, or imperial bureaucracy in any society before writing and formal state administration were actually established in that region.
+      * TEXTILES & LUXURY GOODS: Only feature silk, woven wool, dyed garments, or glass beads where those materials and trade routes were historically active at that date. In simpler or earlier societies, clothing consisted of animal hides, woven plant fibers, or hemp.
+      * UPWARD SOCIAL MOBILITY IN TRIBAL & EARLY CULTURES: In non-monetized or pre-bureaucratic societies, upward mobility was social, cultural, and communal (e.g. rising to become a respected village elder, master artisan, shaman/healer, renowned hunter, or clan matriarch through prestige and alliances)—NEVER commercial wealth or financial entrepreneurship.
+18. JSON OUTPUT ONLY. Adhere strictly to the requested schema.`;
 
   const userPrompt = `
 Generate a structured life profile based strictly on these parameters:
@@ -625,8 +682,8 @@ ${lifeData.isJewish ? `- JEWISH IDENTITY & HISTORICAL REALITIES: This soul is Je
 ${lifeData.minorityPersecution ? `- MINORITY HISTORICAL EXPERIENCE: As a member of ${lifeData.minorityGroupHint}, historical context: ${lifeData.minorityPersecution.level}: ${lifeData.minorityPersecution.details}. Weave this authentic context respectfully into the narrative.` : ''}
 ${lifeData.isInterfaithMarriage ? `- INTERFAITH JEWISH-CHRISTIAN MARRIAGE: This character entered into an interfaith marriage with a ${lifeData.interfaithSpouse} partner: ${lifeData.interfaithDetails}. CRUCIAL: Specifically explore the cultural, religious, and familial dynamics (family reactions, syncretism, holidays, conversion, or social navigation) in the story.` : ''}
 ${lifeData.modelingCareer ? `- MODELING INDUSTRY OPPORTUNITY (BEAUTY 90+ IN MODERN ERA): ${lifeData.modelingCareer.offered ? (lifeData.modelingCareer.accepted ? `Offered a modeling career due to extraordinary beauty and ACCEPTED: ${lifeData.modelingCareer.details}` : `Offered a modeling career due to extraordinary beauty but DECLINED based on personality: ${lifeData.modelingCareer.details}`) : ''}. Reflect their personality and choices in the story.` : ''}
-${lifeData.wasEnslavedLater && lifeData.age >= 6 ? `- ENSLAVEMENT / CAPTIVE SERVITUDE: Not born enslaved, but at age ${lifeData.enslavedAge} was captured and enslaved: ${lifeData.enslavementDetails}. Explicitly chronicle this harrowing turning point, the harsh reality of their captive servitude, and its lifelong impact in the narrative and timeline.` : ''}
-${lifeData.escapedSlavery && lifeData.age >= 12 ? `- ESCAPED / EMANCIPATED FROM SLAVERY: At age ${lifeData.escapeAge}, this soul successfully broke the chains of enslavement: ${lifeData.escapeMethod}. Explicitly chronicle this daring escape / emancipation milestone, their journey to freedom, and their life as a free person in the narrative and timeline.` : ''}
+${lifeData.wasEnslavedLater && lifeData.age >= 6 ? `- ENSLAVEMENT / CAPTIVE SERVITUDE: Not born enslaved, but at age ${lifeData.enslavedAge} was captured and enslaved: ${lifeData.enslavementDetails}. Explicitly chronicle this turning point, the reality of their captive servitude, and its lifelong impact in the narrative and timeline.` : ''}
+${lifeData.escapedSlavery && lifeData.age >= 12 ? `- ESCAPED / EMANCIPATED FROM SLAVERY: At age ${lifeData.escapeAge}, this soul successfully broke the chains of enslavement: ${lifeData.escapeMethod}. Explicitly chronicle this escape / emancipation milestone, their journey to freedom, and their life as a free person in the narrative and timeline.` : ''}
 ${showAdult && lifeData.hasUpwardMobility ? `- UPWARD SOCIAL MOBILITY: Born into ${lifeData.birthSocialClass}, but achieved notable upward mobility in adulthood: ${lifeData.mobilityDetails}. Their attained station is ${lifeData.socialClass}. Explicitly chronicle their rise from humble beginnings to their elevated station in the narrative and timeline.` : ''}
 ${showTraits ? `- Base Intelligence (1-100): ${lifeData.intelligence}` : ''}
 ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${lifeData.beauty >= 80
@@ -639,7 +696,8 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
           ? `Notably plain, rough-hewn, or unadorned in appearance (Score ${lifeData.beauty}/100).`
           : `Average, typical appearance for their era and class (Score ${lifeData.beauty}/100).`))
       }` : ''}
-- Mental/Physical Health: ${[lifeData.schizophrenia && showAdult ? 'Schizophrenia' : '', lifeData.depression && showAdult ? 'Clinical Depression' : '', lifeData.suicide ? 'Suicide' : ''].filter(Boolean).join(', ') || 'No major anomalies'}
+${showTraits && lifeData.isPsychopath ? `- Psychological Profile: Psychopathic traits (1% of population). Innate absence of emotional empathy, guilt, or remorse. Whether this manifests as violent/predatory cruelty (e.g. historical figures like Gilles de Rais), calculated manipulative cunning, cold ambition, or transactional self-interest is up to your judgement based on their circumstances and station.` : ''}
+- Mental/Physical Health: ${[lifeData.isPsychopath && showTraits ? 'Psychopathy' : '', lifeData.schizophrenia && showAdult ? 'Schizophrenia' : '', lifeData.depression && showAdult ? 'Clinical Depression' : '', lifeData.suicide ? 'Suicide' : ''].filter(Boolean).join(', ') || 'No major anomalies'}
 - Age at Death: ${lifeData.age} ${lifeData.isAlive ? '(Currently still alive in the year 2026!)' : ''}
 - Primary Cause of Death: ${lifeData.causeOfDeath || 'N/A'}`;
 
@@ -653,6 +711,7 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
         properties: {
           specificLocation: { type: "STRING", description: "A specific realistic place name (1-4 words): a city district, neighbourhood, village name, or rural region within the character's country/region. Never just the country name itself." },
           deathSpecificLocation: { type: "STRING", description: "If the character emigrated, the specific place/city name in their destination land where they lived and died. If they did not emigrate, return null or empty string." },
+          profession: { type: "STRING", description: "A specific, period-authentic vocation or livelihood (e.g. 'Mesopotamian cuneiform temple scribe', 'Victorian costermonger (street fruit seller)', 'Castilian dryland olive & wheat farmer', 'None (Landed Aristocracy / Gentleman of Leisure)', 'Roman lupanar courtesan'). If passed away in childhood (age < 12), return 'None (Passed away in childhood)'." },
           narrative: { type: "ARRAY", items: { type: "STRING" }, description: "3 to 5 paragraphs of the life story." },
           timeline: {
             type: "ARRAY",
@@ -703,15 +762,15 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
 
   const candidateModels = [
     import.meta.env?.VITE_GEMINI_MODEL,
-    "gemini-3.5-flash-lite",
-    "gemini-3.1-flash-lite"
+    "gemini-3.5-flash",
+    "gemini-3.1-flash"
   ].filter(Boolean);
   const modelsToTry = Array.from(new Set(candidateModels));
 
   let lastError = null;
 
   for (const model of modelsToTry) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.1-pro:generateContent?key=${apiKey}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 20000); // Generous 20.0s timeout
 
@@ -745,6 +804,13 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
         parsed.narrative = parsed.narrative.split('\n\n').filter(Boolean);
       }
       if (!parsed.specificLocation) parsed.specificLocation = lifeData.region;
+      if (!parsed.profession) {
+        if (lifeData.age < 12) parsed.profession = "None (Childhood)";
+        else if (lifeData.isSexWorker) parsed.profession = "Sex Worker / Courtesan";
+        else if (lifeData.socialClass.includes('Nobility') || lifeData.socialClass.includes('Aristocra')) parsed.profession = "None (Landed Aristocracy / Noble Leisure)";
+        else if (lifeData.socialClass.includes('Peasant') || lifeData.socialClass.includes('Agricultural')) parsed.profession = "Agricultural Farmer / Peasant";
+        else parsed.profession = lifeData.socialClass;
+      }
       if (!Array.isArray(parsed.timeline)) parsed.timeline = [];
       if (!Array.isArray(parsed.historicalEncounters)) parsed.historicalEncounters = [];
       if (!Array.isArray(parsed.historicalEventsLivedThrough)) parsed.historicalEventsLivedThrough = [];
@@ -1096,11 +1162,37 @@ ${(currentLife.narrative || []).join('\n\n')}
       return Math.random() < 0.97 ? "Yamato Japanese" : "Ainu / Emishi lineage";
     }
 
-    if (r.includes('egypt') || r.includes('nile') || r.includes('kemet')) {
-      if (eraId === 'CLASSICAL' || eraId === 'HELLENISTIC') {
-        return Math.random() < 0.75 ? "Native Egyptian (Copts)" : "Ptolemaic Greek / Hellenistic Settler";
+    if (r.includes('dahomey') || r.includes('ashanti') || r.includes('benin') || r.includes('ghana') || r.includes('west africa') || r.includes('mali') || r.includes('songhai') || r.includes('yoruba')) {
+      if (isMinority) {
+        return pickRandomItem([
+          "Hausa trans-Saharan trader / merchant enclave",
+          "Fulani pastoralist / migrant lineage",
+          "Mossi caravan merchant",
+          "Nupe / Ewe trade minority",
+          "Portuguese / Luso-African coastal trader"
+        ]);
       }
-      return "Native Egyptian / Nilotic lineage";
+      if (r.includes('dahomey')) return pickRandomItem(["Fon (Dahomey lineage)", "Gbe / Allada lineage"]);
+      if (r.includes('ashanti') || r.includes('ghana')) return pickRandomItem(["Ashanti / Akan lineage", "Fante coastal lineage"]);
+      if (r.includes('benin')) return "Edo / Bini lineage (Kingdom of Benin)";
+      if (r.includes('mali') || r.includes('songhai')) return pickRandomItem(["Mandinka / Malinke lineage", "Songhai lineage", "Soninke lineage"]);
+      if (r.includes('yoruba') || r.includes('oyo')) return "Yoruba (Oyo Empire lineage)";
+      return "Native West African lineage (Fon, Akan, or Yoruba)";
+    }
+
+    if (r.includes('ethiopia') || r.includes('abyssinia') || r.includes('axum') || r.includes('horn of africa')) {
+      if (isMinority) return pickRandomItem(["Beta Israel (Ethiopian Jewish minority)", "Afar pastoralist", "Oromo lineage"]);
+      return Math.random() < 0.65 ? "Habesha / Amhara (Ethiopian Orthodox)" : "Tigrayan lineage";
+    }
+
+    if (r.includes('swahili') || r.includes('zanzibar') || r.includes('kilwa') || r.includes('east africa')) {
+      if (isMinority) return pickRandomItem(["Omani / Arab merchant settler", "Shirazi Persian coastal merchant", "Indian Ocean trader"]);
+      return "Swahili (Bantu coastal trade lineage)";
+    }
+
+    if (r.includes('kongo') || r.includes('angola') || r.includes('central africa')) {
+      if (isMinority) return "Portuguese / Luso-Kongolese mestizo or trader";
+      return "Bakongo / Bantu lineage";
     }
 
     // Modern Era:
@@ -1213,6 +1305,9 @@ ${(currentLife.narrative || []).join('\n\n')}
 
       // 3b. Detailed Ethnicity & Ancestry Determination
       const ethnicity = determineDetailedEthnicity(selectedEra.id, regionText, isMinority, minorityGroupHint, socialClass);
+      if (isMinority && !minorityGroupHint) {
+        minorityGroupHint = ethnicity;
+      }
 
       // 2b. Base Genetics
       const intelligence = randomGaussian(50, 15);
@@ -1279,9 +1374,23 @@ ${(currentLife.narrative || []).join('\n\n')}
       const transChance = orientation === 'Homosexual' ? 0.010 : 0.003;
       const isTransgender = Math.random() < transChance;
 
-      const personality1 = pickRandomItem(PERSONALITY_TRAITS);
-      let personality2 = pickRandomItem(PERSONALITY_TRAITS);
-      while (personality1 === personality2) personality2 = pickRandomItem(PERSONALITY_TRAITS);
+      // Psychopathy demographic roll (1% of population)
+      const isPsychopath = Math.random() < 0.01;
+
+      // Psychopathy strictly precludes emotional empathy, selfless generosity, and familial devotion
+      const NON_PSYCHOPATHIC_TRAITS = [
+        "deeply empathetic",
+        "generous to a fault",
+        "devoted to family",
+        "idealistic"
+      ];
+      const availableTraits = isPsychopath
+        ? PERSONALITY_TRAITS.filter(t => !NON_PSYCHOPATHIC_TRAITS.includes(t))
+        : PERSONALITY_TRAITS;
+
+      const personality1 = pickRandomItem(availableTraits);
+      let personality2 = pickRandomItem(availableTraits);
+      while (personality1 === personality2) personality2 = pickRandomItem(availableTraits);
 
       // Orientation Openness Engine: determines whether a queer character lives openly or stays in the closet
       let isOpenlyGay = false;
@@ -1376,10 +1485,6 @@ ${(currentLife.narrative || []).join('\n\n')}
       ];
 
       if (isAutistic) {
-        hobbyData = Math.random() < 0.8
-          ? "an intense, all-consuming autistic special interest and hyperfocus (historically grounded in their era)"
-          : "a deep, quiet, repetitive autistic craft or specialized fascination";
-      } else if (isNeurodivergent) {
         hobbyData = "a dedicated, absorbing focus on a specific manual craft or technical pursuit";
       } else if (isUpperClass) {
         hobbyData = pickRandomItem([
@@ -1710,23 +1815,56 @@ ${(currentLife.narrative || []).join('\n\n')}
 
         if (Math.random() < Math.min(0.85, mobilityChance)) {
           hasUpwardMobility = true;
-          if (sex === 'Male' && intelligence >= 75) {
+          const isTribalOrPreUrban = selectedEra.id === 'PALEOLITHIC' || selectedEra.id === 'NEOLITHIC' || (selectedEra.id === 'BRONZE_IRON' && birthYear < -1500) || socialClass.includes('Tribal') || socialClass.includes('Chieftain') || socialClass.includes('Forager') || socialClass.includes('Hunter') || socialClass.includes('Herder');
+
+          if (birthSocialClass.includes('Slave') || birthSocialClass.includes('Enslaved') || birthSocialClass.includes('Bondservant') || birthSocialClass.includes('Indentured')) {
             mobilityDetails = pickRandomItem([
-              "Elevated through formidable intellect, scholarship, and civil / trade acumen into the wealthy merchant and bureaucratic elite",
-              "Rose from humble beginnings through military distinction, tactical brilliance, and officer command",
-              "Advanced through guild mastery, financial entrepreneurship, and intellectual ingenuity into the prosperous upper-middle class"
+              "Achieved rare social elevation by securing manumission and establishing a prosperous free livelihood",
+              "Rose from bondage through exceptional talent, legally purchasing freedom and accumulating modest independent wealth"
             ]);
-            socialClass = selectedEra.id === 'MODERN' ? 'Upper Middle Class (Self-Made Professional / Entrepreneur)' : 'Wealthy Guild Master / Imperial Scholar-Official';
-          } else if (sex === 'Female' && beauty >= 80) {
-            mobilityDetails = pickRandomItem([
-              "Elevated from poverty through stunning beauty and grace into an advantageous marriage with landed gentry / high nobility",
-              "Rose from humble origins into a celebrated high-society courtesan, royal favorite, and influential cultural tastemaker",
-              "Secured elite imperial court favor and wealth as an esteemed concubine / high-status aristocratic companion"
-            ]);
-            socialClass = selectedEra.id === 'MODERN' ? 'High Society / Wealthy Elite' : 'Aristocratic Spouse / Court Favorite';
+            socialClass = selectedEra.id === 'MODERN' ? "Freed Citizen / Self-Made" : (selectedEra.id === 'CLASSICAL' ? "Wealthy Freedman (Libertus)" : "Manumitted Freedperson / Free Artisan");
+          } else if (isTribalOrPreUrban) {
+            if (sex === 'Male' && intelligence >= 75) {
+              mobilityDetails = "Gained high communal prestige and council influence as a renowned elder, master artisan, and wise negotiator among neighboring settlements";
+              socialClass = "Respected Settlement Elder / Council Leader";
+            } else if (sex === 'Female' && beauty >= 75) {
+              mobilityDetails = "Elevated from humble subsistence through marriage into the lineage of a prominent village chieftain and clan matriarch";
+              socialClass = "Chieftain's Household / Clan Matriarch";
+            } else {
+              mobilityDetails = "Rose in tribal stature through exceptional craftsmanship, bountiful food harvests, and extensive kinship alliances";
+              socialClass = "Master Artisan / Prosperous Kinship Lineage";
+            }
+          } else if (selectedEra.id === 'MODERN') {
+            if (sex === 'Male' && intelligence >= 75) {
+              mobilityDetails = "Elevated through formidable intellect, education, and professional acumen into the upper-middle class elite";
+              socialClass = "Upper Middle Class (Self-Made Professional / Executive)";
+            } else if (sex === 'Female' && beauty >= 80) {
+              mobilityDetails = "Rose from humble origins into high society and affluent circles through extraordinary grace and advantageous marriage";
+              socialClass = "High Society / Affluent Elite";
+            } else {
+              mobilityDetails = "Rose from working poverty through exceptional diligence, shrewd business ventures, and commercial success";
+              socialClass = "Upper Middle Class / Self-Made Entrepreneur";
+            }
           } else {
-            mobilityDetails = "Rose from working poverty through exceptional diligence, shrewd investments, and lucky patronage into prosperous merchant circles";
-            socialClass = selectedEra.id === 'MODERN' ? 'Upper Middle Class' : 'Prosperous Merchant / Gentry';
+            // Classical, Medieval, Early Modern historic civilizations
+            if (sex === 'Male' && intelligence >= 75) {
+              mobilityDetails = pickRandomItem([
+                "Elevated through scholarship, civil acumen, and trade into the prosperous merchant and administrative circles",
+                "Rose from humble beginnings through military distinction, tactical brilliance, and officer command",
+                "Advanced through guild mastery, skilled craftsmanship, and trade ingenuity into the prosperous artisan elite"
+              ]);
+              socialClass = "Wealthy Guild Master / Scholar-Official / Trade Elite";
+            } else if (sex === 'Female' && beauty >= 80) {
+              mobilityDetails = pickRandomItem([
+                "Elevated from poverty through stunning beauty and grace into an advantageous marriage with landed gentry / nobility",
+                "Rose from humble origins into an influential high-society courtesan and cultural tastemaker",
+                "Secured elite court favor and wealth as an esteemed aristocratic companion"
+              ]);
+              socialClass = "Gentry Spouse / Court Favorite";
+            } else {
+              mobilityDetails = "Rose from working poverty through exceptional diligence, prudent trade, and fortunate patronage into prosperous merchant circles";
+              socialClass = "Prosperous Merchant / Gentry";
+            }
           }
         }
       }
@@ -2223,7 +2361,7 @@ ${(currentLife.narrative || []).join('\n\n')}
         motherDied: Math.random() < (selectedEra.maternalMortality * classMultiplier),
         totalSiblings, siblingsSurvived, isMarried, marriageAge, hadAffair, sameSexAffair, outOfWedlock, hasUnmarriedPartnerChildren, effectiveInfertility, childrenCount,
         age, isAlive, causeOfDeath, suicide, survivedCancer, cancerAge, regionalExpectancy: baselineAdultLifespan,
-        intelligence, beauty, schizophrenia: Math.random() < 0.01, depression: Math.random() < 0.06
+        intelligence, beauty, isPsychopath, schizophrenia: Math.random() < 0.01, depression: Math.random() < 0.06
       };
 
       // 10. GENERATE & SET DATA
@@ -2295,7 +2433,9 @@ ${(currentLife.narrative || []).join('\n\n')}
         hasUnmarriedPartnerChildren: rawLifeData.hasUnmarriedPartnerChildren || false,
         isOpenlyGay: rawLifeData.isOpenlyGay || false,
         isInTheCloset: rawLifeData.isInTheCloset || false,
+        isPsychopath: rawLifeData.isPsychopath || false,
         sex, socialClass, age, isAlive, ethnicity,
+        profession: generatedData?.profession || (rawLifeData.age < 12 ? 'None (Childhood)' : rawLifeData.socialClass),
         isTransgender, transgenderDetails,
         badges: earnedBadges,
         historicalEncounters: generatedData?.historicalEncounters || [],
@@ -2454,13 +2594,13 @@ ${(currentLife.narrative || []).join('\n\n')}
                 <Sparkles className="w-6 h-6 text-indigo-300 absolute inset-0 m-auto animate-ping opacity-75" />
               </div>
               <p className="font-sans text-sm font-semibold tracking-widest uppercase text-indigo-200">Consulting the Akashic Records...</p>
-              <p className="font-sans text-xs text-slate-400 mt-2 max-w-sm">Synthesizing historical demographic data, personal chronology, and contextual narrative with Gemini Flash AI.</p>
+              <p className="font-sans text-xs text-slate-400 mt-2 max-w-sm">Synthesizing historical demographic data, personal chronology, and life story...</p>
             </div>
           ) : currentLife ? (
             <article className="bg-slate-900/80 border border-slate-800/80 rounded-2xl p-6 md:p-10 shadow-2xl backdrop-blur-md animate-fade-in-scale">
 
               {/* Profile Card Header */}
-              <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 md:gap-4 mb-8 font-sans">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-4 mb-8 font-sans">
                 <div className="bg-slate-800/40 hover:bg-slate-800/60 transition-colors p-4 rounded-xl border border-slate-700/40 flex flex-col items-center text-center">
                   <Clock className="w-5 h-5 text-indigo-400 mb-2" />
                   <span className="text-[11px] text-slate-400 uppercase tracking-widest font-bold">Era</span>
@@ -2484,6 +2624,11 @@ ${(currentLife.narrative || []).join('\n\n')}
                   <Star className="w-5 h-5 text-purple-400 mb-2" />
                   <span className="text-[11px] text-slate-400 uppercase tracking-widest font-bold">Station</span>
                   <span className="text-xs font-semibold text-slate-200 mt-1 text-center leading-tight">{currentLife.socialClass}</span>
+                </div>
+                <div className="bg-slate-800/40 hover:bg-slate-800/60 transition-colors p-4 rounded-xl border border-slate-700/40 flex flex-col items-center text-center">
+                  <Briefcase className="w-5 h-5 text-teal-400 mb-2" />
+                  <span className="text-[11px] text-slate-400 uppercase tracking-widest font-bold">Vocation</span>
+                  <span className="text-xs font-semibold text-slate-200 mt-1 text-center leading-tight">{currentLife.profession || 'Laborer'}</span>
                 </div>
                 <div className="bg-slate-800/40 hover:bg-slate-800/60 transition-colors p-4 rounded-xl border border-slate-700/40 flex flex-col items-center text-center">
                   {currentLife.isAlive ? <Heart className="w-5 h-5 text-emerald-400 mb-2 animate-pulse" /> : <Skull className="w-5 h-5 text-rose-400/80 mb-2" />}
