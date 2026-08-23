@@ -688,6 +688,7 @@ ${lifeData.modelingCareer ? `- MODELING INDUSTRY OPPORTUNITY (BEAUTY 90+ IN MODE
 ${lifeData.wasEnslavedLater && lifeData.age >= 6 ? `- ENSLAVEMENT / CAPTIVE SERVITUDE: Not born enslaved, but at age ${lifeData.enslavedAge} was captured and enslaved: ${lifeData.enslavementDetails}. Explicitly chronicle this turning point, the reality of their captive servitude, and its lifelong impact in the narrative and timeline.` : ''}
 ${lifeData.escapedSlavery && lifeData.age >= 12 ? `- ESCAPED / EMANCIPATED FROM SLAVERY: At age ${lifeData.escapeAge}, this soul successfully broke the chains of enslavement: ${lifeData.escapeMethod}. Explicitly chronicle this escape / emancipation milestone, their journey to freedom, and their life as a free person in the narrative and timeline.` : ''}
 ${showAdult && lifeData.hasUpwardMobility ? `- UPWARD SOCIAL MOBILITY: Born into ${lifeData.birthSocialClass}, but achieved notable upward mobility in adulthood: ${lifeData.mobilityDetails}. Their attained station is ${lifeData.socialClass}. Explicitly chronicle their rise from humble beginnings to their elevated station in the narrative and timeline.` : ''}
+${lifeData.becameEliteMistress ? `- QUEEN OF THE NIGHT (UPWARD MOBILITY AS ELITE MISTRESS / COURTESAN): Began in sex work, but due to stunning physical beauty (${lifeData.beauty}/100) and sharp wit/intelligence (${lifeData.intelligence}/100), rose into high society and immense wealth as the celebrated courtesan, salonnière, and favored mistress to someone rich, powerful, or famous: ${lifeData.mistressDetails}. Explicitly chronicle this dramatic elevation, her relationship with her patron/benefactor, and her life in luxury in the narrative and timeline.` : (lifeData.isSexWorker ? `- VOCATION / PROFESSION: Sex Worker / Courtesan. Working-class woman who engaged in sex work to survive. Reflect the authentic social and economic reality of sex work in ${lifeData.region} during this era.` : '')}
 ${showTraits ? `- Base Intelligence (1-100): ${lifeData.intelligence}` : ''}
 ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${lifeData.beauty >= 80
       ? (lifeData.sex === 'Female'
@@ -1891,14 +1892,39 @@ ${(currentLife.narrative || []).join('\n\n')}
         }
       }
 
+      // 3a-2. Sex Work & Courtesan Engine
+      let isSexWorker = false;
+      let becameEliteMistress = false;
+      let mistressDetails = null;
+
+      const isWorkingClassWoman = sex === 'Female' && age >= 14 && (
+        socialClass.toLowerCase().includes('working') ||
+        socialClass.toLowerCase().includes('peasant') ||
+        socialClass.toLowerCase().includes('plebeian') ||
+        socialClass.toLowerCase().includes('laborer') ||
+        socialClass.toLowerCase().includes('servant') ||
+        socialClass.toLowerCase().includes('poor') ||
+        socialClass.toLowerCase().includes('slave') ||
+        socialClass.toLowerCase().includes('serf') ||
+        socialClass.toLowerCase().includes('forager') ||
+        socialClass.toLowerCase().includes('farmer')
+      );
+
+      if (isWorkingClassWoman && !wasExposed) {
+        // 8% likelihood of working class women entering sex work
+        if (Math.random() < 0.08) {
+          isSexWorker = true;
+        }
+      }
+
       // 3b. Upward Social Mobility Engine
-      // Driven by high intelligence (especially for men/scholars) or extreme beauty (especially for women/courtesans/spouses)
+      // Driven by high intelligence (especially for men/scholars), extreme beauty, or courtesan advancement
       let hasUpwardMobility = false;
       let mobilityDetails = null;
       let birthSocialClass = socialClass;
 
       if (!isRoyaltyOrHistoric && age >= 18 && !wasExposed && !socialClass.includes('Royalt') && !socialClass.includes('Nobility') && !socialClass.includes('Patrician')) {
-        let mobilityChance = 0.08; // baseline lucky break (up from 0.02)
+        let mobilityChance = 0.08; // baseline lucky break
 
         // Intellectual advancement
         if (intelligence >= 85) mobilityChance += 0.55;
@@ -1912,11 +1938,29 @@ ${(currentLife.narrative || []).join('\n\n')}
           else if (beauty >= 65) mobilityChance += 0.18;
         }
 
-        if (Math.random() < Math.min(0.85, mobilityChance)) {
+        // Sex worker with high beauty (>=80) and at least average intelligence (>=45)
+        if (isSexWorker && beauty >= 80 && intelligence >= 45) {
+          mobilityChance += 0.65;
+        }
+
+        if (Math.random() < Math.min(0.88, mobilityChance)) {
           hasUpwardMobility = true;
           const isTribalOrPreUrban = selectedEra.id === 'PALEOLITHIC' || selectedEra.id === 'NEOLITHIC' || (selectedEra.id === 'BRONZE_IRON' && birthYear < -1500) || socialClass.includes('Tribal') || socialClass.includes('Chieftain') || socialClass.includes('Forager') || socialClass.includes('Hunter') || socialClass.includes('Herder');
 
-          if (birthSocialClass.includes('Slave') || birthSocialClass.includes('Enslaved') || birthSocialClass.includes('Bondservant') || birthSocialClass.includes('Indentured')) {
+          if (isSexWorker && beauty >= 80 && intelligence >= 45) {
+            becameEliteMistress = true;
+            mistressDetails = pickRandomItem([
+              "Elevated from street or brothel sex work through arresting beauty and sharp wit to become the favored, wealthy mistress of an influential nobleman and high-society patron",
+              "Rose from humble brothels into high society as a celebrated courtesan, gaining vast wealth, luxury, and cultural sway as the mistress of a powerful magnate",
+              "Secured elite court patronage and immense luxury as the renowned companion and mistress to a wealthy aristocrat and famous dignitary"
+            ]);
+            socialClass = selectedEra.id === 'MODERN'
+              ? "High Society Mistress / Affluent Elite Companion"
+              : (selectedEra.id === 'CLASSICAL'
+                ? "Renowned Hetaira / Elite Courtesan"
+                : (selectedEra.id === 'MEDIEVAL' ? "Noble Court Favorite / Celebrated Courtesan" : "Celebrated Courtesan / Royal Mistress"));
+            mobilityDetails = mistressDetails;
+          } else if (birthSocialClass.includes('Slave') || birthSocialClass.includes('Enslaved') || birthSocialClass.includes('Bondservant') || birthSocialClass.includes('Indentured')) {
             mobilityDetails = pickRandomItem([
               "Achieved rare social elevation by securing manumission and establishing a prosperous free livelihood",
               "Rose from bondage through exceptional talent, legally purchasing freedom and accumulating modest independent wealth"
@@ -2286,7 +2330,7 @@ ${(currentLife.narrative || []).join('\n\n')}
       }
 
       if (!isAlive) {
-        causeOfDeath = determineExhaustiveCauseOfDeath(selectedEra, birthYear, age, sex, socialClass, { wasExposed, isHeartDefect, suicide, maternalRoll, hadAffair, orientation, actedOnBi, region: regionText });
+        causeOfDeath = determineExhaustiveCauseOfDeath(selectedEra, birthYear, age, sex, socialClass, { wasExposed, isHeartDefect, suicide, maternalRoll, hadAffair, orientation, actedOnBi, region: regionText, isSexWorker });
       } else {
         // Living in 2026: calibrate fame description
         if (fame.includes("Properly Famous")) {
@@ -2464,6 +2508,7 @@ ${(currentLife.narrative || []).join('\n\n')}
         isEmigrant, emigrationAge, deathRegion, deathLat, deathLng,
         isMaimed, maimedAge, maimedSeverity, maimedDetails, maimedContributedToDeath,
         isRoyaltyOrHistoric, hasUpwardMobility, birthSocialClass, mobilityDetails,
+        isSexWorker, becameEliteMistress, mistressDetails,
         wasEnslavedLater, enslavedAge, enslavementDetails,
         escapedSlavery, escapeAge, escapeMethod,
         isJewish, antisemitismExperience, minorityPersecution,

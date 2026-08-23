@@ -3,10 +3,18 @@ import {
   Swords, Droplets, HeartHandshake, Brain, 
   DoorClosed, Rainbow, UserX, Crown, Compass,
   Bone, Flag, Hourglass, PersonStanding, HeartCrack, Sun, Unlock,
-  Skull
+  Skull, Moon
 } from 'lucide-react';
 
 export const BADGE_DEFINITIONS = [
+  {
+    id: 'queen_of_the_night',
+    name: 'Queen of the Night',
+    icon: Moon,
+    description: 'Elevated from sex work through beauty and intelligence to become a wealthy mistress or celebrated courtesan to someone rich, powerful, or famous.',
+    colorClass: 'bg-purple-950/60 border-purple-400/70 text-purple-200 shadow-[0_0_12px_rgba(168,85,247,0.35)]',
+    condition: (life) => life.becameEliteMistress === true
+  },
   {
     id: 'mask_of_sanity',
     name: 'Mask of Sanity',
