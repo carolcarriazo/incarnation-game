@@ -463,12 +463,12 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
       ]);
     }
     return pickRandomItem([
-      "crushed beneath the timber collapse of a dwelling or barn, due to causes you decide",
-      "suffocation and crush trauma during a mine, trench, or stone quarry collapse",
+      "fatal crushing injuries from a collapsed barn or dwelling wall",
+      "suffocation and crush trauma during a mine or stone quarry collapse",
       "fatal fall from high scaffolding, church masonry, or a steep mountain trail",
-      "trampled and crushed by a runaway ox-cart or spooked team of heavy draft horses",
-      "shipwreck and drowning in freezing waters during a coastal or oceanic trade voyage",
-      "fatal burn shock after a timber workshop caught fire during the night"
+      "trampled and crushed by a runaway cart or spooked team of draft horses",
+      "shipwreck and drowning during a storm on a coastal or trade voyage",
+      "fatal burns and smoke inhalation after a workshop caught fire"
     ]);
   }
   // 8% War & Invasion Violence
@@ -622,7 +622,10 @@ CRITICAL RULES:
       * WRITING, RECORD-KEEPING & BUREAUCRACY: Do NOT mention written ledgers, bookkeeping, written decrees, civil magistrates, or imperial bureaucracy in any society before writing and formal state administration were actually established in that region.
       * TEXTILES & LUXURY GOODS: Only feature silk, woven wool, dyed garments, or glass beads where those materials and trade routes were historically active at that date. In simpler or earlier societies, clothing consisted of animal hides, woven plant fibers, or hemp.
       * UPWARD SOCIAL MOBILITY IN TRIBAL & EARLY CULTURES: In non-monetized or pre-bureaucratic societies, upward mobility was social, cultural, and communal (e.g. rising to become a respected village elder, master artisan, shaman/healer, renowned hunter, or clan matriarch through prestige and alliances)—NEVER commercial wealth or financial entrepreneurship.
-18. JSON OUTPUT ONLY. Adhere strictly to the requested schema.`;
+18. HISTORICAL ACCURACY OF SETTINGS, ARCHITECTURE & MEDICAL CARE (NO ANACHRONISMS):
+    - PREMODERN MEDICAL CARE (BEFORE 1900): In premodern eras, ordinary people were treated in their homes or family rooms with traditional herbal remedies, bone-setters, or local healers. NEVER invent anachronistic institutions like modern 'municipal infirmaries', 'county hospitals with emergency trauma care', or sterile clinical wards in premodern centuries.
+    - GEOGRAPHICAL & ARCHITECTURAL REALISM: Accurately reflect local historical geography and architecture (e.g. Tunis Medina consists of dense stone alleys and covered souks, NOT Venetian canals; Paris in 1705 had wooden/stone bridges across the Seine, not modern sanitation).
+19. JSON OUTPUT ONLY. Adhere strictly to the requested schema.`;
 
   const userPrompt = `
 Generate a structured life profile based strictly on these parameters:
@@ -1197,6 +1200,98 @@ ${(currentLife.narrative || []).join('\n\n')}
       return "Bakongo / Bantu lineage";
     }
 
+    // France & French Realms
+    if (r.includes('france') || r.includes('french') || r.includes('paris') || r.includes('normandy') || r.includes('aquitaine') || r.includes('burgundy') || r.includes('brittany') || r.includes('provence')) {
+      if (isMinority) return pickRandomItem(["Breton (Celtic minority)", "Occitan / Provençal", "Basque", "Alsatian German", "Huguenot Protestant"]);
+      return "French";
+    }
+
+    // England, Britain & British Isles
+    if (r.includes('england') || r.includes('britain') || r.includes('london') || r.includes('wessex') || r.includes('mercia') || r.includes('anglo-saxon')) {
+      if (isMinority) return pickRandomItem(["Cornish (Celtic)", "Welsh", "Scottish", "Anglo-Norman French minority"]);
+      return "English";
+    }
+    if (r.includes('scotland')) return isMinority ? "Gaelic Highlander" : "Lowland Scot";
+    if (r.includes('ireland')) return isMinority ? "Anglo-Irish Settler" : "Irish (Gaelic)";
+    if (r.includes('wales')) return "Welsh (Celtic)";
+
+    // Spain & Iberian Peninsula
+    if (r.includes('spain') || r.includes('castile') || r.includes('aragon') || r.includes('andalus') || r.includes('iberia')) {
+      if (eraId === 'MEDIEVAL' && (r.includes('andalus') || r.includes('cordoba') || r.includes('granada'))) {
+        return Math.random() < 0.60 ? "Andalusian Arab / Moor" : "Mozarab (Arabized Iberian Christian)";
+      }
+      if (isMinority) return pickRandomItem(["Catalan", "Basque", "Galician", "Morisco (Crypto-Muslim minority)", "Converso / Sephardic Jewish lineage"]);
+      return "Spanish (Castilian)";
+    }
+
+    if (r.includes('portugal')) return isMinority ? "Galician / Sephardic minority" : "Portuguese";
+
+    // Holy Roman Empire & German Lands
+    if (r.includes('germany') || r.includes('holy roman empire') || r.includes('prussia') || r.includes('bavaria') || r.includes('saxony') || r.includes('austria') || r.includes('rhineland')) {
+      if (isMinority) return pickRandomItem(["Sorb / Slavic minority", "Ashkenazi Jewish lineage", "Swiss German", "Austrian"]);
+      return "German";
+    }
+
+    // Low Countries / Netherlands / Flanders
+    if (r.includes('netherlands') || r.includes('dutch') || r.includes('flanders') || r.includes('belgium') || r.includes('holland')) {
+      return pickRandomItem(["Dutch", "Flemish", "Walloon"]);
+    }
+
+    // Poland, Lithuania & Eastern Europe
+    if (r.includes('poland') || r.includes('lithuania') || r.includes('bohemia') || r.includes('czech') || r.includes('hungary')) {
+      if (r.includes('lithuania')) return "Lithuanian";
+      if (r.includes('bohemia') || r.includes('czech')) return "Czech (Bohemian)";
+      if (r.includes('hungary')) return "Hungarian (Magyar)";
+      if (isMinority) return pickRandomItem(["Ruthenian (Ukrainian)", "Lithuanian", "Ashkenazi Jewish minority", "Prussian German"]);
+      return "Polish";
+    }
+
+    // Russia & Slavic Lands
+    if (r.includes('russia') || r.includes('rus') || r.includes('muscovy') || r.includes('novgorod') || r.includes('kievan') || r.includes('ukraine')) {
+      if (isMinority) return pickRandomItem(["Cossack", "Tatar (Turkic Muslim)", "Bashkir / Finno-Ugric", "Old Believer"]);
+      return r.includes('ukraine') ? "Ukrainian (Ruthenian)" : "Russian (East Slavic)";
+    }
+
+    // Scandinavia
+    if (r.includes('scandinavia') || r.includes('norway') || r.includes('sweden') || r.includes('denmark') || r.includes('viking') || r.includes('iceland')) {
+      if (isMinority) return "Sámi (Indigenous Arctic pastoralist)";
+      return eraId === 'MEDIEVAL' ? "Scandinavian (Norse)" : pickRandomItem(["Swedish", "Danish", "Norwegian"]);
+    }
+
+    // North Africa / Maghreb
+    if (r.includes('morocco') || r.includes('algiers') || r.includes('tunis') || r.includes('tripoli') || r.includes('maghreb') || r.includes('berber') || r.includes('barbary')) {
+      if (isMinority) return pickRandomItem(["Andalusian refugee (Morisco / Moor)", "Sub-Saharan trans-Saharan lineage", "Janissary / Kouloughli (Turco-Maghrebi)"]);
+      return Math.random() < 0.65 ? "Maghrebi Arab" : "Berber (Amazigh)";
+    }
+
+    // Egypt
+    if (r.includes('egypt') || r.includes('cairo') || r.includes('alexandria')) {
+      if (eraId === 'BRONZE' || eraId === 'CLASSICAL') return "Ancient Egyptian";
+      if (isMinority) return pickRandomItem(["Coptic Christian", "Nubian", "Levantine trader"]);
+      return "Egyptian (Arab-Egyptian)";
+    }
+
+    // Middle East / Arabia / Mesopotamia / Levant
+    if (r.includes('arab') || r.includes('levant') || r.includes('syria') || r.includes('iraq') || r.includes('mesopotamia') || r.includes('baghdad') || r.includes('damascus') || r.includes('caliphate')) {
+      if (eraId === 'BRONZE' || eraId === 'BRONZE_IRON') return pickRandomItem(["Sumerian", "Akkadian", "Babylonian", "Assyrian"]);
+      if (isMinority) return pickRandomItem(["Assyrian / Syriac Christian", "Kurdish", "Mizrahi Jewish lineage", "Armenian"]);
+      return "Arab (Levantine / Mesopotamian)";
+    }
+
+    // Persia / Iran
+    if (r.includes('persia') || r.includes('iran') || r.includes('safavid') || r.includes('parthian') || r.includes('sasanian') || r.includes('achaemenid')) {
+      if (isMinority) return pickRandomItem(["Azeri Turkic", "Kurdish", "Zoroastrian minority", "Armenian merchant"]);
+      return "Persian";
+    }
+
+    // Korea, Vietnam, Southeast Asia
+    if (r.includes('korea') || r.includes('joseon') || r.includes('goryeo') || r.includes('silla')) return "Korean";
+    if (r.includes('vietnam') || r.includes('dai viet') || r.includes('annam')) return isMinority ? "Cham minority" : "Vietnamese (Kinh)";
+    if (r.includes('thailand') || r.includes('ayutthaya') || r.includes('siam')) return "Siamese / Thai";
+    if (r.includes('burma') || r.includes('myanmar') || r.includes('pagan')) return "Burmese (Bamar)";
+    if (r.includes('indonesia') || r.includes('majapahit') || r.includes('java') || r.includes('sumatra')) return pickRandomItem(["Javanese", "Sundanese", "Malay"]);
+    if (r.includes('philippines')) return pickRandomItem(["Tagalog", "Visayan", "Ilocano"]);
+
     // Modern Era:
     if (eraId === 'MODERN') {
       if (r.includes('usa')) return Math.random() < 0.75 ? "White American (Euro-American)" : "Black American";
@@ -1204,15 +1299,17 @@ ${(currentLife.narrative || []).join('\n\n')}
       if (r.includes('mexico')) return pickRandomItem(["Mestizo (Mixed Indigenous and European)", "Indigenous Mexican", "White Mexican"]);
       if (r.includes('india')) return "Indo-Aryan or Dravidian (Indian)";
       if (r.includes('china')) return "Han Chinese";
-      if (r.includes('france')) return "French (European lineage)";
+      if (r.includes('france')) return "French";
       if (r.includes('germany')) return "German";
       if (r.includes('united kingdom') || r.includes('britain')) return "British (English/Scottish/Welsh/Irish)";
       if (r.includes('japan')) return "Japanese";
       if (r.includes('nigeria')) return pickRandomItem(["Yoruba", "Hausa-Fulani", "Igbo"]);
     }
 
-    // Default general lineage
-    return `Native ${regionName.split('(')[0].trim()} lineage`;
+    // Default clean general lineage
+    let cleanName = (regionName || '').split('(')[0].trim();
+    cleanName = cleanName.replace(/^(Kingdom of|Tsardom of|Empire of|Viceroyalty of|Duchy of|Republic of|State of|Emirate of|Sultanate of|Principality of|Grand Duchy of)\s+/i, '');
+    return cleanName ? `${cleanName}` : 'Native lineage';
   };
 
   const simulateLife = async () => {
@@ -1877,8 +1974,26 @@ ${(currentLife.narrative || []).join('\n\n')}
       let enslavementDetails = null;
 
       const isAlreadySlave = socialClass.toLowerCase().includes('slave') || socialClass.toLowerCase().includes('enslaved') || socialClass.toLowerCase().includes('serf');
+      const isMiddleOrUpper = 
+        socialClass.toLowerCase().includes('upper') ||
+        socialClass.toLowerCase().includes('middle') ||
+        socialClass.toLowerCase().includes('merchant') ||
+        socialClass.toLowerCase().includes('gentry') ||
+        socialClass.toLowerCase().includes('noble') ||
+        socialClass.toLowerCase().includes('aristocra') ||
+        socialClass.toLowerCase().includes('patrician') ||
+        socialClass.toLowerCase().includes('elite') ||
+        socialClass.toLowerCase().includes('bureaucrat') ||
+        socialClass.toLowerCase().includes('scholar') ||
+        socialClass.toLowerCase().includes('chieftain') ||
+        socialClass.toLowerCase().includes('bourgeois') ||
+        socialClass.toLowerCase().includes('priest') ||
+        socialClass.toLowerCase().includes('planter') ||
+        socialClass.toLowerCase().includes('landowner') ||
+        socialClass.toLowerCase().includes('burgher') ||
+        isRoyaltyOrHistoric;
 
-      if (!isAlreadySlave && !isRoyaltyOrHistoric && age >= 5 && !wasExposed) {
+      if (!isAlreadySlave && !isMiddleOrUpper && age >= 5 && !wasExposed) {
         let enslavementRisk = 0;
         const eraId = selectedEra.id;
         const rName = (regionText || '').toLowerCase();
@@ -1921,9 +2036,7 @@ ${(currentLife.narrative || []).join('\n\n')}
           }
         }
 
-        if (socialClass.toLowerCase().includes('patrician') || socialClass.toLowerCase().includes('aristocrat') || socialClass.toLowerCase().includes('upper')) {
-          enslavementRisk *= 0.25;
-        } else if (socialClass.toLowerCase().includes('peasant') || socialClass.toLowerCase().includes('plebeian') || socialClass.toLowerCase().includes('working') || socialClass.toLowerCase().includes('laborer')) {
+        if (socialClass.toLowerCase().includes('peasant') || socialClass.toLowerCase().includes('plebeian') || socialClass.toLowerCase().includes('working') || socialClass.toLowerCase().includes('laborer')) {
           enslavementRisk *= 1.3;
         }
 
