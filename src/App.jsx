@@ -441,13 +441,14 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
 
   const historicalRoll = Math.random();
   if (historicalRoll < 0.75) {
+    const regLower = (conditions.region || '').toLowerCase();
+    const isAmericas = regLower.includes('america') || regLower.includes('caribbean') || regLower.includes('new york') || regLower.includes('mexico') || regLower.includes('brazil') || regLower.includes('peru') || regLower.includes('cuba') || regLower.includes('haiti') || regLower.includes('thirteen colonies') || regLower.includes('boston') || regLower.includes('virginia');
+
     const diseasePool = [
       { name: "consumption (pulmonary tuberculosis) with severe wasting and coughing of blood", weight: 28 },
       { name: "pneumonia following exposure to damp, freezing cold", weight: 20 },
       { name: "acute dysentery / severe waterborne enteric illness", weight: 18 },
-      { name: "bubonic plague / regional epidemic pestilence", weight: 14 },
       { name: "typhus fever transmitted by lice during winter quarters", weight: 12 },
-      { name: "summer cholera epidemic with rapid dehydration", weight: 10 },
       { name: "malaria (severe ague) causing chronic chills, anemia, and weakness", weight: 10 },
       { name: "gangrenous sepsis stemming from a laceration", weight: 8 },
       { name: "smallpox epidemic with secondary bacterial infection", weight: 8 },
@@ -460,6 +461,22 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
       { name: "a chronic, progressive nerve illness causing tremors, loss of vision, and numbness (Today, we would call this multiple sclerosis)", weight: 0.5 },
       { name: "a progressive muscle-wasting condition causing weakness in the limbs from youth (Today, we would call this muscular dystrophy)", weight: 0.5 }
     ];
+
+    // Epidemic pestilence calibration
+    if (isAmericas) {
+      diseasePool.push({ name: "yellow fever (Black Vomit) epidemic with severe jaundice and internal bleeding", weight: 14 });
+    } else if (deathYear <= 1725 || (regLower.includes('asia') || regLower.includes('china') || regLower.includes('india') || regLower.includes('ottoman'))) {
+      diseasePool.push({ name: "bubonic plague / regional epidemic pestilence", weight: 14 });
+    } else {
+      diseasePool.push({ name: "scarlet fever / malignant putrid throat epidemic", weight: 14 });
+    }
+
+    // Cholera epidemic calibration (global pandemic began in 1817; otherwise seasonal dysentery)
+    if (deathYear >= 1817 || regLower.includes('india') || regLower.includes('ganges') || regLower.includes('bengal')) {
+      diseasePool.push({ name: "summer cholera epidemic with rapid dehydration", weight: 10 });
+    } else {
+      diseasePool.push({ name: "acute summer dysentery / bloody flux epidemic", weight: 10 });
+    }
 
     if (isFemale && age >= 35) {
       diseasePool.push({ name: "a painful ulcerating breast tumor and severe wasting (Today, we would call this breast cancer)", weight: 3.5 });
@@ -2018,14 +2035,17 @@ ${(currentLife.narrative || []).join('\n\n')}
         commonPastimes = [
           "playing card, dice, or skittle games in local taverns",
           "playing fiddle, flute, guitar, or local pipe ballads",
-          "folk singing, sea shanties, or learning traditional tavern ballads",
+          "folk singing, sea shanties, spirituals, or traditional work ballads",
           "fishing, trapping small game, or coastal crabbing",
           "woodcarving, whittling, or leathercraft",
           "gardening herbs, kitchen vegetables, and orchard fruit",
           "casual wrestling, footraces, or village bowling",
-          "reading broadsides, chapbooks, or family almanacs",
-          "communal dancing and storytelling at seasonal fairs and feasts"
+          "communal dancing and storytelling at seasonal fairs and feasts",
+          "sewing, quilting, mending, or decorative needlework"
         ];
+        if (!isWorkingClass || intelligence > 75) {
+          commonPastimes.push("reading broadsides, chapbooks, or family almanacs");
+        }
       } else {
         // Premodern (Medieval, Classical, Bronze/Iron, Neolithic, Paleolithic)
         commonPastimes = [
