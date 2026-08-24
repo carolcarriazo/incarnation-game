@@ -1340,14 +1340,110 @@ ${(currentLife.narrative || []).join('\n\n')}
       }
     }
 
-    // Default geographic fallback within same era's regions
-    if (eraRegions && Array.isArray(eraRegions) && eraRegions.length > 0) {
-      const candidates = eraRegions.filter(r => r.text !== originName);
-      if (candidates.length > 0) {
-        return pickRandomItem(candidates);
+    if (eraId === 'NEOLITHIC') {
+      // Fertile Crescent, Levant, Mesopotamia, Nile
+      if (oName.includes('fertile crescent') || oName.includes('jericho') || oName.includes('levant') || oName.includes('göbekli')) {
+        return pickWeighted([
+          { name: "Mesopotamian Alluvium (Proto-Sumerian Settlements)", weight: 45, lat: 32.0, lng: 45.0 },
+          { name: "Nile Valley (Pre-Dynastic Egypt / Merimde)", weight: 35, lat: 27.0, lng: 31.0 },
+          { name: "Anatolian Highlands (Çatalhöyük Settlements)", weight: 20, lat: 37.6, lng: 32.8 }
+        ]);
+      }
+      if (oName.includes('mesopotam') || oName.includes('sumer')) {
+        return pickWeighted([
+          { name: "Fertile Crescent (Jericho / Göbekli Tepe / Levant)", weight: 50, lat: 37.2, lng: 38.9 },
+          { name: "Indus Valley (Mehrgarh borderlands)", weight: 30, lat: 29.3, lng: 67.6 },
+          { name: "Nile Valley (Pre-Dynastic Egypt)", weight: 20, lat: 27.0, lng: 31.0 }
+        ]);
+      }
+      if (oName.includes('nile') || oName.includes('egypt')) {
+        return pickWeighted([
+          { name: "Fertile Crescent (Levant / Sinai corridor)", weight: 55, lat: 37.2, lng: 38.9 },
+          { name: "Sahel & Lake Chad Basin", weight: 25, lat: 13.0, lng: 14.0 },
+          { name: "Ethiopian Highlands", weight: 20, lat: 9.0, lng: 38.7 }
+        ]);
+      }
+      // China & East Asia
+      if (oName.includes('yellow river') || oName.includes('yangshao')) {
+        return pickWeighted([
+          { name: "Yangtze River Delta (Hemudu / Liangzhu, China)", weight: 65, lat: 30.0, lng: 120.0 },
+          { name: "Korean Peninsula (Jeulmun Pottery settlements)", weight: 35, lat: 37.5, lng: 127.0 }
+        ]);
+      }
+      if (oName.includes('yangtze') || oName.includes('hemudu') || oName.includes('liangzhu')) {
+        return pickWeighted([
+          { name: "Yellow River Basin (Yangshao Culture, China)", weight: 65, lat: 35.0, lng: 112.0 },
+          { name: "Southeast Asian Mainland (Ban Chiang, Thailand)", weight: 35, lat: 17.4, lng: 103.2 }
+        ]);
+      }
+      if (oName.includes('korea') || oName.includes('jeulmun') || oName.includes('jomon') || oName.includes('japan')) {
+        return pickWeighted([
+          { name: "Jomon Japan (Coastal foraging settlements)", weight: 50, lat: 35.7, lng: 139.7 },
+          { name: "Korean Peninsula (Jeulmun Pottery Period)", weight: 50, lat: 37.5, lng: 127.0 }
+        ]);
+      }
+      // South Asia
+      if (oName.includes('indus') || oName.includes('mehrgarh') || oName.includes('ganges')) {
+        return pickWeighted([
+          { name: "Ganges River Valley (Early Rice Cultivators, India)", weight: 50, lat: 25.5, lng: 83.0 },
+          { name: "Indus Valley (Mehrgarh, South Asia)", weight: 50, lat: 29.3, lng: 67.6 }
+        ]);
+      }
+      // Europe
+      if (oName.includes('danub') || oName.includes('vinča') || oName.includes('megalithic') || oName.includes('atlantic') || oName.includes('stonehenge') || oName.includes('pontic') || oName.includes('steppe')) {
+        return pickWeighted([
+          { name: "Danubian & Balkan Basin (Vinča Culture, Europe)", weight: 45, lat: 44.8, lng: 20.5 },
+          { name: "Atlantic Megalithic Coast (Stonehenge / Carnac)", weight: 35, lat: 51.2, lng: -1.8 },
+          { name: "Pontic-Caspian Steppe (Pastoralist Camps)", weight: 20, lat: 48.0, lng: 44.0 }
+        ]);
+      }
+      // Americas
+      if (oName.includes('tehuacán') || oName.includes('mesoamerica') || oName.includes('caral') || oName.includes('andes') || oName.includes('norte chico')) {
+        return pickWeighted([
+          { name: "Mesoamerican Highlands (Tehuacán Valley)", weight: 50, lat: 18.4, lng: -97.4 },
+          { name: "Central Andes (Caral-Supe / Norte Chico, Peru)", weight: 50, lat: -10.9, lng: -77.5 }
+        ]);
+      }
+      // Africa
+      if (oName.includes('sahel') || oName.includes('chad') || oName.includes('ethiop') || oName.includes('west africa')) {
+        return pickWeighted([
+          { name: "Sahel & Lake Chad Basin (Sub-Saharan Africa)", weight: 40, lat: 13.0, lng: 14.0 },
+          { name: "Ethiopian Highlands (Early Farmers)", weight: 35, lat: 9.0, lng: 38.7 },
+          { name: "West African Forest (Yam Cultivators)", weight: 25, lat: 6.5, lng: 3.0 }
+        ]);
       }
     }
 
+    if (eraId === 'PALEOLITHIC') {
+      // Regional band foraging range shifts within contiguous continental biomes
+      if (oName.includes('europe') || oName.includes('france') || oName.includes('spain') || oName.includes('cantabria') || oName.includes('swabian') || oName.includes('dordogne') || oName.includes('vézère')) {
+        return pickWeighted([
+          { name: "Vézère & Dordogne Cave Shelters (Southwestern France)", weight: 50, lat: 44.9, lng: 1.0 },
+          { name: "Cantabrian Coast Cave Encampments (Northern Spain)", weight: 35, lat: 43.4, lng: -4.0 },
+          { name: "Swabian Jura Foothills (Central Europe)", weight: 15, lat: 48.4, lng: 9.5 }
+        ]);
+      }
+      if (oName.includes('steppe') || oName.includes('mammoth') || oName.includes('dnieper') || oName.includes('siberia')) {
+        return pickWeighted([
+          { name: "Dnieper River Mammoth Hunting Camps (Eastern Europe)", weight: 50, lat: 50.4, lng: 30.5 },
+          { name: "Siberian Altai Foothills (Denisova / Mal'ta)", weight: 50, lat: 51.4, lng: 84.7 }
+        ]);
+      }
+      if (oName.includes('africa') || oName.includes('olduvai') || oName.includes('rift valley') || oName.includes('klasies')) {
+        return pickWeighted([
+          { name: "Great Rift Valley & Lake Turkana Basin (East Africa)", weight: 55, lat: 3.5, lng: 36.0 },
+          { name: "Southern African Coastal Caves (Klasies River)", weight: 45, lat: -34.1, lng: 24.4 }
+        ]);
+      }
+      if (oName.includes('asia') || oName.includes('china') || oName.includes('zhoukoudian') || oName.includes('sunda')) {
+        return pickWeighted([
+          { name: "Zhoukoudian Cave Shelters (North China)", weight: 60, lat: 39.7, lng: 115.9 },
+          { name: "Sundaland Rainforest Foraging Bands (Southeast Asia)", weight: 40, lat: 2.0, lng: 102.0 }
+        ]);
+      }
+    }
+
+    // Default fallback: return null so we never generate an impossible random cross-continental pairing
     return null;
   };
 
