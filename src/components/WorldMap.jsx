@@ -4,9 +4,9 @@ import { ComposableMap, Geographies, Geography, Marker, Line } from 'react-simpl
 // Reliable CDN for 110m simplified world topology (TopoJSON)
 const GEO_URL = 'https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json';
 
-const WorldMap = memo(function WorldMap({ 
-  lat, 
-  lng, 
+const WorldMap = memo(function WorldMap({
+  lat,
+  lng,
   locationLabel,
   deathLat,
   deathLng,
@@ -38,7 +38,7 @@ const WorldMap = memo(function WorldMap({
                 strokeWidth={0.4}
                 style={{
                   default: { outline: 'none' },
-                  hover:   { outline: 'none', fill: '#1e2d4a' },
+                  hover: { outline: 'none', fill: '#1e2d4a' },
                   pressed: { outline: 'none' },
                 }}
               />
@@ -87,7 +87,7 @@ const WorldMap = memo(function WorldMap({
             <span className="text-rose-400 font-bold">📍 Born:</span>
             <span className="text-slate-300 truncate max-w-[130px] md:max-w-[200px]">{locationLabel}</span>
             <span className="text-amber-400 font-bold">➔</span>
-            <span className="text-emerald-400 font-bold">🏁 Passed:</span>
+            <span className="text-emerald-400 font-bold">🏁 Died:</span>
             <span className="text-slate-300 truncate max-w-[130px] md:max-w-[200px]">{deathLocationLabel || 'Abroad'}</span>
           </div>
         ) : locationLabel ? (
