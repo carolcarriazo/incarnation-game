@@ -587,7 +587,9 @@ CRITICAL RULES:
      a) She was BORN NOBLE / UPPER CLASS AND was INDEPENDENT (possessing the wealth, private inheritance, or family station to resist arranged matches), OR
      b) She was HOMOSEXUAL / LESBIAN (actively resisting male marriage, taking holy vows in a convent, adopting male dress, or living in secret female companionhood).
    - FOR ALL OTHER PREMODERN COMMONER WOMEN WHO REMAINED UNWED, IT WAS NOT A FREE "CHOICE": It must be driven by external hardship (e.g. extreme family destitution / unable to afford a dowry, lifelong enslavement/bondage, monastic nunnery devotion, severe physical impairment, or unpaid lifelong labor dependence in her father's/brother's household).
-8. FAME & HOBBIES / PASTIMES: Incorporate their assigned Fame level. Even for commoners and poor folk, incorporate their natural casual pastimes (e.g. folk songs, storytelling, dice games, tavern banter, communal dancing, whittling, foraging, fishing, local sports) based on their personality. Ensure hobbies match their social class—a working-class peasant should NEVER be described enjoying expensive, elite hobbies like falconry, collecting antiquities, or attending grand operas.
+8. FAME & HOBBIES / PASTIMES (ERA-AUTHENTIC & CLASS-AUTHENTIC):
+   - ERA-AUTHENTIC PASTIMES: Hobbies and leisure activities MUST strictly match the character's exact historical era and decade. In the modern era (20th–21st century), people engage with period-appropriate culture (e.g. listening to cassettes, radio, or vinyl, playing football/soccer, reading paperbacks or magazines, playing guitar or accordion, riding bicycles, watching films)—NEVER give anachronistic ancient/agrarian pastimes like carving reed flutes, knucklebones, or prehistoric folk rituals to someone born in the late 20th century!
+   - CLASS-AUTHENTIC PASTIMES: Ensure pastimes fit their social station. A working-class or common person should enjoy natural casual pursuits (local music, sports, fishing, card games, community gardening), never elite pursuits like falconry, collecting classical antiquities, or attending grand operas.
 9. SIBLINGS & FAMILY: ONLY mention exact sibling survival numbers if it is narratively crucial (e.g. sole survivor). Do NOT mechanically list "4 of 6 siblings survived" as a robotic fact.
 10. SEXUAL ORIENTATION & BISEXUALITY (SIMPLE & GROUNDED):
     - BISEXUALITY: State clearly that the character is attracted to both men and women. If married or in a partnership, describe how they navigate their desires cleanly and without purple melodrama.
@@ -1619,29 +1621,59 @@ ${(currentLife.narrative || []).join('\n\n')}
 
       let hobbyData = "No formal hobbies (daily life centered on labor and sustenance).";
 
-      // Casual pastimes pool for commoners/poor
-      const commonPastimes = [
-        "folk singing and learning traditional ballads",
-        "communal folk dancing at village feasts and seasonal festivals",
-        "storytelling and recounting local folklore by the hearth or town fountain",
-        "dice, knucklebone, or coin-tossing games in taverns and public squares",
-        "fishing along local rivers and coastal waters",
-        "whittling decorative wood figurines, utensils, or whistles",
-        "playing a handmade pipe, reed flute, or drum",
-        "foraging for wild herbs, berries, and medicinal plants",
-        "casual wrestling, footraces, or traditional stone-lifting games",
-        "stargazing and tracking the constellations",
-        "gardening a small patch of flowers, herbs, or vegetables"
-      ];
+      // Casual pastimes pool segmented by era
+      let commonPastimes = [];
+      if (selectedEra.id === 'MODERN') {
+        commonPastimes = [
+          "listening to radio, cassette tapes, or vinyl records",
+          "playing casual street football, basketball, or local sports",
+          "reading paperback novels, popular magazines, or newspapers",
+          "learning acoustic guitar, accordion, harmonica, or local folk songs",
+          "fishing along local lakes, canals, or rivers",
+          "tinkering with bicycles, radios, or small mechanical engines",
+          "sketching, painting, or amateur photography",
+          "gardening a small patch of vegetables or flowers in an allotment",
+          "watching cinema films, VHS tapes, or playing card games with friends",
+          "hiking, camping, or foraging mushrooms and berries in nearby woods",
+          "sewing, knitting, or making clothes"
+        ];
+      } else if (selectedEra.id === 'EARLY_MODERN') {
+        commonPastimes = [
+          "playing card, dice, or skittle games in local taverns",
+          "playing fiddle, flute, guitar, or local pipe ballads",
+          "folk singing, sea shanties, or learning traditional tavern ballads",
+          "fishing, trapping small game, or coastal crabbing",
+          "woodcarving, whittling, or leathercraft",
+          "gardening herbs, kitchen vegetables, and orchard fruit",
+          "casual wrestling, footraces, or village bowling",
+          "reading broadsides, chapbooks, or family almanacs",
+          "communal dancing and storytelling at seasonal fairs and feasts"
+        ];
+      } else {
+        // Premodern (Medieval, Classical, Bronze/Iron, Neolithic, Paleolithic)
+        commonPastimes = [
+          "folk singing and learning traditional oral ballads",
+          "communal folk dancing at village feasts and seasonal festivals",
+          "storytelling and recounting local myths and ancestors by the hearth",
+          "dice, knucklebone, or board games in public squares and taverns",
+          "fishing along local rivers and coastal shallows",
+          "whittling decorative wood figurines, utensils, or whistles",
+          "playing a wooden pipe, reed flute, or drum",
+          "foraging for wild herbs, nuts, berries, and medicinal roots",
+          "casual wrestling, footraces, or traditional stone-lifting games",
+          "stargazing and tracking the constellations",
+          "gardening a small patch of herbs, beans, or vegetables"
+        ];
+      }
 
       if (isAutistic) {
         hobbyData = "a dedicated, absorbing focus on a specific manual craft or technical pursuit";
       } else if (isUpperClass) {
         hobbyData = pickRandomItem([
-          "formal equestrian riding, hunting, or falconry",
+          selectedEra.id === 'MODERN' ? "competitive golf, yachting, or equestrian sports" : "formal equestrian riding, hunting, or falconry",
           "patronage of fine arts, collecting ancient coins or curiosities",
           "scholarly reading, poetry composition, and philosophical correspondence",
-          "fencing, music composition, or playing the lute/harpsichord/guqin",
+          selectedEra.id === 'MODERN' ? "playing classical piano, violin, or attending the theatre/opera" : "fencing, music composition, or playing the lute/harpsichord/guqin",
           "botanical cultivation and ornate estate gardening"
         ]);
       } else {
