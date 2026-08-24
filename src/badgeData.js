@@ -3,10 +3,22 @@ import {
   Swords, Droplets, HeartHandshake, Brain,
   DoorClosed, Rainbow, UserX, Crown, Compass,
   Bone, Flag, Hourglass, PersonStanding, HeartCrack, Sun, Unlock,
-  Skull, Moon, Flame
+  Skull, Moon, Flame, Pickaxe
 } from 'lucide-react';
 
 export const BADGE_DEFINITIONS = [
+  {
+    id: 'archaeological_discovery',
+    name: 'Unearthed',
+    icon: Pickaxe,
+    description: 'Your burial or preserved remains were discovered and excavated by modern archaeologists centuries or millennia later.',
+    colorClass: 'bg-amber-950/60 border-amber-500/60 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]',
+    condition: (life) => {
+      if (!life.fame) return false;
+      const f = life.fame.toLowerCase();
+      return f.includes('archaeological discovery') || f.includes('archaeolog');
+    }
+  },
   {
     id: 'queen_of_the_night',
     name: 'Queen of the Night',
