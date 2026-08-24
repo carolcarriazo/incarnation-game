@@ -1557,15 +1557,8 @@ ${(currentLife.narrative || []).join('\n\n')}
       return Math.random() < 0.75 ? "Celtic Gaul (Arverni / Aedui tribal lineage)" : "Gallo-Roman";
     }
 
-    if (r.includes('china') || r.includes('ming') || r.includes('qing') || r.includes('han') || r.includes('tang') || r.includes('song')) {
-      return Math.random() < 0.92 ? "Han Chinese" : "Manchu / Jurchen / Northern minority";
-    }
-
-    if (r.includes('japan') || r.includes('tokugawa') || r.includes('edo') || r.includes('heian')) {
-      return Math.random() < 0.97 ? "Yamato Japanese" : "Ainu / Emishi lineage";
-    }
-
-    if (r.includes('dahomey') || r.includes('ashanti') || r.includes('benin') || r.includes('ghana') || r.includes('west africa') || r.includes('mali') || r.includes('songhai') || r.includes('yoruba')) {
+    // West Africa (Dahomey, Ashanti, Benin, Ghana, Mali, Songhai, Yoruba) - Checked BEFORE Han/China to avoid substring issues
+    if (r.includes('dahomey') || r.includes('ashanti') || r.includes('benin') || r.includes('ghana') || r.includes('west africa') || r.includes('mali') || r.includes('songhai') || r.includes('yoruba') || r.includes('nok') || r.includes('nigeria') || r.includes('senegal')) {
       if (isMinority) {
         return pickRandomItem([
           "Hausa trans-Saharan trader / merchant enclave",
@@ -1581,6 +1574,14 @@ ${(currentLife.narrative || []).join('\n\n')}
       if (r.includes('mali') || r.includes('songhai')) return pickRandomItem(["Mandinka / Malinke lineage", "Songhai lineage", "Soninke lineage"]);
       if (r.includes('yoruba') || r.includes('oyo')) return "Yoruba (Oyo Empire lineage)";
       return "Native West African lineage (Fon, Akan, or Yoruba)";
+    }
+
+    if (r.includes('china') || r.includes('ming') || r.includes('qing') || r.includes('han dynasty') || r.includes('tang') || r.includes('song dynasty') || r.includes('beijing') || r.includes('shanghai') || r.includes('guangzhou') || r.includes('nanjing') || r.includes('chang\'an')) {
+      return Math.random() < 0.92 ? "Han Chinese" : "Manchu / Jurchen / Northern minority";
+    }
+
+    if (r.includes('japan') || r.includes('tokugawa') || r.includes('edo') || r.includes('heian')) {
+      return Math.random() < 0.97 ? "Yamato Japanese" : "Ainu / Emishi lineage";
     }
 
     if (r.includes('ethiopia') || r.includes('abyssinia') || r.includes('axum') || r.includes('horn of africa')) {
@@ -2543,7 +2544,14 @@ ${(currentLife.narrative || []).join('\n\n')}
         socialClass.toLowerCase().includes('burgher') ||
         isRoyaltyOrHistoric;
 
-      if (!isAlreadySlave && !isMiddleOrUpper && age >= 5 && !wasExposed) {
+      const isEastAsianOrChinese = (ethnicity || '').toLowerCase().includes('chinese') ||
+        (ethnicity || '').toLowerCase().includes('japanese') ||
+        (ethnicity || '').toLowerCase().includes('korean') ||
+        (ethnicity || '').toLowerCase().includes('vietnamese') ||
+        (minorityGroupHint || '').toLowerCase().includes('chinese') ||
+        (minorityGroupHint || '').toLowerCase().includes('asian');
+
+      if (!isAlreadySlave && !isMiddleOrUpper && !isEastAsianOrChinese && age >= 5 && !wasExposed) {
         let enslavementRisk = 0;
         const eraId = selectedEra.id;
         const rName = (regionText || '').toLowerCase();
