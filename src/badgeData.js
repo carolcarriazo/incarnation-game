@@ -1,6 +1,6 @@
-import { 
-  Award, ShieldAlert, Baby, Sparkles, Ghost, 
-  Swords, Droplets, HeartHandshake, Brain, 
+import {
+  Award, ShieldAlert, Baby, Sparkles, Ghost,
+  Swords, Droplets, HeartHandshake, Brain,
   DoorClosed, Rainbow, UserX, Crown, Compass,
   Bone, Flag, Hourglass, PersonStanding, HeartCrack, Sun, Unlock,
   Skull, Moon
@@ -27,7 +27,7 @@ export const BADGE_DEFINITIONS = [
     id: 'bye_baby',
     name: 'Bye, Baby',
     icon: Baby,
-    description: 'Passed away in infancy at 0 years old before reaching your first birthday.',
+    description: 'Died in infancy at 0 years old before reaching your first birthday.',
     colorClass: 'bg-indigo-950/50 border-indigo-500/60 text-indigo-300',
     condition: (life) => life.age === 0
   },
@@ -99,7 +99,7 @@ export const BADGE_DEFINITIONS = [
         const match = life.historicalEventsLivedThrough.some(e => {
           const text = ((e.event || '') + ' ' + (e.impact || '')).toLowerCase();
           return (text.includes('british') || text.includes('east india company') || text.includes('crown colony') || text.includes('treaty of waitangi') || text.includes('treaty of nanking') || text.includes('opium war') || text.includes('raj') || text.includes('scramble for africa')) &&
-                 (text.includes('colon') || text.includes('conquest') || text.includes('invasi') || text.includes('rule') || text.includes('annex') || text.includes('occup') || text.includes('war') || text.includes('treaty') || text.includes('company rule') || text.includes('subjugat'));
+            (text.includes('colon') || text.includes('conquest') || text.includes('invasi') || text.includes('rule') || text.includes('annex') || text.includes('occup') || text.includes('war') || text.includes('treaty') || text.includes('company rule') || text.includes('subjugat'));
         });
         if (match) return true;
       }
@@ -122,9 +122,9 @@ export const BADGE_DEFINITIONS = [
       if (life.historicalEventsLivedThrough && life.historicalEventsLivedThrough.length > 0) {
         const match = life.historicalEventsLivedThrough.some(e => {
           const text = ((e.event || '') + ' ' + (e.impact || '')).toLowerCase();
-          return text.includes('fall of') || text.includes('collapse of') || text.includes('sack of') || 
-                 text.includes('destruction of') || text.includes('conquest of') || text.includes('end of the') ||
-                 text.includes('spanish conquest') || text.includes('mongol invasion') || text.includes('bronze age collapse');
+          return text.includes('fall of') || text.includes('collapse of') || text.includes('sack of') ||
+            text.includes('destruction of') || text.includes('conquest of') || text.includes('end of the') ||
+            text.includes('spanish conquest') || text.includes('mongol invasion') || text.includes('bronze age collapse');
         });
         if (match) return true;
       }
@@ -202,17 +202,17 @@ export const BADGE_DEFINITIONS = [
     condition: (life) => {
       if (!life.causeOfDeath) return false;
       const death = life.causeOfDeath.toLowerCase();
-      return death.includes('battle') || death.includes('combat') || 
-             death.includes('shrapnel') || death.includes('artillery') || 
-             death.includes('shield wall') || death.includes('spear thrust') ||
-             death.includes('cavalry');
+      return death.includes('battle') || death.includes('combat') ||
+        death.includes('shrapnel') || death.includes('artillery') ||
+        death.includes('shield wall') || death.includes('spear thrust') ||
+        death.includes('cavalry');
     }
   },
   {
     id: 'died_in_childbirth',
     name: 'Died in Childbirth',
     icon: Baby,
-    description: 'Passed away due to complications during childbirth.',
+    description: 'Died due to complications during childbirth.',
     colorClass: 'bg-rose-500/20 border-rose-500/50 text-rose-300',
     condition: (life) => {
       if (life.maternalRoll) return true;
@@ -233,7 +233,7 @@ export const BADGE_DEFINITIONS = [
     id: 'cut_short',
     name: 'Cut Short',
     icon: Ghost,
-    description: 'Passed away tragically between the ages of 5 and 15.',
+    description: 'Died between the ages of 5 and 15.',
     colorClass: 'bg-slate-700/40 border-slate-500/50 text-slate-300',
     condition: (life) => life.age >= 5 && life.age <= 15
   },
@@ -248,11 +248,11 @@ export const BADGE_DEFINITIONS = [
       const death = life.causeOfDeath.toLowerCase();
       const isWar = death.includes('battle') || death.includes('combat') || death.includes('shrapnel') || death.includes('siege') || death.includes('bombardment') || death.includes('sacking') || death.includes('military raid');
       if (isWar) return false;
-      return death.includes('assassination') || death.includes('murder') || 
-             death.includes('stabbing') || death.includes('homicide') || 
-             death.includes('duel') || death.includes('assault') || death.includes('firearm trauma') ||
-             death.includes('domestic violence') || death.includes('domestic assault') || death.includes('strangulation') ||
-             death.includes('witchcraft');
+      return death.includes('assassination') || death.includes('murder') ||
+        death.includes('stabbing') || death.includes('homicide') ||
+        death.includes('duel') || death.includes('assault') || death.includes('firearm trauma') ||
+        death.includes('domestic violence') || death.includes('domestic assault') || death.includes('strangulation') ||
+        death.includes('witchcraft');
     }
   },
   {

@@ -38,16 +38,28 @@ const pickWeightedCause = (pool) => {
 
 const cleanRegionName = (region) => {
   if (!region) return '';
+
+  // 1. Specific Roman Provinces & Classical Mediterranean (checked before generic Rome/Italy)
+  if (region.includes("Roman Britannia")) return "Roman Britannia";
+  if (region.includes("Roman Gaul")) return "Roman Gaul";
+  if (region.includes("Roman Hispania")) return "Roman Hispania";
+  if (region.includes("City of Rome") || region.includes("Italian Peninsula")) return "Rome & Italian Peninsula";
+  if (region.includes("Ptolemaic & Roman Alexandria") || region.includes("Alexandria (Egypt)")) return "Alexandria, Egypt";
+  if (region.includes("Punic Carthage") || region.includes("Roman Africa")) return "Carthage & Roman Africa";
+  if (region.includes("Classical Athens") || region.includes("Greek City-States")) return "Classical Greece";
+
+  // 2. Global historical regions & civilizations
   if (region.includes("Polynesia") || region.includes("Polynesian") || region.includes("Samoa") || region.includes("Tonga") || region.includes("Hawaii")) return "Polynesia & Pacific";
   if (region.includes("Aotearoa") || region.includes("Māori")) return "New Zealand (Aotearoa)";
   if (region.includes("China") || region.includes("Shang") || region.includes("Zhou") || region.includes("Han Dynasty") || region.includes("Song") || region.includes("Tang") || region.includes("Ming") || region.includes("Qing") || region.includes("Yuan") || region.includes("Sanxingdui") || region.includes("Yangshao") || region.includes("Liangzhu")) return "China";
   if (region.includes("India") || region.includes("Vedic") || region.includes("Maurya") || region.includes("Gupta") || region.includes("Mughal") || region.includes("Maratha") || region.includes("Delhi Sultanate") || region.includes("Chola") || region.includes("Mehrgarh") || region.includes("Harappan") || region.includes("Ganges")) return "India";
   if (region.includes("Japan") || region.includes("Jomon") || region.includes("Yayoi") || region.includes("Kamakura") || region.includes("Tokugawa") || region.includes("Heian") || region.includes("Edo") || region.includes("Yamato")) return "Japan";
   if (region.includes("Korea") || region.includes("Goryeo") || region.includes("Joseon") || region.includes("Gojoseon") || region.includes("Silla") || region.includes("Goguryeo") || region.includes("Jeulmun")) return "Korea";
-  if (region.includes("Egypt") || region.includes("Alexandria") || region.includes("Kush") || region.includes("Nubia") || region.includes("Nile")) return "Egypt & Nile";
+  if (region.includes("Egypt") || region.includes("Kush") || region.includes("Nubia") || region.includes("Nile")) return "Egypt & Nile";
   if (region.includes("Mesopotamia") || region.includes("Sumer") || region.includes("Akkad") || region.includes("Assyrian") || region.includes("Babylon") || region.includes("Ur ") || region.includes("Nineveh")) return "Mesopotamia";
   if (region.includes("Persia") || region.includes("Iran") || region.includes("Elamite") || region.includes("Sasanian") || region.includes("Safavid") || region.includes("Qajar") || region.includes("Parthian")) return "Persia (Iran)";
-  if (region.includes("Rome") || region.includes("Roman") || region.includes("Italian") || region.includes("Venice") || region.includes("Florence") || region.includes("Genoa") || region.includes("Naples") || region.includes("Etruscan")) return "Italy / Roman World";
+  if (region.includes("Italian City-Republics") || region.includes("Venice") || region.includes("Florence") || region.includes("Genoa") || region.includes("Naples") || region.includes("Etruscan")) return "Italian Peninsula";
+  if (region.includes("Rome") || region.includes("Roman")) return "Roman World";
   if (region.includes("Greece") || region.includes("Athens") || region.includes("Minoan") || region.includes("Mycenaean") || region.includes("Byzantine") || region.includes("Constantinople")) return "Greece / Byzantine World";
   if (region.includes("France") || region.includes("Gaul") || region.includes("French") || region.includes("Franco-Cantabria")) return "France";
   if (region.includes("England") || region.includes("Britain") || region.includes("Britannia") || region.includes("Scotland") || region.includes("Ireland") || region.includes("Stonehenge")) return "British Isles";
@@ -56,7 +68,7 @@ const cleanRegionName = (region) => {
   if (region.includes("Russia") || region.includes("Rus") || region.includes("Novgorod") || region.includes("Siberian") || region.includes("Baikal")) return "Russia & Eastern Europe";
   if (region.includes("Poland") || region.includes("Lithuania")) return "Poland-Lithuania";
   if (region.includes("Ottoman") || region.includes("Turkey") || region.includes("Istanbul") || region.includes("Anatolia") || region.includes("Hittite") || region.includes("Göbekli")) return "Ottoman / Anatolia";
-  if (region.includes("Levant") || region.includes("Fertile Crescent") || region.includes("Jericho") || region.includes("Judea") || region.includes("Phoenician") || region.includes("Tyre") || region.includes("Carthage") || region.includes("Caliphate") || region.includes("Arabia") || region.includes("Saba")) return "Middle East & Levant";
+  if (region.includes("Levant") || region.includes("Fertile Crescent") || region.includes("Jericho") || region.includes("Judea") || region.includes("Phoenician") || region.includes("Tyre") || region.includes("Caliphate") || region.includes("Arabia") || region.includes("Saba")) return "Middle East & Levant";
   if (region.includes("Ethiopia") || region.includes("Aksumite") || region.includes("Solomonic") || region.includes("Eritrea")) return "Ethiopia & Horn of Africa";
   if (region.includes("Maya") || region.includes("Aztec") || region.includes("Teotihuacan") || region.includes("Olmec") || region.includes("Mexico") || region.includes("New Spain") || region.includes("Tehuacán")) return "Mexico & Mesoamerica";
   if (region.includes("Inca") || region.includes("Peru") || region.includes("Andes") || region.includes("Chavín") || region.includes("Moche") || region.includes("Nazca") || region.includes("Caral")) return "Andean South America";
@@ -549,6 +561,7 @@ CRITICAL RULES:
    - MANDATORY FIRST SENTENCE: Your very first sentence of the story's first paragraph MUST explicitly begin with either "You were born a male..." or "You were born a female..." based on the assigned birth sex (e.g. "You were born a male to peasant farmers in...", "You were born a female in a drafty timber house in...").
 2. PROSE STYLE: LEAN, OBJECTIVE & RESTRAINED (STRICT BAN ON ADJECTIVE STACKING & PURPLE MELODRAMA):
    - LEAN, RESTRAINED, FACTUAL TONE: Write like a crisp, observant historical biographer or documentary historian. Use clean, direct English with emotional restraint and economy of language.
+   - PREFER "DIED" OVER EUPHEMISMS: ALWAYS use the direct, plain verb "died" (e.g. "You died of cholera at age 42", "You died from a winter fever", "You died after a severe fall"). STRICTLY AVOID euphemisms or melodramatic phrases like "passed away", "passed on", "perished", "slipped away", "departed this life", or "met your demise". State death plainly and directly.
    - STRICT BAN ON EXCESSIVE ADJECTIVES & ADVERB CLUSTERS: NEVER stack 2 or 3 adjectives/adverbs onto a single noun (e.g. BANNED: "quiet, deeply suppressed romantic desires", "untreated, crushing weight of severe melancholia", "dutifully fulfilled your heterosexual marital expectations", "whispered shame, heavily weighing upon your traditional worldview", "utterly alienated from the vital rhythms"). Use single, precise, natural nouns and verbs.
    - SHOW FACTS, DO NOT MELODRAMATIZE: Strictly avoid theatrical metaphors, dramatic clichés, and melodramatic filler (e.g. BANNED: "casting a permanent shadow over your daily existence", "the internal darkness finally overcame your pious endurance", "unbearable burden", "profound sorrow took root"). Describe what the person actually did, their trade, marriage, daily realities, and circumstances simply and factually.
    - HISTORICAL INSTITUTIONAL & POLITICAL SPECIFICITY (MANDATORY): NEVER rely on vague, generic abstractions like "a bureaucrat", "government agency", "military unit", "provincial administration", or "regional supply bureau". Name real, specific historical institutions, ministries, work units (*danwei*), state enterprises, guilds, regiments, councils, or municipal organs appropriate for that exact country and decade (e.g. *Hebei Provincial Supply and Marketing Cooperative*, *State Planning Commission*, *Ministry of Metallurgical Industry*, *Danwei work unit*, *London County Council*, *British East India Company Board of Control*, *Roman Prefect of the Annona*, *Gosplan*).
@@ -556,7 +569,7 @@ CRITICAL RULES:
    - AVOID dense, clinical, Latinate textbook jargon or hyper-specific anatomical terms (e.g. NEVER write "femoral neck", "patella", "lung adenocarcinoma", "invasive ductal carcinoma", "gastric adenocarcinoma", or "talipes equinovarus").
    - ALWAYS use plain, natural, accessible English terms (e.g. "a severe fall resulting in a fractured hip and fatal hospital complications", "lung cancer", "breast cancer", "stomach cancer", "bowel cancer", "pancreatic cancer", "leukemia", "heart attack", "heart failure", "motor neuron disease / ALS", "a ruptured brain aneurysm", "muscular dystrophy", "multiple sclerosis", "a clubfoot", "a hunchback", "a cleft palate").
    - MODERN MEDICAL REALITIES (20th–21st CENTURY): Depict medical realities accurately for modern eras: an elderly person suffering a severe fall, stroke, or heart event receives hospital care, surgery, or hospice treatment, and fatal outcomes are contextualized within hospital or post-surgical recovery complications rather than dying untreated at home.
-   - PREMODERN MEDICAL FRAMING (CRITICAL): If someone in a premodern era (before 1850) suffers or dies from modern complex diagnoses (specifically cancers, motor neuron disease / ALS, multiple sclerosis, muscular dystrophy, or a ruptured brain aneurysm), describe their progressive symptoms through the lens of historical peers (e.g. creeping paralysis, sudden unheralded stroke, progressive muscle wasting, or a deep lingering internal mass), and follow it with: "Today, we would call this [cancer / ALS / a brain aneurysm / muscular dystrophy / multiple sclerosis]."
+   - PREMODERN MEDICAL FRAMING (MANDATORY DISEASE NAME): If the assigned Primary Cause of Death contains a modern diagnostic clarification (such as leukemia, stomach cancer, breast cancer, bowel cancer, motor neuron disease / ALS, multiple sclerosis, muscular dystrophy, or a brain aneurysm), you MUST explicitly include the modern disease name in the narrative. Describe their physical symptoms as perceived by their historical peers (e.g. creeping paralysis, progressive muscle wasting, mysterious bruising and pallor, or a lingering internal mass), and ALWAYS conclude with the explicit sentence: "Today, we would call this [leukemia / stomach cancer / ALS / a brain aneurysm / etc.]." NEVER omit the modern disease name!
    - STRICT BAN ON META-COMMENTARY FOR COMMON HISTORICAL DISEASES: NEVER use "Today, we would call this..." for well-known historical diseases (malaria, ague, dysentery, tuberculosis / consumption, cholera, smallpox, typhus, yellow fever, syphilis, or bubonic plague). Call them directly by their natural historical names (e.g. simply "malaria" or "the ague") without any anachronistic modern commentary.
    - AUTISM & NEURODIVERGENCE (BE EXPLICIT & CLEAR): If the character has an autism spectrum condition, be EXPLICIT about their neurodivergence. In the modern era, explicitly identify it as autism. In premodern eras, vividly depict their distinct autistic traits: their intense hyperfocus on specialized interests, deep sensory sensitivities (to sounds, touch, crowded markets), literal communication style, strong preference for predictable routines, and difficulty navigating unspoken social cues or diplomatic subtext, while explaining how peers perceived their unique mind (e.g. an eccentric solitary savant, singularly gifted craftsperson, or misunderstood thinker).
    - HOBBIES OBSESSIVENESS RULE: Hobbies and pastimes MUST NOT be described as "obsessive" or "all-consuming" UNLESS the character is specifically autistic / neurodivergent. For neurotypical characters, pastimes must be depicted as enjoyable, relaxing, communal, creative, or casual recreational pursuits.
@@ -566,7 +579,7 @@ CRITICAL RULES:
 6. CAUSE OF DEATH & CONTEMPORARY LIVES (STILL ALIVE IN 2026):
    - FOR DECEASED CHARACTERS: Weave their assigned Primary Cause of Death seamlessly into their final paragraph. Cancer was extremely rare in premodern eras; rely only on the provided premodern diseases. If they died of old age, describe the physical realities of advanced age (e.g., loss of teeth, dimming eyesight, joint pain, frailty) rather than a sterile modern "passing peacefully in their sleep."
    - BATTLEFIELD & CAVALRY CHARGE AGE LIMIT (AGE <= 45): Active frontline infantry clashes, shield wall melee, and battlefield cavalry charges MUST ONLY happen to combatants aged 15 to 45. Characters over age 45 who die in wartime MUST be depicted as civilian casualties of sieges, village sackings, burning of dwellings, starvation during military blockades, or defense against invading raiders—NEVER as aging elders actively fighting in frontline cavalry charges.
-   - WARTIME RAIDS & OLDER ADULTS (AGE 40+): For mature women (age 40+) who perish or suffer trauma in settlement raids or warfare, depict the tragedy realistically as defending their homestead, family protection, arson, or collateral violence (NEVER frame violence against mature women past 40 as sexual assault/attempted violation).
+   - WARTIME RAIDS & OLDER ADULTS (AGE 40+): For mature women (age 40+) who suffer trauma or death in settlement raids or warfare, depict the tragedy realistically as defending their homestead, family protection, arson, or collateral violence (NEVER frame violence against mature women past 40 as sexual assault/attempted violation).
    - FOR LIVING CHARACTERS (STILL ALIVE IN 2026): NEVER say they are "forgotten by history" or speak of their life in past tense as a closed ancient chapter. Write about their ongoing daily life today in the year 2026, their contemporary routine, reflections on modern times, family/community, and how they navigate life today.
 7. PREMODERN MARRIAGE & UNMARRIED WOMEN (STRICT HISTORICAL AGENCY CONSTRAINT):
    - In premodern eras (before 1900), marriage was a near-universal economic survival institution; women did NOT have the societal or economic independence to casually "choose" lifelong spinsterhood.
@@ -584,7 +597,7 @@ CRITICAL RULES:
     - "year": MUST strictly contain ONLY the calendar year with its era indicator (e.g. "1908 CE", "1926 CE", "450 BCE"). Do NOT put location or story narrative inside the "year" string.
     - "event": MUST contain a clear, descriptive 1-2 sentence summary of what occurred in that year (e.g. "Born in a hillside village in Basilicata, Italy to an impoverished agricultural family.").
 12. HISTORICAL FIGURES & EYEWITNESS EVENTS (EXHAUSTIVE & AUTHENTIC):
-    - INFANT / CHILD MORTALITY LIFESPAN RULES (CRITICAL): If the character passed away in infancy or childhood (age < 12), they MUST NOT be given adult careers, adult upward mobility, adult marriages, or historical encounters that occurred after their year of death.
+    - INFANT / CHILD MORTALITY LIFESPAN RULES (CRITICAL): If the character died in infancy or childhood (age < 12), they MUST NOT be given adult careers, adult upward mobility, adult marriages, or historical encounters that occurred after their year of death.
     - HISTORICAL ENCOUNTERS: Carefully evaluate the character's exact lifespan (birth year to death year), region/city, and class. If real historical figures (monarchs, artists, philosophers, generals, revolutionaries, scientists—e.g. Richard II, Van Gogh, Leonardo da Vinci, Socrates, Joan of Arc, Marie Antoinette, Napoleon, Abraham Lincoln, Mansa Musa, Caravaggio, Tokugawa Ieyasu, Confucius, etc.) lived or operated in that area during their lifetime:
       - Provide an authentic encounter or observation (e.g. catching a glimpse during a royal progress, hearing them speak, drinking in the same tavern, observing their public works, serving in their unit, or direct acquaintance).
       - If an encounter occurs, populate the historicalEncounters array with figure, year, and context. If no plausible figure exists in that exact time and place, return an empty array.
@@ -615,8 +628,8 @@ CRITICAL RULES:
       d) URBAN WORKING CLASS & STREET TRADES (MAYHEW'S LONDON LABOUR & HISTORICAL CITY TRADES): For urban poor and working classes, draw on rich specific historical livelihoods: costermongers (fruit/nut street-sellers), mudlarks, knocker-ups, chimney sweeps, watercress sellers, laundresses, coal-whippers, scullery maids, tanners, dockers, nightsoil carters.
       e) SCHOLARS, SCRIBES, ARTISANS & CRAFTS: Cuneiform scribes (*tupsharru*) in Mesopotamia, hieroglyphic scribes/embalmers in Egypt, Roman *argentarii* (bankers) / *tonsores* (barbers), medieval apothecaries, fullers, coopers, fletchers, chandlers, clockmakers, silversmiths.
       f) 20th-21st CENTURY (MODERN TRADES): Factory assembly line workers, switchboard operators, radiologists, telegraphists, locomotive engineers, nurses, software developers, postal clerks, bus drivers.
-      g) INFANTS & CHILDREN (Age < 12): Must return 'None (Passed away in childhood)'.
-17. MATERIAL CULTURE, ECONOMIC REALISM & ASYNCHRONOUS TECHNOLOGICAL DEVELOPMENT:
+      g) INFANTS & CHILDREN (Age < 12): Must return 'None (Died in childhood)'.
+d17. MATERIAL CULTURE, ECONOMIC REALISM & ASYNCHRONOUS TECHNOLOGICAL DEVELOPMENT:
     - CRITICAL HISTORICAL PRINCIPLE: Technological breakthroughs, trade infrastructure, metallurgy, writing systems, monetization, and social institutions developed asynchronously at vastly different paces across different civilizations and continents.
     - ALWAYS EVALUATE THE EXACT TIME AND GEOGRAPHY:
       * METALLURGY: Only incorporate bronze, iron, or steel if that specific culture and region had developed or adopted metallurgy by that exact century (e.g. bronze emerged early in the Near East ~3300 BCE, but centuries/millennia later across other parts of Eurasia, and was not present in pre-Columbian North America or Australia).
@@ -627,18 +640,31 @@ CRITICAL RULES:
 18. HISTORICAL ACCURACY OF SETTINGS, ARCHITECTURE & MEDICAL CARE (NO ANACHRONISMS):
     - PREMODERN MEDICAL CARE (BEFORE 1900): In premodern eras, ordinary people were treated in their homes or family rooms with traditional herbal remedies, bone-setters, or local healers. NEVER invent anachronistic institutions like modern 'municipal infirmaries', 'county hospitals with emergency trauma care', or sterile clinical wards in premodern centuries.
     - GEOGRAPHICAL & ARCHITECTURAL REALISM: Accurately reflect local historical geography and architecture (e.g. Tunis Medina consists of dense stone alleys and covered souks, NOT Venetian canals; Paris in 1705 had wooden/stone bridges across the Seine, not modern sanitation).
-19. JSON OUTPUT ONLY. Adhere strictly to the requested schema.`;
+19. ETHNICITY, ANCESTRY & GEOGRAPHIC ORIENTATION:
+    - NO REDUNDANT ANCESTRY FOR NATIVE HOMELANDS: If the character is born in their ancestral homeland and belongs to the native majority population (e.g. French in France, English in England, Han in China, Japanese in Japan), NEVER use stiff, redundant phrasing like "You were born a female of French ancestry in France". State their birth, family, and station naturally (e.g. "You were born a female to a farming family in...").
+    - EXPLICIT ANCESTRY FOR MINORITIES & IMMIGRANTS: Only explicitly emphasize ancestry/ethnicity if the character is an ethnic/religious minority, immigrant, colonial subject, of mixed heritage (e.g. Mestizo, Anglo-Indian), or living in diaspora.
+    - REGIONAL GEOGRAPHIC ORIENTATION: When introducing a specific province, department, or prefecture (e.g. Ardèche, Sichuan, Lancashire, Oaxaca, Calabria, Bavaria), briefly orient the reader where it is located (e.g. "the rugged hills of the Ardèche department in southeastern France").
+20. HISTORICAL EDUCATION & LITERACY REALISM (LATE 19th & 20th CENTURY):
+    - From the late 19th century onward (e.g. post-1880s Jules Ferry laws in France, the 1870 Education Act in Britain, universal elementary mandates in Europe, North America, and Meiji Japan), basic primary/elementary schooling was widespread and standard.
+    - Working-class and rural children born in these eras typically received basic elementary schooling (learning reading, writing, and basic arithmetic in village or parish public schools) before entering labor or domestic work. NEVER claim they grew up with "no formal education" simply because they were poor or rural.
+21. LOGICAL COHERENCE & CAUSALITY (NO FALSE CAUSAL CHAINS):
+    - PERSONALITY IS TEMPERAMENT, NOT A MECHANICAL RESULT OF SOCIAL CLASS: Inborn psychological traits (such as being impressionable, easily led, stubborn, anxious, neurotic, empathetic, or curious) are temperamental dispositions—NEVER frame them as direct causal consequences of having a manual job or lacking higher education (e.g. BANNED: "Because your life was shaped by farm toil rather than formal education, you were easily swayed by others" or "Because you were a laborer, you had an anxious temperament").
+    - INTEGRATE TRAITS NATURALLY: Depict psychological traits through the character's personal choices, relationships, coping habits, and reactions to events without inventing illogical causal leaps.
+22. JSON OUTPUT ONLY. Adhere strictly to the requested schema.`;
 
   const userPrompt = `
 Generate a structured life profile based strictly on these parameters:
 - Era: ${lifeData.eraName}
 - Birth Year: ${formatYear(lifeData.birthYear)}
 - ${lifeData.isModernEra
-      ? `Country: ${lifeData.region} | Setting: ${lifeData.isUrban ? 'Urban (city dweller)' : 'Rural (village or countryside)'}\n- Language: ${lifeData.lang}\n- Specific Location (YOUR CHOICE — put in specificLocation field): Invent the most realistic specific ${lifeData.isUrban ? 'city district, neighbourhood, or city name' : 'village, small town, or rural region'} within ${lifeData.region} for ${formatYear(lifeData.birthYear)}. Be specific — vary your answer, never just use the capital.`
-      : `Region: ${lifeData.region} (Primary Language: ${lifeData.lang})\n- Specific Location (YOUR CHOICE — put in specificLocation field): Invent a realistic specific settlement, town, village, or district within this region appropriate for the era and class.`
+      ? `Country: ${lifeData.region} | Setting: ${lifeData.isUrban ? 'Urban (city dweller)' : 'Rural (village or countryside)'}\n- Language: ${lifeData.lang}\n- Specific Location (YOUR CHOICE — put in specificLocation field): Invent the most realistic specific ${lifeData.isUrban ? 'city district, neighbourhood, or city name' : 'village, small town, or rural region'} within ${lifeData.region} for ${formatYear(lifeData.birthYear)}. Be specific — vary your answer, never just use the capital. Provide a brief geographical orientation if it is a specific province/department.`
+      : `Region: ${lifeData.region} (Primary Language: ${lifeData.lang})\n- Specific Location (YOUR CHOICE — put in specificLocation field): Invent a realistic specific settlement, town, village, or district within this region appropriate for the era and class. Provide a brief geographical orientation if it is a specific province/region.`
     }
 - Sex: ${lifeData.sex} (REMINDER: First sentence MUST start with "You were born a ${lifeData.sex.toLowerCase()}...")
-- Ethnicity / Ancestry (EXPLICIT): ${lifeData.ethnicity || 'Native local lineage'}. CRITICAL RULE: Explicitly state and weave the character's exact ethnicity and ancestry (${lifeData.ethnicity || 'local ancestry'}) into the narrative, reflecting their lived reality and cultural station in this society.
+- Ethnicity / Ancestry: ${lifeData.isMinority || lifeData.isImmigrant
+      ? `${lifeData.ethnicity || 'Minority heritage'} (Minority / Immigrant background — integrate their specific heritage and lived cultural reality into the story)`
+      : `${lifeData.ethnicity || 'Native majority'} (Native majority in home country — do NOT write redundant phrases like 'of French ancestry in France'; integrate their regional birth naturally)`
+    }
 - Gender Identity: ${lifeData.isTransgender ? `Transgender (${lifeData.transgenderDetails})` : 'Cisgender (aligns with birth sex)'}
 - Social Class: ${lifeData.socialClass}
 ${lifeData.isRoyaltyOrHistoric ? `- REAL HISTORICAL ROYALTY / MONARCH: This soul is born into Royalty / Imperial Dynasty in ${lifeData.region} around ${formatYear(lifeData.birthYear)}. You MUST identify an actual real historical royal, prince/princess, monarch, or dynasty member of this land, narrate their factual life story, and include their exact Wikipedia article URL in the wikiLinks array.` : ''}
@@ -661,7 +687,7 @@ ${showEarlyCrushes ? `- Orientation: ${lifeData.orientation} ${lifeData.orientat
         ? `(Attracted to both men and women. ${lifeData.actedOnBi ? (lifeData.isOpenlyGay ? 'Acted openly on same-sex attractions.' : 'Pursued same-sex encounters in strict secrecy.') : 'Suppressed same-sex desires and conformed to heterosexual expectations.'})`
         : '')
       }` : ''}
-${showTraits ? `- Personality: ${lifeData.personality.join(' and ')}` : ''}
+${showTraits ? `- Personality: ${lifeData.personality.join(' and ')} (Reflect these innate psychological traits organically in their choices, relationships, and reactions; NEVER claim personality traits were caused by their manual job or lack of schooling).` : ''}
 ${showAdult ? `- Pastimes & Leisure: ${lifeData.hobbyData} (CRITICAL: Do NOT describe hobbies as obsessive or compulsive unless the person is autistic).` : ''}
 ${showAdult ? `- Marriage / Structure: ${lifeData.isMarried
       ? `Married/Bonded at age ${lifeData.marriageAge}`
@@ -705,7 +731,7 @@ ${showTraits ? `- Physical Appearance (1-100, score: ${lifeData.beauty}): ${life
 ${showTraits && lifeData.isPsychopath ? `- Psychological Profile: Psychopathic traits (1% of population). Innate absence of emotional empathy, guilt, or remorse. Whether this manifests as violent/predatory cruelty (e.g. historical figures like Gilles de Rais), calculated manipulative cunning, cold ambition, or transactional self-interest is up to your judgement based on their circumstances and station.` : ''}
 - Mental/Physical Health: ${[lifeData.isPsychopath && showTraits ? 'Psychopathy' : '', lifeData.schizophrenia && showAdult ? 'Schizophrenia' : '', lifeData.depression && showAdult ? 'Clinical Depression' : '', lifeData.suicide ? 'Suicide' : ''].filter(Boolean).join(', ') || 'No major anomalies'}
 - Age at Death: ${lifeData.age} ${lifeData.isAlive ? '(Currently still alive in the year 2026!)' : ''}
-- Primary Cause of Death: ${lifeData.causeOfDeath || 'N/A'}`;
+- Primary Cause of Death: ${lifeData.causeOfDeath || 'N/A'} (CRITICAL: If this cause of death includes a modern medical name in parentheses like '(Today, we would call this [disease])', you MUST explicitly write that sentence in your story's final paragraph).`;
 
   const payload = {
     contents: [{ parts: [{ text: userPrompt }] }],
@@ -717,7 +743,7 @@ ${showTraits && lifeData.isPsychopath ? `- Psychological Profile: Psychopathic t
         properties: {
           specificLocation: { type: "STRING", description: "A specific realistic place name (1-4 words): a city district, neighbourhood, village name, or rural region within the character's country/region. Never just the country name itself." },
           deathSpecificLocation: { type: "STRING", description: "If the character emigrated, the specific place/city name in their destination land where they lived and died. If they did not emigrate, return null or empty string." },
-          profession: { type: "STRING", description: "A specific, period-authentic vocation or livelihood (e.g. 'Mesopotamian cuneiform temple scribe', 'Victorian costermonger (street fruit seller)', 'Castilian dryland olive & wheat farmer', 'None (Landed Aristocracy / Gentleman of Leisure)', 'Roman lupanar courtesan'). If passed away in childhood (age < 12), return 'None (Passed away in childhood)'." },
+          profession: { type: "STRING", description: "A specific, period-authentic vocation or livelihood (e.g. 'Mesopotamian cuneiform temple scribe', 'Victorian costermonger (street fruit seller)', 'Castilian dryland olive & wheat farmer', 'None (Landed Aristocracy / Gentleman of Leisure)', 'Roman lupanar courtesan'). If died in childhood (age < 12), return 'None (Died in childhood)'." },
           narrative: { type: "ARRAY", items: { type: "STRING" }, description: "3 to 5 paragraphs of the life story." },
           timeline: {
             type: "ARRAY",
@@ -1935,8 +1961,8 @@ ${(currentLife.narrative || []).join('\n\n')}
       );
 
       if (isWorkingClassWoman && !wasExposed) {
-        // 8% likelihood of working class women entering sex work
-        if (Math.random() < 0.08) {
+        // 5% likelihood of working class women entering sex work
+        if (Math.random() < 0.05) {
           isSexWorker = true;
         }
       }
@@ -2042,7 +2068,7 @@ ${(currentLife.narrative || []).join('\n\n')}
       let enslavementDetails = null;
 
       const isAlreadySlave = socialClass.toLowerCase().includes('slave') || socialClass.toLowerCase().includes('enslaved') || socialClass.toLowerCase().includes('serf');
-      const isMiddleOrUpper = 
+      const isMiddleOrUpper =
         socialClass.toLowerCase().includes('upper') ||
         socialClass.toLowerCase().includes('middle') ||
         socialClass.toLowerCase().includes('merchant') ||
@@ -2704,7 +2730,7 @@ ${(currentLife.narrative || []).join('\n\n')}
               }}
               className="w-full py-3.5 px-6 font-sans font-semibold text-slate-950 bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 rounded-xl shadow-[0_0_20px_rgba(245,158,11,0.4)] transition-all transform active:scale-95 cursor-pointer"
             >
-              {badgeModalQueue.length > 1 ? "Next Badge →" : "Claim Legacy"}
+              {badgeModalQueue.length > 1 ? "Next Badge →" : "OK"}
             </button>
           </div>
         </div>
