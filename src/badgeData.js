@@ -9,9 +9,9 @@ import {
 export const BADGE_DEFINITIONS = [
   {
     id: 'archaeological_discovery',
-    name: 'Unearthed',
+    name: 'Archaeological Discovery',
     icon: Pickaxe,
-    description: 'Your burial or preserved remains were discovered and excavated by modern archaeologists centuries or millennia later.',
+    description: 'Your remarkably preserved body or burial was unearthed and studied by 21st-century archaeologists.',
     colorClass: 'bg-amber-950/60 border-amber-500/60 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.3)]',
     condition: (life) => {
       if (!life.fame) return false;
