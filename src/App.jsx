@@ -440,9 +440,8 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
   }
 
   const historicalRoll = Math.random();
-  // 75% Disease / Epidemic / Internal illness
   if (historicalRoll < 0.75) {
-    return pickWeightedCause([
+    const diseasePool = [
       { name: "consumption (pulmonary tuberculosis) with severe wasting and coughing of blood", weight: 28 },
       { name: "pneumonia following exposure to damp, freezing cold", weight: 20 },
       { name: "acute dysentery / severe waterborne enteric illness", weight: 18 },
@@ -454,14 +453,19 @@ const determineExhaustiveCauseOfDeath = (era, birthYear, age, sex, socialClass, 
       { name: "smallpox epidemic with secondary bacterial infection", weight: 8 },
       { name: "acute peritonitis from an undiagnosed internal rupture", weight: 5 },
       { name: "a progressive, painful internal abdominal tumor (Today, we would call this stomach cancer)", weight: 3.5 },
-      { name: "a painful ulcerating breast tumor and severe wasting (Today, we would call this breast cancer)", weight: 3.0 },
       { name: "a painful, bleeding bowel tumor (Today, we would call this colon / bowel cancer)", weight: 2.5 },
       { name: "a mysterious, exhausting illness of the blood causing severe pallor and bruising (Today, we would call this leukemia)", weight: 1.5 },
       { name: "a ruptured brain aneurysm", weight: 1.5 },
       { name: "a creeping, debilitating paralysis with loss of speech and muscle control (Today, we would call this motor neuron disease / ALS)", weight: 0.5 },
       { name: "a chronic, progressive nerve illness causing tremors, loss of vision, and numbness (Today, we would call this multiple sclerosis)", weight: 0.5 },
       { name: "a progressive muscle-wasting condition causing weakness in the limbs from youth (Today, we would call this muscular dystrophy)", weight: 0.5 }
-    ]);
+    ];
+
+    if (isFemale && age >= 35) {
+      diseasePool.push({ name: "a painful ulcerating breast tumor and severe wasting (Today, we would call this breast cancer)", weight: 3.5 });
+    }
+
+    return pickWeightedCause(diseasePool);
   }
   // 12% Accidents / Workplace & Domestic trauma
   if (historicalRoll < 0.87) {
@@ -562,6 +566,7 @@ CRITICAL RULES:
 2. PROSE STYLE: LEAN, OBJECTIVE & RESTRAINED (STRICT BAN ON ADJECTIVE STACKING & PURPLE MELODRAMA):
    - LEAN, RESTRAINED, FACTUAL TONE: Write like a crisp, observant historical biographer or documentary historian. Use clean, direct English with emotional restraint and economy of language.
    - PREFER "DIED" OVER EUPHEMISMS: ALWAYS use the direct, plain verb "died" (e.g. "You died of cholera at age 42", "You died from a winter fever", "You died after a severe fall"). STRICTLY AVOID euphemisms or melodramatic phrases like "passed away", "passed on", "perished", "slipped away", "departed this life", or "met your demise". State death plainly and directly.
+   - NO REDUNDANT CLOSING DEATH SENTENCE: Integrate the cause of death naturally into the narrative flow of the final paragraph. NEVER append a robotic, redundant final sentence repeating the cause of death if the fatal event has already just been described (e.g. if you just described being rounded up and shot at Babi Yar, do NOT tack on "You died from a gunshot wound in battle or execution at age 40").
    - STRICT BAN ON EXCESSIVE ADJECTIVES & ADVERB CLUSTERS: NEVER stack 2 or 3 adjectives/adverbs onto a single noun (e.g. BANNED: "quiet, deeply suppressed romantic desires", "untreated, crushing weight of severe melancholia", "dutifully fulfilled your heterosexual marital expectations", "whispered shame, heavily weighing upon your traditional worldview", "utterly alienated from the vital rhythms"). Use single, precise, natural nouns and verbs.
    - SHOW FACTS, DO NOT MELODRAMATIZE: Strictly avoid theatrical metaphors, dramatic clichés, and melodramatic filler (e.g. BANNED: "casting a permanent shadow over your daily existence", "the internal darkness finally overcame your pious endurance", "unbearable burden", "profound sorrow took root"). Describe what the person actually did, their trade, marriage, daily realities, and circumstances simply and factually.
    - HISTORICAL INSTITUTIONAL & POLITICAL SPECIFICITY (MANDATORY): NEVER rely on vague, generic abstractions like "a bureaucrat", "government agency", "military unit", "provincial administration", or "regional supply bureau". Name real, specific historical institutions, ministries, work units (*danwei*), state enterprises, guilds, regiments, councils, or municipal organs appropriate for that exact country and decade (e.g. *Hebei Provincial Supply and Marketing Cooperative*, *State Planning Commission*, *Ministry of Metallurgical Industry*, *Danwei work unit*, *London County Council*, *British East India Company Board of Control*, *Roman Prefect of the Annona*, *Gosplan*).
@@ -574,6 +579,7 @@ CRITICAL RULES:
    - AUTISM & NEURODIVERGENCE (BE EXPLICIT & CLEAR): If the character has an autism spectrum condition, be EXPLICIT about their neurodivergence. In the modern era, explicitly identify it as autism. In premodern eras, vividly depict their distinct autistic traits: their intense hyperfocus on specialized interests, deep sensory sensitivities (to sounds, touch, crowded markets), literal communication style, strong preference for predictable routines, and difficulty navigating unspoken social cues or diplomatic subtext, while explaining how peers perceived their unique mind (e.g. an eccentric solitary savant, singularly gifted craftsperson, or misunderstood thinker).
    - HOBBIES OBSESSIVENESS RULE: Hobbies and pastimes MUST NOT be described as "obsessive" or "all-consuming" UNLESS the character is specifically autistic / neurodivergent. For neurotypical characters, pastimes must be depicted as enjoyable, relaxing, communal, creative, or casual recreational pursuits.
    - SCOLIOSIS & SPINAL CURVATURE ONSET: Idiopathic scoliosis develops during childhood or adolescent growth spurts (ages 10–14) or from adult physical toll, rather than being evident at birth. Describe its gradual development as they grow.
+   - SEX-LINKED GENETIC CONDITIONS: Congenital red-green colour-blindness and hemophilia are X-linked recessive conditions occurring almost exclusively in males (~8% of males vs <0.5% of females). A female character MUST NEVER be described as colour-blind or having hemophilia.
 4. TRANSGENDER & GENDER DIVERGENCE: If rolled as Transgender, authentically reflect their experience according to their era, culture, and personality. In premodern/early modern eras, people navigating this often lived in disguise, assumed alternate societal roles (e.g. military enlistment, monastic life, sailors like Catalina de Erauso), joined culturally recognized roles (Two-Spirit, Hijra, Galli, Public Universal Friend, Chevalier d'Éon), or repressed it depending on bravery and fear. In the 20th/21st century, reflect the emergence of medical transition (like Lili Elbe) or underground communities.
 5. MODERN MEDICAL CANCER SURVIVAL: If flagged as a "Cancer Survivor" in a modern era, describe their harrowing but successful battle with modern oncology (surgery/radiation/chemo) and how it shifted their perspective before returning to remission.
 6. CAUSE OF DEATH & CONTEMPORARY LIVES (STILL ALIVE IN 2026):
@@ -586,7 +592,7 @@ CRITICAL RULES:
    - A PREMODERN WOMAN COULD ONLY VOLUNTARILY REFUSE / EVADE MARRIAGE IF:
      a) She was BORN NOBLE / UPPER CLASS AND was INDEPENDENT (possessing the wealth, private inheritance, or family station to resist arranged matches), OR
      b) She was HOMOSEXUAL / LESBIAN (actively resisting male marriage, taking holy vows in a convent, adopting male dress, or living in secret female companionhood).
-   - FOR ALL OTHER PREMODERN COMMONER WOMEN WHO REMAINED UNWED, IT WAS NOT A FREE "CHOICE": It must be driven by external hardship (e.g. extreme family destitution / unable to afford a dowry, lifelong enslavement/bondage, monastic nunnery devotion, severe physical impairment, or unpaid lifelong labor dependence in her father's/brother's household).
+   - PREMODERN FEMALE UPWARD MOBILITY & ECONOMIC REALITIES (BEFORE 1900): In ancient, medieval, and early modern societies, young unmarried women did NOT independently launch or run private shipping firms, commercial import/export businesses, or merchant enterprises on their own. Female upward mobility occurred through: (a) advantageous marriage into a merchant or gentry family, where she later assisted in or co-managed household commerce, (b) as a widow continuing and managing her late husband's workshop, tavern, or guild trade, (c) courtesanship or noble patron favor, or (d) religious/monastic administrative leadership. NEVER write about a teenage girl in antiquity or the Middle Ages independently founding and running an international trading enterprise before marriage!
 8. FAME & HOBBIES / PASTIMES (ERA-AUTHENTIC & CLASS-AUTHENTIC):
    - ERA-AUTHENTIC PASTIMES: Hobbies and leisure activities MUST strictly match the character's exact historical era and decade. In the modern era (20th–21st century), people engage with period-appropriate culture (e.g. listening to cassettes, radio, or vinyl, playing football/soccer, reading paperbacks or magazines, playing guitar or accordion, riding bicycles, watching films)—NEVER give anachronistic ancient/agrarian pastimes like carving reed flutes, knucklebones, or prehistoric folk rituals to someone born in the late 20th century!
    - CLASS-AUTHENTIC PASTIMES: Ensure pastimes fit their social station. A working-class or common person should enjoy natural casual pursuits (local music, sports, fishing, card games, community gardening), never elite pursuits like falconry, collecting classical antiquities, or attending grand operas.
@@ -932,7 +938,7 @@ ${(currentLife.narrative || []).join('\n\n')}
     });
   };
 
-  const getWeightedEmigrationDestination = (originName, eraId) => {
+  const getWeightedEmigrationDestination = (originName, eraId, eraRegions) => {
     const oName = (originName || '').toLowerCase();
 
     if (eraId === 'MODERN') {
@@ -945,7 +951,7 @@ ${(currentLife.narrative || []).join('\n\n')}
           { name: "France", weight: 8, lat: 46.22, lng: 2.21 },
           { name: "Germany", weight: 4, lat: 51.16, lng: 10.45 },
           { name: "United Kingdom", weight: 3, lat: 55.37, lng: -3.43 },
-          { name: "India", weight: 2, lat: 20.59, lng: 78.96 }, // Historic Suez/Bombay mercantile corridor
+          { name: "India", weight: 2, lat: 20.59, lng: 78.96 },
           { name: "Australia", weight: 2, lat: -25.27, lng: 133.77 }
         ]);
       }
@@ -1089,9 +1095,256 @@ ${(currentLife.narrative || []).join('\n\n')}
         ]);
       }
 
-      // Default modern fallback
       const destPool = MODERN_COUNTRIES.filter(c => c.name !== originName);
       return destPool.length > 0 ? pickWeighted(destPool) : MODERN_COUNTRIES[0];
+    }
+
+    if (eraId === 'EARLY_MODERN') {
+      // India (Mughal / Maratha / Deccan)
+      if (oName.includes('india') || oName.includes('mughal') || oName.includes('maratha') || oName.includes('deccan')) {
+        return pickWeighted([
+          { name: "Safavid & Qajar Persia (Isfahan / Shiraz)", weight: 35, lat: 32.6, lng: 51.7 },
+          { name: "Maritime Southeast Asia (Batavia / Malacca)", weight: 25, lat: -6.2, lng: 106.8 },
+          { name: "Ottoman Empire (Basra / Baghdad / Cairo)", weight: 20, lat: 30.5, lng: 47.8 },
+          { name: "Kingdom of Ayutthaya & Siam", weight: 12, lat: 14.3, lng: 100.5 },
+          { name: "Swahili Coast / East Africa", weight: 8, lat: -6.1, lng: 39.2 }
+        ]);
+      }
+      // Great Britain & Ireland
+      if (oName.includes('britain') || oName.includes('england') || oName.includes('ireland') || oName.includes('scotland')) {
+        return pickWeighted([
+          { name: "British North America & Early USA (Boston / Virginia)", weight: 45, lat: 40.7, lng: -74.0 },
+          { name: "Caribbean Sugar Colonies (Jamaica / Barbados)", weight: 25, lat: 18.1, lng: -77.3 },
+          { name: "Mughal Empire (Calcutta / Bombay / Madras)", weight: 15, lat: 22.5, lng: 88.3 },
+          { name: "Dutch Republic & Low Countries", weight: 10, lat: 52.37, lng: 4.9 },
+          { name: "Kingdom of France", weight: 5, lat: 48.8, lng: 2.3 }
+        ]);
+      }
+      // Spain
+      if (oName.includes('spain') || oName.includes('habsburg spain')) {
+        return pickWeighted([
+          { name: "Viceroyalty of New Spain (Mexico City / Veracruz)", weight: 45, lat: 19.4, lng: -99.1 },
+          { name: "Viceroyalty of Peru (Lima / Potosí)", weight: 30, lat: -12.0, lng: -77.0 },
+          { name: "Caribbean Sugar Colonies (Havana, Cuba)", weight: 12, lat: 23.1, lng: -82.3 },
+          { name: "Italian States (Naples / Milan)", weight: 8, lat: 40.8, lng: 14.2 },
+          { name: "Maritime Southeast Asia (Manila, Philippines)", weight: 5, lat: 14.5, lng: 120.9 }
+        ]);
+      }
+      // France
+      if (oName.includes('france')) {
+        return pickWeighted([
+          { name: "French Canada & Acadia (Quebec / Montreal)", weight: 40, lat: 46.8, lng: -71.2 },
+          { name: "Caribbean Sugar Colonies (Saint-Domingue / Martinique)", weight: 30, lat: 18.5, lng: -72.3 },
+          { name: "Kingdom of Great Britain & Low Countries", weight: 15, lat: 51.5, lng: -0.13 },
+          { name: "Ottoman Empire / Levant (Pera / Aleppo)", weight: 10, lat: 41.0, lng: 29.0 },
+          { name: "Louisiana / North America", weight: 5, lat: 29.9, lng: -90.0 }
+        ]);
+      }
+      // Portugal / Brazil
+      if (oName.includes('portugal') || oName.includes('brazil')) {
+        return pickWeighted([
+          { name: "Colonial Brazil (Salvador da Bahia / Rio de Janeiro)", weight: 55, lat: -12.9, lng: -38.5 },
+          { name: "Habsburg Spain & Portugal", weight: 20, lat: 38.7, lng: -9.1 },
+          { name: "Goa & Indian Coast (Portuguese India)", weight: 15, lat: 15.4, lng: 73.8 },
+          { name: "Kingdom of Kongo / Angola (Luanda)", weight: 10, lat: -8.8, lng: 13.2 }
+        ]);
+      }
+      // China (Ming / Qing)
+      if (oName.includes('china') || oName.includes('ming') || oName.includes('qing')) {
+        return pickWeighted([
+          { name: "Maritime Southeast Asia (Batavia / Manila / Malacca)", weight: 48, lat: -6.2, lng: 106.8 },
+          { name: "Kingdom of Ayutthaya & Siam", weight: 26, lat: 14.3, lng: 100.5 },
+          { name: "Joseon Dynasty (Korea)", weight: 14, lat: 37.5, lng: 127.0 },
+          { name: "Tokugawa Shogunate (Nagasaki, Japan)", weight: 12, lat: 32.7, lng: 129.8 }
+        ]);
+      }
+      // Ottoman Empire
+      if (oName.includes('ottoman') || oName.includes('turkey') || oName.includes('cairo')) {
+        return pickWeighted([
+          { name: "Safavid & Qajar Persia", weight: 35, lat: 32.6, lng: 51.7 },
+          { name: "Italian States (Venice / Ragusa)", weight: 25, lat: 45.4, lng: 12.3 },
+          { name: "Holy Roman Empire & Balkans", weight: 20, lat: 48.2, lng: 16.4 },
+          { name: "Mughal Empire (Surat / Gujarat)", weight: 12, lat: 21.1, lng: 72.8 },
+          { name: "North Africa (Tunis / Algiers)", weight: 8, lat: 36.8, lng: 10.1 }
+        ]);
+      }
+      // Japan (Tokugawa)
+      if (oName.includes('japan') || oName.includes('tokugawa')) {
+        return pickWeighted([
+          { name: "Joseon Dynasty (Busan, Korea)", weight: 50, lat: 35.1, lng: 129.0 },
+          { name: "Ryukyu Kingdom (Okinawa)", weight: 35, lat: 26.2, lng: 127.6 },
+          { name: "Qing Dynasty China (Nagasaki trade mission)", weight: 15, lat: 31.2, lng: 121.4 }
+        ]);
+      }
+      // Americas (New Spain, Peru, North America)
+      if (oName.includes('new spain') || oName.includes('peru') || oName.includes('mexico')) {
+        return pickWeighted([
+          { name: "Habsburg Spain (Madrid / Seville / Cadiz)", weight: 45, lat: 37.3, lng: -5.9 },
+          { name: "Caribbean Sugar Colonies (Cuba / Santo Domingo)", weight: 30, lat: 21.5, lng: -77.7 },
+          { name: "Viceroyalty of New Spain", weight: 15, lat: 19.4, lng: -99.1 },
+          { name: "Maritime Southeast Asia (Manila Galleon route)", weight: 10, lat: 14.5, lng: 120.9 }
+        ]);
+      }
+      // Polynesia / Hawaii
+      if (oName.includes('hawaii') || oName.includes('polynesia') || oName.includes('aotearoa') || oName.includes('māori')) {
+        return pickWeighted([
+          { name: "Aotearoa / New Zealand (Māori Iwi)", weight: 50, lat: -36.8, lng: 174.7 },
+          { name: "Kingdom of Hawaii & Polynesian Islands", weight: 50, lat: -17.5, lng: -149.5 }
+        ]);
+      }
+    }
+
+    if (eraId === 'MEDIEVAL') {
+      // European realms
+      if (oName.includes('england') || oName.includes('france') || oName.includes('holy roman') || oName.includes('castile') || oName.includes('italy') || oName.includes('poland') || oName.includes('hungary')) {
+        return pickWeighted([
+          { name: "Byzantine Empire (Constantinople)", weight: 30, lat: 41.0, lng: 28.9 },
+          { name: "Kingdom of France (Paris)", weight: 22, lat: 48.8, lng: 2.3 },
+          { name: "Italian City-Republics (Venice / Genoa)", weight: 20, lat: 45.4, lng: 12.3 },
+          { name: "Holy Roman Empire (Rhineland)", weight: 15, lat: 50.1, lng: 8.6 },
+          { name: "Al-Andalus & Islamic Iberia (Cordoba)", weight: 8, lat: 37.8, lng: -4.7 },
+          { name: "Medieval England (London)", weight: 5, lat: 51.5, lng: -0.13 }
+        ]);
+      }
+      // Vikings
+      if (oName.includes('viking') || oName.includes('scandinavia')) {
+        return pickWeighted([
+          { name: "Medieval England (Danelaw / York)", weight: 35, lat: 53.9, lng: -1.0 },
+          { name: "Kievan Rus & Novgorod Republic", weight: 30, lat: 58.5, lng: 31.2 },
+          { name: "Kingdom of France (Normandy)", weight: 20, lat: 49.4, lng: 1.0 },
+          { name: "Byzantine Empire (Varangian Guard, Constantinople)", weight: 15, lat: 41.0, lng: 28.9 }
+        ]);
+      }
+      // Caliphates & Persia
+      if (oName.includes('caliphate') || oName.includes('abbasid') || oName.includes('persia') || oName.includes('seljuk') || oName.includes('al-andalus')) {
+        return pickWeighted([
+          { name: "Abbasid & Fatimid Caliphates (Baghdad / Cairo)", weight: 35, lat: 33.3, lng: 44.4 },
+          { name: "Seljuk & Ilkhanate Persia (Isfahan / Nishapur)", weight: 25, lat: 32.6, lng: 51.7 },
+          { name: "Al-Andalus & Islamic Iberia (Cordoba / Granada)", weight: 18, lat: 37.8, lng: -4.7 },
+          { name: "Byzantine Empire (Constantinople / Antioch)", weight: 12, lat: 41.0, lng: 28.9 },
+          { name: "Delhi Sultanate (Northern India)", weight: 10, lat: 28.6, lng: 77.2 }
+        ]);
+      }
+      // India
+      if (oName.includes('india') || oName.includes('delhi') || oName.includes('chola') || oName.includes('vijayanagara')) {
+        return pickWeighted([
+          { name: "Srivijaya & Majapahit Empires (Java / Sumatra)", weight: 40, lat: -7.5, lng: 110.4 },
+          { name: "Khmer Empire (Angkor Wat, Cambodia)", weight: 25, lat: 13.4, lng: 103.9 },
+          { name: "Abbasid & Fatimid Caliphates (Persian Gulf / Hormuz)", weight: 20, lat: 27.1, lng: 56.2 },
+          { name: "Swahili Coast City-States (Kilwa / Zanzibar)", weight: 15, lat: -8.9, lng: 39.5 }
+        ]);
+      }
+      // China, Korea, Japan
+      if (oName.includes('china') || oName.includes('tang') || oName.includes('song') || oName.includes('yuan') || oName.includes('korea') || oName.includes('japan')) {
+        return pickWeighted([
+          { name: "Tang & Song Dynasties (Chang'an / Hangzhou)", weight: 38, lat: 34.3, lng: 108.9 },
+          { name: "Goryeo Dynasty (Kaesong, Korea)", weight: 24, lat: 38.0, lng: 126.5 },
+          { name: "Heian & Kamakura Shogunate (Kyoto, Japan)", weight: 20, lat: 35.0, lng: 135.7 },
+          { name: "Dai Viet (Hanoi, Vietnam)", weight: 12, lat: 21.0, lng: 105.8 },
+          { name: "Silk Road / Mongol Steppe", weight: 6, lat: 47.2, lng: 102.8 }
+        ]);
+      }
+      // Pre-Columbian Americas (Strictly internal)
+      if (oName.includes('aztec') || oName.includes('inca') || oName.includes('cahokia') || oName.includes('mississippian') || oName.includes('haudenosaunee')) {
+        return pickWeighted([
+          { name: "Aztec Empire & Central Mexico", weight: 45, lat: 19.4, lng: -99.1 },
+          { name: "Inca Empire (Cusco / Quito)", weight: 35, lat: -13.5, lng: -72.0 },
+          { name: "Mississippian Civilization (Cahokia / Southeast)", weight: 20, lat: 38.6, lng: -90.0 }
+        ]);
+      }
+      // Polynesia
+      if (oName.includes('polynesian') || oName.includes('aotearoa') || oName.includes('māori') || oName.includes('tahiti') || oName.includes('hawaii')) {
+        return pickWeighted([
+          { name: "Aotearoa (North Island, New Zealand)", weight: 50, lat: -38.0, lng: 176.0 },
+          { name: "Polynesian Voyaging Settlements (Tahiti / Samoa)", weight: 50, lat: -14.0, lng: -172.0 }
+        ]);
+      }
+    }
+
+    if (eraId === 'CLASSICAL') {
+      // Mediterranean / Roman World
+      if (oName.includes('rome') || oName.includes('gaul') || oName.includes('hispania') || oName.includes('britannia') || oName.includes('athens') || oName.includes('alexandria') || oName.includes('carthage')) {
+        return pickWeighted([
+          { name: "City of Rome & Italian Peninsula", weight: 32, lat: 41.9, lng: 12.5 },
+          { name: "Ptolemaic & Roman Alexandria (Egypt)", weight: 24, lat: 31.2, lng: 29.9 },
+          { name: "Classical Athens & Greek City-States", weight: 16, lat: 37.97, lng: 23.73 },
+          { name: "Roman Gaul (Massalia / Lugdunum)", weight: 12, lat: 45.7, lng: 4.8 },
+          { name: "Punic Carthage & Roman Africa Proconsularis", weight: 10, lat: 36.8, lng: 10.3 },
+          { name: "Roman Hispania (Corduba / Tarraco)", weight: 6, lat: 40.0, lng: -4.0 }
+        ]);
+      }
+      // Han China, Korea, Japan, Steppe
+      if (oName.includes('china') || oName.includes('han') || oName.includes('korea') || oName.includes('japan') || oName.includes('xiongnu') || oName.includes('nanyue')) {
+        return pickWeighted([
+          { name: "Han Dynasty China (Chang'an / Luoyang)", weight: 45, lat: 34.3, lng: 108.9 },
+          { name: "Silk Road Oasis Kingdoms (Khotan / Sogdia)", weight: 22, lat: 39.5, lng: 67.0 },
+          { name: "Three Kingdoms of Korea (Goguryeo / Silla)", weight: 16, lat: 37.5, lng: 127.0 },
+          { name: "Kingdom of Nanyue / Lingnan (Southern China)", weight: 10, lat: 23.1, lng: 113.3 },
+          { name: "Yayoi & Kofun Japan (Yamato Realm)", weight: 7, lat: 34.5, lng: 135.8 }
+        ]);
+      }
+      // India, Persia, Levant
+      if (oName.includes('india') || oName.includes('maurya') || oName.includes('gupta') || oName.includes('sangam') || oName.includes('persia') || oName.includes('judea') || oName.includes('levant')) {
+        return pickWeighted([
+          { name: "Maurya & Gupta Empires (Pataliputra, North India)", weight: 35, lat: 25.6, lng: 85.1 },
+          { name: "Achaemenid, Parthian & Sasanian Persia", weight: 28, lat: 29.9, lng: 52.9 },
+          { name: "Levant & Judea (Antioch / Jerusalem)", weight: 20, lat: 31.8, lng: 35.2 },
+          { name: "Funan & Champa Kingdoms (Southeast Asia)", weight: 10, lat: 11.5, lng: 105.0 },
+          { name: "Ptolemaic & Roman Alexandria (Egypt)", weight: 7, lat: 31.2, lng: 29.9 }
+        ]);
+      }
+      // Pre-Columbian Americas
+      if (oName.includes('teotihuacan') || oName.includes('maya') || oName.includes('moche') || oName.includes('nazca')) {
+        return pickWeighted([
+          { name: "Classic Maya Kingdoms (Tikal / Copán)", weight: 45, lat: 17.2, lng: -89.6 },
+          { name: "Teotihuacan Metropolis (Central Mexico)", weight: 35, lat: 19.7, lng: -98.8 },
+          { name: "Moche & Nazca Civilizations (Coastal Peru)", weight: 20, lat: -8.1, lng: -79.0 }
+        ]);
+      }
+    }
+
+    if (eraId === 'BRONZE_IRON') {
+      // Near East & Eastern Mediterranean
+      if (oName.includes('mesopotamia') || oName.includes('egypt') || oName.includes('levant') || oName.includes('hittite') || oName.includes('minoan') || oName.includes('mycenaean') || oName.includes('elamite')) {
+        return pickWeighted([
+          { name: "New Kingdom Egypt (Thebes / Memphis)", weight: 35, lat: 25.7, lng: 32.6 },
+          { name: "Babylon & Assyria (Mesopotamia)", weight: 30, lat: 32.5, lng: 44.4 },
+          { name: "Levant (Tyre / Ugarit / Byblos)", weight: 20, lat: 33.2, lng: 35.2 },
+          { name: "Hittite Empire (Hattusa, Anatolia)", weight: 10, lat: 40.0, lng: 34.6 },
+          { name: "Mycenaean Greece & Minoan Crete", weight: 5, lat: 37.7, lng: 22.7 }
+        ]);
+      }
+      // Indus & India
+      if (oName.includes('indus') || oName.includes('harappan') || oName.includes('vedic')) {
+        return pickWeighted([
+          { name: "Mesopotamia (Ur / Sumerian trade)", weight: 45, lat: 30.9, lng: 46.1 },
+          { name: "Elamite Civilization (Susa, Iran)", weight: 35, lat: 32.2, lng: 48.2 },
+          { name: "Vedic Settlements (Ganges Valley)", weight: 20, lat: 26.8, lng: 80.9 }
+        ]);
+      }
+      // China & Korea
+      if (oName.includes('china') || oName.includes('shang') || oName.includes('zhou') || oName.includes('sanxingdui') || oName.includes('gojoseon')) {
+        return pickWeighted([
+          { name: "Shang & Zhou Dynasties (Yellow River, Anyang)", weight: 55, lat: 36.1, lng: 114.3 },
+          { name: "Sanxingdui Civilization (Sichuan Basin)", weight: 25, lat: 30.9, lng: 104.2 },
+          { name: "Gojoseon Kingdom (Ancient Korea)", weight: 20, lat: 39.0, lng: 125.7 }
+        ]);
+      }
+      // Ancient Americas
+      if (oName.includes('olmec') || oName.includes('chavín') || oName.includes('caral') || oName.includes('andean') || oName.includes('mesoamerica')) {
+        return pickWeighted([
+          { name: "Olmec Civilization (Gulf Coast of Mexico)", weight: 50, lat: 18.0, lng: -94.0 },
+          { name: "Chavín Civilization (Andean Highlands, Peru)", weight: 50, lat: -9.6, lng: -77.2 }
+        ]);
+      }
+    }
+
+    // Default geographic fallback within same era's regions
+    if (eraRegions && Array.isArray(eraRegions) && eraRegions.length > 0) {
+      const candidates = eraRegions.filter(r => r.text !== originName);
+      if (candidates.length > 0) {
+        return pickRandomItem(candidates);
+      }
     }
 
     return null;
@@ -1277,8 +1530,31 @@ ${(currentLife.narrative || []).join('\n\n')}
       return "Polish";
     }
 
+    // Levant & Judea
+    if (r.includes('judea') || r.includes('jerusalem') || r.includes('levant') || r.includes('antioch') || r.includes('phoenicia')) {
+      if (eraId === 'CLASSICAL') {
+        if (isMinority) {
+          return pickRandomItem([
+            "Samaritan",
+            "Greek / Hellenistic Syrian settler",
+            "Nabataean Arab merchant",
+            "Roman / Italic legionary veteran or official",
+            "Idumean lineage",
+            "Phoenician coastal merchant"
+          ]);
+        }
+        return "Judean / Jewish (Aramaic & Hebrew speaking)";
+      }
+      if (eraId === 'BRONZE' || eraId === 'BRONZE_IRON') {
+        if (isMinority) return pickRandomItem(["Philistine", "Canaanite", "Hittite merchant", "Phoenician"]);
+        return "Israelite / Judean (Canaanite-Hebrew lineage)";
+      }
+      if (isMinority) return pickRandomItem(["Syriac / Antiochian Greek Christian", "Armenian", "Mizrahi Jewish minority", "Samaritan"]);
+      return "Levantine Arab / Aramaic speaker";
+    }
+
     // Russia & Slavic Lands
-    if (r.includes('russia') || r.includes('rus') || r.includes('muscovy') || r.includes('novgorod') || r.includes('kievan') || r.includes('ukraine')) {
+    if (r.includes('russia') || r.includes('muscovy') || r.includes('novgorod') || r.includes('kievan') || r.includes('ukraine') || r.includes('tsardom')) {
       if (isMinority) return pickRandomItem(["Cossack", "Tatar (Turkic Muslim)", "Bashkir / Finno-Ugric", "Old Believer"]);
       return r.includes('ukraine') ? "Ukrainian (Ruthenian)" : "Russian (East Slavic)";
     }
@@ -1302,8 +1578,8 @@ ${(currentLife.narrative || []).join('\n\n')}
       return "Egyptian (Arab-Egyptian)";
     }
 
-    // Middle East / Arabia / Mesopotamia / Levant
-    if (r.includes('arab') || r.includes('levant') || r.includes('syria') || r.includes('iraq') || r.includes('mesopotamia') || r.includes('baghdad') || r.includes('damascus') || r.includes('caliphate')) {
+    // Middle East / Arabia / Mesopotamia
+    if (r.includes('arab') || r.includes('syria') || r.includes('iraq') || r.includes('mesopotamia') || r.includes('baghdad') || r.includes('damascus') || r.includes('caliphate')) {
       if (eraId === 'BRONZE' || eraId === 'BRONZE_IRON') return pickRandomItem(["Sumerian", "Akkadian", "Babylonian", "Assyrian"]);
       if (isMinority) return pickRandomItem(["Assyrian / Syriac Christian", "Kurdish", "Mizrahi Jewish lineage", "Armenian"]);
       return "Arab (Levantine / Mesopotamian)";
@@ -1478,7 +1754,11 @@ ${(currentLife.narrative || []).join('\n\n')}
       if (Math.random() < 0.10) {
         const picked = pickWeighted(DISABILITY_POOL);
         disabilityCategory = picked.category;
-        disabilityExamples = Array.isArray(picked.examples) ? pickRandomItem(picked.examples) : picked.examples;
+        let availableExamples = Array.isArray(picked.examples) ? picked.examples : [picked.examples];
+        if (sex === 'Female') {
+          availableExamples = availableExamples.filter(ex => !ex.toLowerCase().includes('colour-blindness') && !ex.toLowerCase().includes('color-blindness') && !ex.toLowerCase().includes('hemophilia'));
+        }
+        disabilityExamples = pickRandomItem(availableExamples.length > 0 ? availableExamples : picked.examples);
         isVisibleAtBirth = picked.visibleAtBirth;
         isHeartDefect = picked.heartDefect;
       }
@@ -1749,7 +2029,7 @@ ${(currentLife.narrative || []).join('\n\n')}
             minorityGroupHint = 'Jewish (Judean)';
           } else if (reg.includes('andalus') || reg.includes('spain') || reg.includes('iberia') || reg.includes('portugal')) {
             if (Math.random() < 0.22) { isJewish = true; minorityGroupHint = 'Jewish (Sephardic)'; }
-          } else if (reg.includes('poland') || reg.includes('lithuania') || reg.includes('rus') || reg.includes('rhineland') || reg.includes('germany') || reg.includes('holy roman')) {
+          } else if (reg.includes('poland') || reg.includes('lithuania') || reg.includes('russia') || reg.includes('kievan') || reg.includes('muscovy') || reg.includes('rhineland') || reg.includes('germany') || reg.includes('holy roman')) {
             if (Math.random() < 0.28) { isJewish = true; minorityGroupHint = 'Jewish (Ashkenazi)'; }
           } else if (reg.includes('caliphate') || reg.includes('egypt') || reg.includes('baghdad') || reg.includes('ottoman') || reg.includes('constantinople')) {
             if (Math.random() < 0.20) { isJewish = true; minorityGroupHint = 'Jewish (Mizrahi/Sephardic)'; }
@@ -1788,16 +2068,31 @@ ${(currentLife.narrative || []).join('\n\n')}
                 const deathY = Math.min(1945, Math.max(1941, by + Math.min(age, 45)));
                 age = Math.max(0, deathY - by);
                 isAlive = false;
-                causeOfDeath = pickRandomItem([
-                  "murdered in the extermination camps during the Holocaust in Nazi-occupied Europe (Auschwitz-Birkenau)",
-                  "murdered in the gas chambers during the Holocaust (Treblinka / Sobibor)",
-                  "murdered in a mass shooting by Nazi Einsatzgruppen mobile killing squads",
-                  "starvation, typhus, and brutal exhaustion inside an enclosed Nazi ghetto (Warsaw / Lodz Ghetto)"
-                ]);
-                antisemitismExperience = {
-                  level: "The Holocaust (Victim)",
-                  details: "Perished in the Holocaust during the Nazi genocide of European Jewry."
-                };
+                const isSovietOrEast = rName.includes('russia') || rName.includes('ukraine') || rName.includes('belarus') || rName.includes('kiev');
+                if (isSovietOrEast) {
+                  const pick = pickRandomItem([
+                    { cause: "murdered in the Holocaust by Nazi execution squads at Babi Yar", detail: "Perished in the Holocaust at Babi Yar." },
+                    { cause: "murdered in the Holocaust by Nazi Einsatzgruppen mass shooting squads", detail: "Perished in the Holocaust during the Nazi occupation." },
+                    { cause: "murdered in the Holocaust in the extermination camps (Auschwitz-Birkenau)", detail: "Perished in the Holocaust at Auschwitz-Birkenau." }
+                  ]);
+                  causeOfDeath = pick.cause;
+                  antisemitismExperience = {
+                    level: "The Holocaust (Victim)",
+                    details: pick.detail
+                  };
+                } else {
+                  const pick = pickRandomItem([
+                    { cause: "murdered in the Holocaust in the gas chambers of Auschwitz-Birkenau", detail: "Perished in the Holocaust at Auschwitz-Birkenau." },
+                    { cause: "murdered in the Holocaust in the gas chambers of Treblinka", detail: "Perished in the Holocaust at Treblinka." },
+                    { cause: "starvation and typhus in the Holocaust inside the Warsaw Ghetto", detail: "Perished in the Holocaust in the Warsaw Ghetto." },
+                    { cause: "murdered in the Holocaust in the Sobibor extermination camp", detail: "Perished in the Holocaust at Sobibor." }
+                  ]);
+                  causeOfDeath = pick.cause;
+                  antisemitismExperience = {
+                    level: "The Holocaust (Victim)",
+                    details: pick.detail
+                  };
+                }
               } else {
                 antisemitismExperience = {
                   level: "The Holocaust (Survivor)",
@@ -2079,13 +2374,25 @@ ${(currentLife.narrative || []).join('\n\n')}
                 "Advanced through guild mastery, skilled craftsmanship, and trade ingenuity into the prosperous artisan elite"
               ]);
               socialClass = "Wealthy Guild Master / Scholar-Official / Trade Elite";
-            } else if (sex === 'Female' && beauty >= 80) {
-              mobilityDetails = pickRandomItem([
-                "Elevated from poverty through stunning beauty and grace into an advantageous marriage with landed gentry / nobility",
-                "Rose from humble origins into an influential high-society courtesan and cultural tastemaker",
-                "Secured elite court favor and wealth as an esteemed aristocratic companion"
-              ]);
-              socialClass = "Gentry Spouse / Court Favorite";
+            } else if (sex === 'Female') {
+              if (beauty >= 80) {
+                mobilityDetails = pickRandomItem([
+                  "Elevated from poverty through exceptional beauty and grace into an advantageous marriage with a prosperous merchant or landed gentry",
+                  "Rose from humble origins into a celebrated high-society courtesan, salonnière, and cultural tastemaker",
+                  "Secured elite court favor and wealth as an esteemed aristocratic companion or noble household favorite"
+                ]);
+                socialClass = "Prosperous Merchant Spouse / Gentry Household";
+              } else if (intelligence >= 70) {
+                mobilityDetails = pickRandomItem([
+                  "Elevated through sharp intelligence and household management into an advantageous marriage with a prosperous guild master, later overseeing the family enterprise and finances",
+                  "Rose into respected status by marrying into a prosperous merchant lineage, managing domestic accounts and trade records with exceptional acumen",
+                  "Advanced within religious and monastic life through sharp intellect and administrative skill to become a respected prioress or convent administrator"
+                ]);
+                socialClass = "Prosperous Guild / Merchant Household Matron";
+              } else {
+                mobilityDetails = "Elevated through an advantageous marriage and domestic diligence into a comfortable middle-class merchant or artisan household";
+                socialClass = "Prosperous Merchant / Guild Household";
+              }
             } else {
               mobilityDetails = "Rose from working poverty through exceptional diligence, prudent trade, and fortunate patronage into prosperous merchant circles";
               socialClass = "Prosperous Merchant / Gentry";
@@ -2134,7 +2441,7 @@ ${(currentLife.narrative || []).join('\n\n')}
         } else if (eraId === 'MEDIEVAL') {
           // Viking thralls, Mongol conquests, Barbary corsairs, Arab slave trade
           enslavementRisk = 0.04;
-          if (rName.includes('viking') || rName.includes('rus') || rName.includes('england') || rName.includes('poland') || rName.includes('balkans') || rName.includes('mongol') || rName.includes('andalus') || rName.includes('caliphate')) {
+          if (rName.includes('viking') || rName.includes('kievan') || rName.includes('russia') || rName.includes('england') || rName.includes('poland') || rName.includes('balkans') || rName.includes('mongol') || rName.includes('andalus') || rName.includes('caliphate')) {
             enslavementRisk = 0.07;
           }
         } else if (eraId === 'EARLY_MODERN') {
@@ -2411,7 +2718,7 @@ ${(currentLife.narrative || []).join('\n\n')}
         }
       }
 
-      if (!isAlive) {
+      if (!isAlive && !causeOfDeath) {
         causeOfDeath = determineExhaustiveCauseOfDeath(selectedEra, birthYear, age, sex, socialClass, { wasExposed, isHeartDefect, suicide, maternalRoll, hadAffair, orientation, actedOnBi, region: regionText, isSexWorker });
       } else {
         // Living in 2026: calibrate fame description
@@ -2533,17 +2840,13 @@ ${(currentLife.narrative || []).join('\n\n')}
           isEmigrant = true;
           emigrationAge = randomInt(16, Math.min(age, 45));
 
-          if (selectedEra.id === 'MODERN') {
-            const dest = getWeightedEmigrationDestination(regionText, selectedEra.id);
-            deathRegion = dest.name;
+          const dest = getWeightedEmigrationDestination(regionText, selectedEra.id, selectedEra.regions);
+          if (dest) {
+            deathRegion = dest.name || dest.text;
             deathLat = dest.lat;
             deathLng = dest.lng;
           } else {
-            const destPool = selectedEra.regions.filter(r => r.text !== regionText);
-            const dest = destPool.length > 0 ? pickRandomItem(destPool) : selectedEra.regions[0];
-            deathRegion = dest.text;
-            deathLat = dest.lat;
-            deathLng = dest.lng;
+            isEmigrant = false;
           }
         }
       }

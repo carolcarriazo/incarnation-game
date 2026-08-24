@@ -27,7 +27,7 @@ export const DISABILITY_POOL = [
     examples: [
       "crossed eyes (strabismus) and poor eyesight",
       "clouded eye lenses (congenital cataracts)",
-      "congenital colour-blindness",
+      "congenital colour-blindness (males)",
       "severe congenital near-sightedness"],
     visibleAtBirth: false, heartDefect: false
   },

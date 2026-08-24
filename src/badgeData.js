@@ -3,7 +3,7 @@ import {
   Swords, Droplets, HeartHandshake, Brain,
   DoorClosed, Rainbow, UserX, Crown, Compass,
   Bone, Flag, Hourglass, PersonStanding, HeartCrack, Sun, Unlock,
-  Skull, Moon
+  Skull, Moon, Flame
 } from 'lucide-react';
 
 export const BADGE_DEFINITIONS = [
@@ -22,6 +22,29 @@ export const BADGE_DEFINITIONS = [
     description: 'Born without the faculty of emotional empathy, remorse, or guilt — navigating humanity behind a calculated mask.',
     colorClass: 'bg-zinc-950/60 border-zinc-400/60 text-zinc-200 shadow-[0_0_12px_rgba(161,161,170,0.25)]',
     condition: (life) => life.isPsychopath === true
+  },
+  {
+    id: 'shoah',
+    name: 'Shoah',
+    icon: Flame,
+    description: 'Victim of the Holocaust under Nazi occupation.',
+    colorClass: 'bg-amber-950/60 border-amber-500/60 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.25)]',
+    condition: (life) => {
+      const cause = (life.causeOfDeath || '').toLowerCase();
+      const anti = (life.antisemitismExperience?.details || '').toLowerCase();
+      const antiLevel = (life.antisemitismExperience?.level || '').toLowerCase();
+      return (
+        antiLevel.includes('holocaust') ||
+        cause.includes('holocaust') ||
+        cause.includes('babi yar') ||
+        cause.includes('auschwitz') ||
+        cause.includes('treblinka') ||
+        anti.includes('holocaust') ||
+        anti.includes('babi yar') ||
+        anti.includes('auschwitz') ||
+        anti.includes('treblinka')
+      );
+    }
   },
   {
     id: 'bye_baby',
@@ -202,6 +225,10 @@ export const BADGE_DEFINITIONS = [
     condition: (life) => {
       if (!life.causeOfDeath) return false;
       const death = life.causeOfDeath.toLowerCase();
+      const anti = (life.antisemitismExperience?.details || '').toLowerCase();
+      const antiLevel = (life.antisemitismExperience?.level || '').toLowerCase();
+      const isHolocaust = antiLevel.includes('holocaust') || death.includes('holocaust') || death.includes('babi yar') || death.includes('auschwitz') || death.includes('treblinka') || death.includes('einsatzgruppen') || death.includes('porajmos') || anti.includes('holocaust');
+      if (isHolocaust) return false;
       return death.includes('battle') || death.includes('combat') ||
         death.includes('shrapnel') || death.includes('artillery') ||
         death.includes('shield wall') || death.includes('spear thrust') ||
